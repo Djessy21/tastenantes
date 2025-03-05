@@ -1,20 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { imageService } from "../../lib/imageService";
+import * as imageService from "@/app/lib/imageService";
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const image = formData.get("image") as File;
-    const type =
-      (formData.get("type") as "restaurant" | "dish") || "restaurant";
+    const image = formData.get("image") as File | null;
+    const type = formData.get("type") as string | null;
 
-    if (!image) {
-      return NextResponse.json({ error: "No image provided" }, { status: 400 });
+    if (!image || !type) {
+      return NextResponse.json(
+        { error: "Image and type are required" },
+        { status: 400 }
+      );
     }
 
     const buffer = Buffer.from(await image.arrayBuffer());
     const imageUrl = await imageService.saveImage(
-      { buffer } as Express.Multer.File,
+      {
+        buffer,
+        originalname: image.name,
+        mimetype: image.type,
+        size: image.size,
+      },
       type
     );
 
