@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CertifiedRestaurant } from "../services/certifiedRestaurantService";
+import { CertifiedRestaurant, Dish } from "../types/restaurant";
 
 interface CertifiedRestaurantCardProps {
   restaurant: CertifiedRestaurant;
@@ -49,13 +49,12 @@ export default function CertifiedRestaurantCard({
         )}
       </div>
 
-      {restaurant.images?.[0] && (
+      {restaurant.image && (
         <div className="aspect-[4/3] overflow-hidden mb-3 sm:mb-4">
           <img
-            src={restaurant.images[0]}
+            src={restaurant.image}
             alt={restaurant.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
         </div>
       )}
@@ -139,7 +138,7 @@ export default function CertifiedRestaurantCard({
             Nos Plats
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {restaurant.dishes.map((dish) => (
+            {restaurant.dishes.map((dish: Dish) => (
               <div
                 key={dish.id}
                 className="space-y-2"
@@ -164,6 +163,20 @@ export default function CertifiedRestaurantCard({
                     {dish.price.toFixed(2)} €
                   </p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {restaurant.dishes && restaurant.dishes.length > 0 && (
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold mb-2">Plats Signature</h3>
+          <div className="space-y-2">
+            {restaurant.dishes.map((dish: Dish) => (
+              <div key={dish.id} className="flex justify-between items-center">
+                <span>{dish.name}</span>
+                <span className="font-semibold">{dish.price}€</span>
               </div>
             ))}
           </div>
