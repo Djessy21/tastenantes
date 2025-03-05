@@ -5,9 +5,8 @@ import RestaurantCard from "./components/RestaurantCard";
 import CertifiedRestaurantCard from "./components/CertifiedRestaurantCard";
 import AdminPanel from "./components/AdminPanel";
 import { Restaurant, restaurantService } from "./services/restaurantService";
-import certifiedRestaurantService, {
-  type CertifiedRestaurant,
-} from "./services/certifiedRestaurantService";
+import certifiedRestaurantService from "./services/certifiedRestaurantService";
+import { CertifiedRestaurant } from "./types/restaurant";
 
 export default function Home() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -131,7 +130,7 @@ export default function Home() {
           <div className="space-y-6">
             {loading ? (
               <div className="text-center py-8 dior-text">
-                DÉCOUVERTE DE L'EXCELLENCE CULINAIRE...
+                DÉCOUVERTE DE L&apos;EXCELLENCE CULINAIRE...
               </div>
             ) : (
               <>
@@ -193,8 +192,10 @@ export default function Home() {
 
                 {filteredRestaurants.length === 0 &&
                   filteredCertifiedRestaurants.length === 0 && (
-                    <div className="text-center py-8 dior-text">
-                      AUCUN ÉTABLISSEMENT TROUVÉ
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">
+                        Aucun établissement n&apos;a été trouvé
+                      </p>
                     </div>
                   )}
               </>

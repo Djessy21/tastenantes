@@ -1,13 +1,11 @@
 import { useState } from "react";
-import certifiedRestaurantService, {
-  type CertifiedRestaurant,
-  type Dish,
-} from "../services/certifiedRestaurantService";
+import certifiedRestaurantService from "../services/certifiedRestaurantService";
+import { CertifiedRestaurant } from "../types/restaurant";
 
 interface AdminPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  onRestaurantAdded: () => void;
+  onRestaurantAdded: (restaurant: CertifiedRestaurant) => void;
 }
 
 interface DishForm {
@@ -26,11 +24,14 @@ export default function AdminPanel({
     name: "",
     address: "",
     cuisine: "",
-    rating: 5,
+    rating: 0,
     specialNote: "",
+    certifiedBy: "",
+    certificationDate: new Date().toISOString(),
+    featured: false,
     location: {
-      lat: 48.8566,
-      lng: 2.3522,
+      lat: 0,
+      lng: 0,
     },
   });
 
@@ -87,76 +88,29 @@ export default function AdminPanel({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Créer le restaurant
-      const newRestaurant =
+      const restaurant =
         await certifiedRestaurantService.addCertifiedRestaurant({
           ...formData,
-          certifiedBy: "Admin",
-          featured: false,
+          rating: Number(formData.rating),
+          certificationDate: formData.certificationDate,
         });
-
-      // Uploader les images du restaurant
-      for (let i = 0; i < restaurantImages.length; i++) {
-        const formData = new FormData();
-        formData.append("image", restaurantImages[i]);
-
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const { imageUrl } = await response.json();
-        await certifiedRestaurantService.addRestaurantImage(
-          newRestaurant.id,
-          imageUrl,
-          i === mainImageIndex
-        );
-      }
-
-      // Ajouter les plats
-      for (const dish of dishes) {
-        let imageUrl;
-        if (dish.image) {
-          const formData = new FormData();
-          formData.append("image", dish.image);
-
-          const response = await fetch("/api/upload", {
-            method: "POST",
-            body: formData,
-          });
-
-          const { imageUrl: uploadedUrl } = await response.json();
-          imageUrl = uploadedUrl;
-        }
-
-        await certifiedRestaurantService.addDish(newRestaurant.id, {
-          name: dish.name,
-          description: dish.description,
-          price: parseFloat(dish.price) || 0,
-          imageUrl,
-        });
-      }
-
-      onRestaurantAdded();
-      onClose();
-
-      // Réinitialiser le formulaire
+      onRestaurantAdded(restaurant);
       setFormData({
         name: "",
         address: "",
         cuisine: "",
-        rating: 5,
+        rating: 0,
         specialNote: "",
+        certifiedBy: "",
+        certificationDate: new Date().toISOString(),
+        featured: false,
         location: {
-          lat: 48.8566,
-          lng: 2.3522,
+          lat: 0,
+          lng: 0,
         },
       });
-      setDishes([]);
-      setRestaurantImages([]);
-      setMainImageIndex(0);
     } catch (error) {
-      console.error("Error adding certified restaurant:", error);
+      console.error("Error adding restaurant:", error);
     }
   };
 

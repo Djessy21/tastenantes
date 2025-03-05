@@ -12,27 +12,34 @@ export async function initDB() {
       CREATE TABLE IF NOT EXISTS restaurants (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
+        description TEXT,
         address TEXT NOT NULL,
+        phone TEXT,
+        email TEXT,
+        website TEXT,
+        image TEXT,
         cuisine TEXT NOT NULL,
-        rating REAL NOT NULL,
-        special_note TEXT,
-        latitude REAL NOT NULL,
-        longitude REAL NOT NULL,
+        rating DECIMAL NOT NULL,
+        price_range TEXT,
+        opening_hours TEXT,
+        latitude DECIMAL NOT NULL,
+        longitude DECIMAL NOT NULL,
         certified_by TEXT,
-        certification_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        featured BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        certification_date TIMESTAMP WITH TIME ZONE,
+        special_note TEXT,
+        featured BOOLEAN DEFAULT false,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE
       );
 
       CREATE TABLE IF NOT EXISTS dishes (
         id TEXT PRIMARY KEY,
-        restaurant_id TEXT NOT NULL,
+        restaurant_id TEXT REFERENCES restaurants(id) ON DELETE CASCADE,
         name TEXT NOT NULL,
         description TEXT,
-        price REAL NOT NULL,
+        price DECIMAL NOT NULL,
         image_url TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (restaurant_id) REFERENCES restaurants(id) ON DELETE CASCADE
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
       CREATE TABLE IF NOT EXISTS restaurant_images (
@@ -44,9 +51,10 @@ export async function initDB() {
         FOREIGN KEY (restaurant_id) REFERENCES restaurants(id) ON DELETE CASCADE
       );
     `;
-    console.log("Database tables created successfully");
+    console.log("Database initialized successfully");
   } catch (error) {
-    console.error("Error creating database tables:", error);
+    console.error("Error initializing database:", error);
+    throw error;
   }
 }
 

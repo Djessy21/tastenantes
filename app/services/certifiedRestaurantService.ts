@@ -1,21 +1,21 @@
-import { Restaurant } from "./restaurantService";
+import { CertifiedRestaurant, Dish, Location } from "../types/restaurant";
 import db from "../lib/db";
 import { QueryResultRow } from "@vercel/postgres";
-
-export interface CertifiedRestaurant extends Restaurant {
-  certifiedBy: string;
-  certificationDate: Date;
-  specialNote: string | null;
-  featured: boolean;
-  createdAt: Date;
-}
+import { randomUUID } from "crypto";
 
 interface CertifiedRestaurantRow extends QueryResultRow {
   id: string;
   name: string;
+  description: string | null;
   address: string;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  image: string | null;
   cuisine: string;
   rating: number;
+  price_range: string | null;
+  opening_hours: string | null;
   special_note: string | null;
   latitude: number;
   longitude: number;
@@ -23,14 +23,13 @@ interface CertifiedRestaurantRow extends QueryResultRow {
   certification_date: Date;
   featured: boolean;
   created_at: Date;
-}
-
-export interface Dish {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  imageUrl?: string;
+  updated_at: Date | null;
+  // Colonnes des plats
+  dish_id: string | null;
+  dish_name: string | null;
+  dish_description: string | null;
+  dish_price: number | null;
+  dish_image_url: string | null;
 }
 
 const certifiedRestaurantService = {
@@ -39,29 +38,64 @@ const certifiedRestaurantService = {
       const rows = await db.query<CertifiedRestaurantRow>(`
         SELECT 
           r.*,
-          r.certified_by as "certifiedBy",
-          r.certification_date as "certificationDate"
+          d.id as dish_id,
+          d.name as dish_name,
+          d.description as dish_description,
+          d.price as dish_price,
+          d.image_url as dish_image_url
         FROM restaurants r
+        LEFT JOIN dishes d ON d.restaurant_id = r.id
         WHERE r.certified_by IS NOT NULL
         ORDER BY r.certification_date DESC
       `);
 
-      return rows.map((row) => ({
-        id: row.id,
-        name: row.name,
-        address: row.address,
-        cuisine: row.cuisine,
-        rating: row.rating,
-        specialNote: row.special_note,
-        location: {
-          lat: row.latitude,
-          lng: row.longitude,
-        },
-        certifiedBy: row.certified_by,
-        certificationDate: row.certification_date,
-        featured: row.featured,
-        createdAt: row.created_at,
-      }));
+      // Grouper les plats par restaurant
+      const restaurantsMap = new Map<string, CertifiedRestaurant>();
+
+      rows.forEach((row) => {
+        if (!restaurantsMap.has(row.id)) {
+          restaurantsMap.set(row.id, {
+            id: row.id,
+            name: row.name,
+            description: row.description || undefined,
+            address: row.address,
+            phone: row.phone || undefined,
+            email: row.email || undefined,
+            website: row.website || undefined,
+            image: row.image || undefined,
+            cuisine: row.cuisine,
+            rating: row.rating,
+            priceRange: row.price_range || undefined,
+            openingHours: row.opening_hours || undefined,
+            location: {
+              lat: row.latitude,
+              lng: row.longitude,
+            },
+            dishes: [],
+            featured: row.featured,
+            specialNote: row.special_note || undefined,
+            certifiedBy: row.certified_by,
+            certificationDate: row.certification_date.toISOString(),
+            createdAt: row.created_at.toISOString(),
+            updatedAt: row.updated_at?.toISOString(),
+          });
+        }
+
+        // Ajouter le plat s'il existe
+        if (row.dish_id && row.dish_name && row.dish_price) {
+          const restaurant = restaurantsMap.get(row.id)!;
+          restaurant.dishes.push({
+            id: row.dish_id,
+            name: row.dish_name,
+            description: row.dish_description || undefined,
+            price: row.dish_price,
+            imageUrl: row.dish_image_url || undefined,
+            restaurantId: row.id,
+          });
+        }
+      });
+
+      return Array.from(restaurantsMap.values());
     } catch (error) {
       console.error("Error fetching certified restaurants:", error);
       return [];
@@ -71,60 +105,50 @@ const certifiedRestaurantService = {
   addCertifiedRestaurant: async (
     restaurant: Omit<
       CertifiedRestaurant,
-      "id" | "certificationDate" | "createdAt"
+      "id" | "dishes" | "createdAt" | "updatedAt"
     >
-  ) => {
+  ): Promise<CertifiedRestaurant> => {
     try {
+      const id = randomUUID();
       const result = await db.query<CertifiedRestaurantRow>(
-        `
-        INSERT INTO restaurants (
-          id, 
-          name, 
-          address, 
-          cuisine, 
-          rating, 
-          special_note,
-          latitude,
-          longitude,
-          certified_by,
-          featured
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        RETURNING *
-      `,
+        `INSERT INTO restaurants (
+          id, name, description, address, phone, email, website,
+          image, cuisine, rating, price_range, opening_hours,
+          latitude, longitude, certified_by, certification_date,
+          special_note, featured
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
+          $13, $14, $15, $16, $17, $18
+        ) RETURNING *`,
         [
-          crypto.randomUUID(),
+          id,
           restaurant.name,
+          restaurant.description || null,
           restaurant.address,
+          restaurant.phone || null,
+          restaurant.email || null,
+          restaurant.website || null,
+          restaurant.image || null,
           restaurant.cuisine,
           restaurant.rating,
-          restaurant.specialNote,
+          restaurant.priceRange || null,
+          restaurant.openingHours || null,
           restaurant.location.lat,
           restaurant.location.lng,
           restaurant.certifiedBy,
+          restaurant.certificationDate,
+          restaurant.specialNote || null,
           restaurant.featured,
         ]
       );
 
-      if (!result.length) {
-        throw new Error("Failed to insert restaurant");
-      }
-
       const row = result[0];
       return {
+        ...restaurant,
         id: row.id,
-        name: row.name,
-        address: row.address,
-        cuisine: row.cuisine,
-        rating: row.rating,
-        specialNote: row.special_note,
-        location: {
-          lat: row.latitude,
-          lng: row.longitude,
-        },
-        certifiedBy: row.certified_by,
-        certificationDate: row.certification_date,
-        featured: row.featured,
-        createdAt: row.created_at,
+        dishes: [],
+        createdAt: row.created_at.toISOString(),
+        updatedAt: row.updated_at?.toISOString(),
       };
     } catch (error) {
       console.error("Error adding certified restaurant:", error);
@@ -132,112 +156,115 @@ const certifiedRestaurantService = {
     }
   },
 
-  // Mettre à jour un restaurant certifié
   updateCertifiedRestaurant: async (
     id: string,
-    updates: Partial<CertifiedRestaurant>
-  ) => {
-    const stmt = db.prepare(`
-      UPDATE restaurants
-      SET name = COALESCE(?, name),
-          address = COALESCE(?, address),
-          cuisine = COALESCE(?, cuisine),
-          rating = COALESCE(?, rating),
-          special_note = COALESCE(?, special_note),
-          latitude = COALESCE(?, latitude),
-          longitude = COALESCE(?, longitude),
-          featured = COALESCE(?, featured)
-      WHERE id = ?
-    `);
+    updates: Partial<
+      Omit<CertifiedRestaurant, "id" | "dishes" | "createdAt" | "updatedAt">
+    >
+  ): Promise<void> => {
+    try {
+      const setClause = Object.entries(updates)
+        .map(([key], index) => {
+          const dbKey = key.replace(
+            /[A-Z]/g,
+            (letter) => `_${letter.toLowerCase()}`
+          );
+          return `${dbKey} = $${index + 2}`;
+        })
+        .join(", ");
 
-    stmt.run(
-      updates.name,
-      updates.address,
-      updates.cuisine,
-      updates.rating,
-      updates.specialNote,
-      updates.location?.lat,
-      updates.location?.lng,
-      updates.featured !== undefined ? (updates.featured ? 1 : 0) : null,
-      id
-    );
+      const values = Object.values(updates).map((value) => {
+        if (
+          value &&
+          typeof value === "object" &&
+          "lat" in value &&
+          "lng" in value
+        ) {
+          return (value as Location).lat;
+        }
+        return value ?? null;
+      });
 
-    return this.getCertifiedRestaurants().then((restaurants) =>
-      restaurants.find((r) => r.id === id)
-    );
-  },
-
-  // Supprimer un restaurant certifié
-  deleteCertifiedRestaurant: async (id: string) => {
-    const stmt = db.prepare("DELETE FROM restaurants WHERE id = ?");
-    stmt.run(id);
-  },
-
-  // Basculer le statut "featured" d'un restaurant
-  toggleFeatured: async (id: string) => {
-    const stmt = db.prepare(`
-      UPDATE restaurants
-      SET featured = NOT featured
-      WHERE id = ?
-    `);
-    stmt.run(id);
-
-    return this.getCertifiedRestaurants().then((restaurants) =>
-      restaurants.find((r) => r.id === id)
-    );
-  },
-
-  // Ajouter une image à un restaurant
-  addRestaurantImage: async (
-    restaurantId: string,
-    imageUrl: string,
-    isMain: boolean = false
-  ) => {
-    const stmt = db.prepare(`
-      INSERT INTO restaurant_images (
-        id, restaurant_id, image_url, is_main
-      ) VALUES (?, ?, ?, ?)
-    `);
-
-    if (isMain) {
-      // Mettre à jour les autres images pour ne plus être principales
-      db.prepare(
-        `
-        UPDATE restaurant_images
-        SET is_main = 0
-        WHERE restaurant_id = ?
-      `
-      ).run(restaurantId);
+      await db.query(`UPDATE restaurants SET ${setClause} WHERE id = $1`, [
+        id,
+        ...values,
+      ]);
+    } catch (error) {
+      console.error("Error updating certified restaurant:", error);
+      throw error;
     }
-
-    stmt.run(Date.now().toString(), restaurantId, imageUrl, isMain ? 1 : 0);
   },
 
-  // Ajouter un plat à un restaurant
-  addDish: async (restaurantId: string, dish: Omit<Dish, "id">) => {
-    const stmt = db.prepare(`
-      INSERT INTO dishes (
-        id, restaurant_id, name, description, price, image_url
-      ) VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-    const dishId = Date.now().toString();
-    stmt.run(
-      dishId,
-      restaurantId,
-      dish.name,
-      dish.description || null,
-      dish.price,
-      dish.imageUrl || null
-    );
-
-    return { id: dishId, ...dish };
+  deleteCertifiedRestaurant: async (id: string): Promise<void> => {
+    try {
+      await db.query("DELETE FROM restaurants WHERE id = $1", [id]);
+    } catch (error) {
+      console.error("Error deleting certified restaurant:", error);
+      throw error;
+    }
   },
 
-  // Supprimer un plat
-  deleteDish: async (dishId: string) => {
-    const stmt = db.prepare("DELETE FROM dishes WHERE id = ?");
-    stmt.run(dishId);
+  toggleFeatured: async (id: string): Promise<void> => {
+    try {
+      await db.query(
+        "UPDATE restaurants SET featured = NOT featured WHERE id = $1",
+        [id]
+      );
+    } catch (error) {
+      console.error("Error toggling featured status:", error);
+      throw error;
+    }
+  },
+
+  addDish: async (
+    restaurantId: string,
+    dish: Omit<Dish, "id" | "restaurantId">
+  ): Promise<Dish> => {
+    try {
+      const id = randomUUID();
+      const result = await db.query<{ id: string }>(
+        `INSERT INTO dishes (id, restaurant_id, name, description, price, image_url)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id`,
+        [
+          id,
+          restaurantId,
+          dish.name,
+          dish.description || null,
+          dish.price,
+          dish.imageUrl || null,
+        ]
+      );
+
+      return {
+        ...dish,
+        id: result[0].id,
+        restaurantId,
+      };
+    } catch (error) {
+      console.error("Error adding dish:", error);
+      throw error;
+    }
+  },
+
+  deleteDish: async (id: string): Promise<void> => {
+    try {
+      await db.query("DELETE FROM dishes WHERE id = $1", [id]);
+    } catch (error) {
+      console.error("Error deleting dish:", error);
+      throw error;
+    }
+  },
+
+  deleteImage: async (imageUrl: string): Promise<void> => {
+    try {
+      await db.query("UPDATE restaurants SET image = NULL WHERE image = $1", [
+        imageUrl,
+      ]);
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      throw error;
+    }
   },
 };
 
