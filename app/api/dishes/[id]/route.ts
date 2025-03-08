@@ -1,26 +1,27 @@
+import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
-import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
-
-    const { rowCount } = await sql`
-      DELETE FROM dishes 
-      WHERE id = ${id} 
-      RETURNING *
-    `;
-
-    if (rowCount === 0) {
-      return NextResponse.json({ error: "Dish not found" }, { status: 404 });
+    console.log(`API Dishes: Suppression du plat ${params.id}`);
+    const dishId = parseInt(params.id);
+    if (isNaN(dishId)) {
+      return NextResponse.json({ error: "Invalid dish ID" }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true });
+    // Supprimer le plat
+    await sql`
+      DELETE FROM dishes 
+      WHERE id = ${dishId}
+    `;
+
+    console.log(`Plat ${dishId} supprimé avec succès`);
+    return NextResponse.json({ message: "Dish deleted successfully" });
   } catch (error) {
     console.error("Error deleting dish:", error);
     return NextResponse.json(

@@ -223,9 +223,9 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="pt-40 sm:pt-44 md:pt-36">
+      <main className="pt-48 sm:pt-52 md:pt-44">
         <div className="dior-container">
-          <div className="space-y-6">
+          <div className="space-y-8">
             {loading ? (
               <div className="text-center py-8 dior-text">
                 DÉCOUVERTE DE L&apos;EXCELLENCE CULINAIRE...
