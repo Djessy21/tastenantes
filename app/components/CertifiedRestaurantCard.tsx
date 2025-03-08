@@ -102,7 +102,7 @@ export default function CertifiedRestaurantCard({
 
   return (
     <div
-      className={`dior-card p-4 sm:p-6 transition-all duration-300 relative mt-2 rounded-lg ${
+      className={`dior-card p-0 transition-all duration-300 relative mt-2 rounded-lg ${
         isSelected
           ? "shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-gray-200"
           : "shadow-[0_5px_15px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)]"
@@ -121,7 +121,7 @@ export default function CertifiedRestaurantCard({
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-6">
+        <div className="flex flex-col sm:flex-row">
           {/* Photo à gauche - prend tout l'espace vertical */}
           <div className="w-full sm:w-1/3 restaurant-image-container">
             {restaurant.image ? (
@@ -138,7 +138,7 @@ export default function CertifiedRestaurantCard({
           </div>
 
           {/* Informations à droite - avec meilleure organisation */}
-          <div className="w-full sm:w-2/3 flex flex-col justify-between">
+          <div className="w-full sm:w-2/3 flex flex-col justify-between p-4 sm:p-6">
             <div>
               {/* En-tête avec nom */}
               <div className="mb-3">
@@ -288,7 +288,7 @@ export default function CertifiedRestaurantCard({
 
         {showAddDishForm && isAdmin && (
           <div
-            className="mt-6 border-t border-gray-200 pt-6"
+            className="mt-6 border-t border-gray-200 pt-6 px-4 sm:px-6 pb-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h4 className="text-sm uppercase tracking-wider font-medium mb-4">
@@ -302,7 +302,7 @@ export default function CertifiedRestaurantCard({
         )}
 
         {showDishes && (
-          <div className="mt-4 space-y-4 border-t border-gray-200 pt-4">
+          <div className="mt-4 space-y-4 border-t border-gray-200 pt-4 px-4 sm:px-6 pb-4">
             <h4 className="text-sm uppercase tracking-wider font-medium">
               Nos Plats
             </h4>
@@ -315,7 +315,7 @@ export default function CertifiedRestaurantCard({
                 {dishes.map((dish) => (
                   <div
                     key={dish.id}
-                    className="space-y-3 bg-gray-50 rounded-lg p-3 shadow-sm"
+                    className="space-y-3 bg-gray-50 p-0 shadow-sm"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {dish.image_url && (
@@ -327,7 +327,7 @@ export default function CertifiedRestaurantCard({
                         />
                       </div>
                     )}
-                    <div>
+                    <div className="p-3">
                       <div className="flex justify-between items-start">
                         <div>
                           <h5 className="text-sm font-medium">{dish.name}</h5>

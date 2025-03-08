@@ -234,9 +234,6 @@ export default function Home() {
               <>
                 {featuredRestaurants.length > 0 && (
                   <div className="space-y-4">
-                    <h2 className="dior-text text-lg uppercase tracking-wider">
-                      Restaurants Recommandés
-                    </h2>
                     {featuredRestaurants.map((restaurant) => (
                       <CertifiedRestaurantCard
                         key={restaurant.id}
@@ -255,9 +252,6 @@ export default function Home() {
 
                 {nonFeaturedCertifiedRestaurants.length > 0 && (
                   <div className="space-y-4">
-                    <h2 className="dior-text text-lg uppercase tracking-wider">
-                      Restaurants Certifiés
-                    </h2>
                     {nonFeaturedCertifiedRestaurants.map((restaurant) => (
                       <CertifiedRestaurantCard
                         key={restaurant.id}
@@ -276,9 +270,6 @@ export default function Home() {
 
                 {filteredRestaurants.length > 0 && (
                   <div className="space-y-4">
-                    <h2 className="dior-text text-lg uppercase tracking-wider">
-                      Autres Restaurants
-                    </h2>
                     {filteredRestaurants.map((restaurant) => (
                       <RestaurantCard
                         key={restaurant.id}

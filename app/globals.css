@@ -105,7 +105,7 @@ button {
   height: var(--restaurant-image-height);
   max-height: var(--restaurant-image-height);
   overflow: hidden;
-  border-radius: var(--image-border-radius);
+  border-radius: 0; /* Suppression des bords arrondis */
   position: relative;
 }
 
@@ -121,7 +121,7 @@ button {
   aspect-ratio: 1 / 1; /* Assure un ratio carré */
   width: 100%;
   overflow: hidden;
-  border-radius: var(--dish-image-border-radius);
+  border-radius: 0; /* Suppression des bords arrondis */
   position: relative;
 }
 
