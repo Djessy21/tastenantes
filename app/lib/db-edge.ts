@@ -17,6 +17,16 @@ export interface Restaurant {
   featured: boolean;
 }
 
+export interface Dish {
+  id: number;
+  restaurant_id: number;
+  name: string;
+  description: string;
+  price: number;
+  image_url?: string;
+  created_at: string;
+}
+
 export async function getRestaurants(): Promise<Restaurant[]> {
   const { rows } = await sql<Restaurant>`
     SELECT * FROM restaurants 
@@ -68,6 +78,62 @@ export async function createRestaurant(
   return rows[0];
 }
 
+export async function getDishes(restaurantId: number): Promise<Dish[]> {
+  const { rows } = await sql<Dish>`
+    SELECT d.*, i.image_url
+    FROM dishes d
+    LEFT JOIN restaurant_images i ON i.id = d.image_id
+    WHERE d.restaurant_id = ${restaurantId}
+    ORDER BY d.created_at DESC
+  `;
+  return rows;
+}
+
+export async function createDish(
+  restaurantId: number,
+  name: string,
+  description: string,
+  price: number,
+  imageUrl?: string
+): Promise<Dish> {
+  let imageId = null;
+
+  if (imageUrl) {
+    const {
+      rows: [image],
+    } = await sql`
+      INSERT INTO restaurant_images (restaurant_id, image_url, image_type)
+      VALUES (${restaurantId}, ${imageUrl}, 'dish')
+      RETURNING id
+    `;
+    imageId = image.id;
+  }
+
+  const {
+    rows: [dish],
+  } = await sql<Dish>`
+    INSERT INTO dishes (
+      restaurant_id,
+      name,
+      description,
+      price,
+      image_id
+    ) VALUES (
+      ${restaurantId},
+      ${name},
+      ${description},
+      ${price},
+      ${imageId}
+    )
+    RETURNING *
+  `;
+
+  return {
+    ...dish,
+    image_url: imageUrl,
+  };
+}
+
 async function checkTableSchema() {
   try {
     const { rows } = await sql`
@@ -109,6 +175,7 @@ export async function initDB() {
 
     if (!isSchemaValid) {
       // Supprimer les tables existantes
+      await sql`DROP TABLE IF EXISTS dishes CASCADE`;
       await sql`DROP TABLE IF EXISTS restaurant_images CASCADE`;
       await sql`DROP TABLE IF EXISTS restaurants CASCADE`;
 
@@ -139,6 +206,19 @@ export async function initDB() {
           restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
           image_url TEXT NOT NULL,
           image_type VARCHAR(50),
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+
+      // Créer la table dishes
+      await sql`
+        CREATE TABLE IF NOT EXISTS dishes (
+          id SERIAL PRIMARY KEY,
+          restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
+          name VARCHAR(255) NOT NULL,
+          description TEXT,
+          price NUMERIC(10,2) NOT NULL,
+          image_id INTEGER REFERENCES restaurant_images(id),
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         )
       `;

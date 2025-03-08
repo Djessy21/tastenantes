@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["maps.googleapis.com"],
+    domains: [
+      "maps.googleapis.com",
+      "storage.googleapis.com", // Si vous utilisez Google Cloud Storage
+      "s3.amazonaws.com", // Si vous utilisez AWS S3
+      "uploadthing.com", // Si vous utilisez UploadThing
+      "utfs.io", // Pour UploadThing
+    ],
     unoptimized: true,
   },
   output: "standalone",
