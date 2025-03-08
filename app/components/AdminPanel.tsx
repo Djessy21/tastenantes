@@ -131,19 +131,15 @@ export default function AdminPanel({
     try {
       let restaurantImageUrl = "";
 
-      // En environnement de production, utiliser directement les images statiques
-      if (process.env.NODE_ENV === "production") {
-        console.log(
-          "AdminPanel: Utilisation d'une image statique pour le restaurant (production)"
-        );
-        restaurantImageUrl = `/default-restaurant.svg`;
-      } else if (restaurantImages.length > 0) {
+      // Télécharger l'image principale du restaurant si elle existe
+      if (restaurantImages.length > 0) {
         // Télécharger l'image principale du restaurant si elle existe
         const mainImage = restaurantImages[mainImageIndex];
         const imageFormData = new FormData();
         imageFormData.append("image", mainImage);
         imageFormData.append("type", "restaurant");
 
+        console.log("Envoi de l'image du restaurant à l'API d'upload");
         const imageResponse = await fetch("/api/upload", {
           method: "POST",
           body: imageFormData,
@@ -152,10 +148,22 @@ export default function AdminPanel({
         if (imageResponse.ok) {
           const { imageUrl } = await imageResponse.json();
           restaurantImageUrl = imageUrl;
+          console.log(
+            `Image du restaurant uploadée avec succès: ${restaurantImageUrl}`
+          );
+        } else {
+          console.error(
+            "Erreur lors de l'upload de l'image du restaurant:",
+            await imageResponse.text()
+          );
+          restaurantImageUrl = `/default-restaurant.svg`;
         }
+      } else {
+        restaurantImageUrl = `/default-restaurant.svg`;
       }
 
       // Créer le restaurant avec l'image
+      console.log(`Création du restaurant avec l'image: ${restaurantImageUrl}`);
       const restaurant =
         await certifiedRestaurantService.addCertifiedRestaurant({
           name: formData.name,
@@ -166,7 +174,7 @@ export default function AdminPanel({
           certificationDate: formData.certificationDate,
           featured: formData.featured,
           rating: 5,
-          image_url: restaurantImageUrl || `/default-restaurant.svg`,
+          image_url: restaurantImageUrl,
           specialNote: formData.establishmentType,
         });
 
@@ -175,18 +183,15 @@ export default function AdminPanel({
         for (const dish of dishes) {
           let dishImageUrl = "";
 
-          // En environnement de production, utiliser directement les images statiques
-          if (process.env.NODE_ENV === "production") {
-            console.log(
-              "AdminPanel: Utilisation d'une image statique pour le plat (production)"
-            );
-            dishImageUrl = `/default-dish.svg`;
-          } else if (dish.image) {
+          if (dish.image) {
             // Créer un FormData pour l'upload d'image
             const formData = new FormData();
             formData.append("image", dish.image);
             formData.append("type", "dish");
 
+            console.log(
+              `Envoi de l'image du plat ${dish.name} à l'API d'upload`
+            );
             // Upload de l'image
             const response = await fetch("/api/upload", {
               method: "POST",
@@ -196,15 +201,29 @@ export default function AdminPanel({
             if (response.ok) {
               const { imageUrl } = await response.json();
               dishImageUrl = imageUrl;
+              console.log(
+                `Image du plat uploadée avec succès: ${dishImageUrl}`
+              );
+            } else {
+              console.error(
+                `Erreur lors de l'upload de l'image du plat ${dish.name}:`,
+                await response.text()
+              );
+              dishImageUrl = `/default-dish.svg`;
             }
+          } else {
+            dishImageUrl = `/default-dish.svg`;
           }
 
           // Créer le plat avec l'URL de l'image
+          console.log(
+            `Création du plat ${dish.name} avec l'image: ${dishImageUrl}`
+          );
           await certifiedRestaurantService.addDish(restaurant.id.toString(), {
             name: dish.name,
             description: dish.description,
             price: parseFloat(dish.price),
-            image_url: dishImageUrl || `/default-dish.svg`,
+            image_url: dishImageUrl,
           });
         }
       }

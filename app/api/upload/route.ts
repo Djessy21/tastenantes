@@ -14,24 +14,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // En environnement de production, utiliser directement les images statiques
-    if (process.env.NODE_ENV === "production") {
-      console.log(
-        `API Upload: Utilisation d'une image statique pour le type: ${type} (production)`
-      );
-      let defaultImageUrl = "";
-      if (type === "restaurant") {
-        defaultImageUrl = `/default-restaurant.svg`;
-      } else if (type === "dish") {
-        defaultImageUrl = `/default-dish.svg`;
-      } else {
-        defaultImageUrl = `/default-image.svg`;
-      }
-
-      return NextResponse.json({ imageUrl: defaultImageUrl });
-    }
-
     try {
+      console.log(`Traitement de l'image de type: ${type}`);
       const buffer = Buffer.from(await image.arrayBuffer());
       const imageUrl = await imageService.saveImage(
         {
@@ -43,13 +27,14 @@ export async function POST(request: NextRequest) {
         type
       );
 
+      console.log(`Image traitée avec succès, URL: ${imageUrl}`);
       return NextResponse.json({ imageUrl });
     } catch (imageError) {
       console.error("Error processing image:", imageError);
 
       // En cas d'erreur, retourner une URL d'image statique
       console.log(
-        `API Upload: Utilisation d'une image statique pour le type: ${type} (après erreur)`
+        `Utilisation d'une image statique pour le type: ${type} (après erreur)`
       );
       let defaultImageUrl = "";
       if (type === "restaurant") {

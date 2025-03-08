@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs/promises";
+import { storeBinaryImage } from "./db-edge";
 
 // Import sharp uniquement en développement
 let sharp: any;
@@ -32,16 +33,39 @@ export async function saveImage(
   type: string
 ): Promise<string> {
   try {
-    // En environnement de production ou si sharp n'est pas disponible
-    if (process.env.NODE_ENV === "production" || !sharp) {
-      console.log(`Utilisation d'une image statique pour le type: ${type}`);
-      // Utiliser des images statiques hébergées dans le projet
-      if (type === "restaurant") {
-        return `/default-restaurant.svg`;
-      } else if (type === "dish") {
-        return `/default-dish.svg`;
-      } else {
-        return `/default-image.svg`;
+    // En environnement de production, stocker l'image dans la base de données
+    if (process.env.NODE_ENV === "production") {
+      console.log(
+        `Stockage de l'image dans la base de données pour le type: ${type}`
+      );
+
+      try {
+        // Optimiser l'image avant de la stocker si sharp est disponible
+        let imageBuffer = file.buffer;
+
+        // Stocker l'image dans la base de données
+        const imageId = await storeBinaryImage(
+          imageBuffer,
+          type,
+          file.mimetype,
+          file.originalname
+        );
+
+        // Retourner l'URL de l'API qui servira l'image
+        return `/api/images/${imageId}`;
+      } catch (dbError) {
+        console.error(
+          "Erreur lors du stockage de l'image dans la base de données:",
+          dbError
+        );
+        // En cas d'erreur, utiliser une image statique
+        if (type === "restaurant") {
+          return `/default-restaurant.svg`;
+        } else if (type === "dish") {
+          return `/default-dish.svg`;
+        } else {
+          return `/default-image.svg`;
+        }
       }
     } else {
       // En développement avec sharp disponible

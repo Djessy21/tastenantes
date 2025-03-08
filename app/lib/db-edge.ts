@@ -169,6 +169,7 @@ export async function initDB() {
     // Supprimer les tables existantes
     await sql`DROP TABLE IF EXISTS dishes CASCADE`;
     await sql`DROP TABLE IF EXISTS restaurant_images CASCADE`;
+    await sql`DROP TABLE IF EXISTS binary_images CASCADE`;
     await sql`DROP TABLE IF EXISTS restaurants CASCADE`;
 
     // Créer la table restaurants avec le nouveau schéma
@@ -217,9 +218,84 @@ export async function initDB() {
       )
     `;
 
+    // Créer une table pour stocker les images binaires
+    await sql`
+      CREATE TABLE IF NOT EXISTS binary_images (
+        id SERIAL PRIMARY KEY,
+        image_data BYTEA NOT NULL,
+        image_type VARCHAR(50) NOT NULL,
+        mime_type VARCHAR(100) NOT NULL,
+        filename VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
     return true;
   } catch (error) {
     console.error("Error initializing database:", error);
+    throw error;
+  }
+}
+
+// Fonction pour stocker une image binaire dans la base de données
+export async function storeBinaryImage(
+  imageData: Buffer,
+  imageType: string,
+  mimeType: string,
+  filename: string
+): Promise<number> {
+  try {
+    // Convertir le Buffer en format hexadécimal pour PostgreSQL
+    const hexData = "\\x" + imageData.toString("hex");
+
+    const { rows } = await sql`
+      INSERT INTO binary_images (
+        image_data,
+        image_type,
+        mime_type,
+        filename
+      ) VALUES (
+        ${hexData}::bytea,
+        ${imageType},
+        ${mimeType},
+        ${filename}
+      )
+      RETURNING id
+    `;
+
+    return rows[0].id;
+  } catch (error) {
+    console.error("Error storing binary image:", error);
+    throw error;
+  }
+}
+
+// Fonction pour récupérer une image binaire par son ID
+export async function getBinaryImageById(id: number): Promise<{
+  image_data: Buffer;
+  mime_type: string;
+  filename: string;
+} | null> {
+  try {
+    const { rows } = await sql`
+      SELECT image_data, mime_type, filename
+      FROM binary_images
+      WHERE id = ${id}
+    `;
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    // Convertir les données binaires en Buffer
+    const row = rows[0];
+    return {
+      image_data: Buffer.from(row.image_data),
+      mime_type: row.mime_type,
+      filename: row.filename,
+    };
+  } catch (error) {
+    console.error("Error getting binary image:", error);
     throw error;
   }
 }
