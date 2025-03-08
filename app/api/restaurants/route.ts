@@ -14,10 +14,9 @@ export async function GET() {
         restaurant.image = restaurant.image_url;
       }
 
-      // Si aucune image n'est définie, utiliser une image placeholder
+      // Si aucune image n'est définie, utiliser une image statique
       if (!restaurant.image) {
-        restaurant.image =
-          "https://via.placeholder.com/800x600.png?text=Restaurant";
+        restaurant.image = `/default-restaurant.svg`;
       }
 
       // Transformer les noms de champs pour correspondre à l'interface CertifiedRestaurant
@@ -77,10 +76,7 @@ export async function POST(request: Request) {
     // Transformer le restaurant pour assurer la cohérence des noms de champs
     const transformedRestaurant = {
       ...restaurant,
-      image:
-        restaurant.image ||
-        image_url ||
-        "https://via.placeholder.com/800x600.png?text=Restaurant",
+      image: restaurant.image || image_url || `/default-restaurant.svg`,
       certifiedBy: restaurant.certified_by,
       certificationDate: restaurant.certification_date,
       specialNote: restaurant.special_note,

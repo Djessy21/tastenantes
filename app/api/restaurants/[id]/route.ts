@@ -27,9 +27,7 @@ export async function GET(
     // Transformer le restaurant pour assurer la cohérence des noms de champs
     const transformedRestaurant = {
       ...restaurant,
-      image:
-        restaurant.image ||
-        "https://via.placeholder.com/800x600.png?text=Restaurant",
+      image: restaurant.image || `/default-restaurant.svg`,
       certifiedBy: restaurant.certified_by,
       certificationDate: restaurant.certification_date,
       specialNote: restaurant.special_note,

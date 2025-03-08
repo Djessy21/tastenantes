@@ -30,20 +30,17 @@ export async function POST(request: NextRequest) {
     } catch (imageError) {
       console.error("Error processing image:", imageError);
 
-      // En cas d'erreur, retourner une URL de placeholder
-      let placeholderUrl = "";
+      // En cas d'erreur, retourner une URL d'image statique
+      let defaultImageUrl = "";
       if (type === "restaurant") {
-        placeholderUrl =
-          "https://via.placeholder.com/800x600.png?text=Restaurant";
+        defaultImageUrl = `/default-restaurant.svg`;
       } else if (type === "dish") {
-        placeholderUrl = "https://via.placeholder.com/400x300.png?text=Plat";
+        defaultImageUrl = `/default-dish.svg`;
       } else {
-        placeholderUrl = `https://via.placeholder.com/600x400.png?text=${encodeURIComponent(
-          type
-        )}`;
+        defaultImageUrl = `/default-image.svg`;
       }
 
-      return NextResponse.json({ imageUrl: placeholderUrl });
+      return NextResponse.json({ imageUrl: defaultImageUrl });
     }
   } catch (error) {
     console.error("Error uploading image:", error);

@@ -20,9 +20,9 @@ export async function GET(
 
     // Transformer les plats pour assurer la cohérence des URLs d'images
     const transformedDishes = dishes.map((dish) => {
-      // Si aucune image n'est définie, utiliser une image placeholder
+      // Si aucune image n'est définie, utiliser une image statique
       if (!dish.image_url) {
-        dish.image_url = "https://via.placeholder.com/400x300.png?text=Plat";
+        dish.image_url = `/default-dish.svg`;
       }
       return dish;
     });

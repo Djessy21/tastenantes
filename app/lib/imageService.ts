@@ -34,15 +34,13 @@ export async function saveImage(
   try {
     // En environnement de production ou si sharp n'est pas disponible
     if (process.env.NODE_ENV === "production" || !sharp) {
-      // Générer des URLs de placeholder selon le type
+      // Utiliser des images statiques hébergées dans le projet
       if (type === "restaurant") {
-        return `https://via.placeholder.com/800x600.png?text=Restaurant`;
+        return `/default-restaurant.svg`;
       } else if (type === "dish") {
-        return `https://via.placeholder.com/400x300.png?text=Plat`;
+        return `/default-dish.svg`;
       } else {
-        return `https://via.placeholder.com/600x400.png?text=${encodeURIComponent(
-          type
-        )}`;
+        return `/default-image.svg`;
       }
     } else {
       // En développement avec sharp disponible
@@ -71,15 +69,13 @@ export async function saveImage(
     }
   } catch (error) {
     console.error("Error saving image:", error);
-    // En cas d'erreur, retourner une image de placeholder
+    // En cas d'erreur, retourner une image statique
     if (type === "restaurant") {
-      return `https://via.placeholder.com/800x600.png?text=Restaurant`;
+      return `/default-restaurant.svg`;
     } else if (type === "dish") {
-      return `https://via.placeholder.com/400x300.png?text=Plat`;
+      return `/default-dish.svg`;
     } else {
-      return `https://via.placeholder.com/600x400.png?text=${encodeURIComponent(
-        type
-      )}`;
+      return `/default-image.svg`;
     }
   }
 }
@@ -91,8 +87,12 @@ export const imageService = {
       return;
     }
 
-    // Ne pas essayer de supprimer des images de placeholder
-    if (imageUrl.startsWith("https://placehold.co")) {
+    // Ne pas essayer de supprimer des images statiques par défaut
+    if (
+      imageUrl === "/default-restaurant.svg" ||
+      imageUrl === "/default-dish.svg" ||
+      imageUrl === "/default-image.svg"
+    ) {
       return;
     }
 
