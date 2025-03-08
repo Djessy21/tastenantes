@@ -152,9 +152,14 @@ export default function AdminPanel({
       // Créer le restaurant avec l'image
       const restaurant =
         await certifiedRestaurantService.addCertifiedRestaurant({
-          ...formData,
-          rating: 5,
+          name: formData.name,
+          address: formData.address,
+          location: formData.location,
+          cuisine: formData.cuisine,
+          certifiedBy: formData.certifiedBy,
           certificationDate: formData.certificationDate,
+          featured: formData.featured,
+          rating: 5,
           image_url: restaurantImageUrl,
           specialNote: formData.establishmentType,
         });
