@@ -15,6 +15,8 @@ export interface Restaurant {
   certified_by: string;
   certification_date: string;
   featured: boolean;
+  image?: string;
+  image_url?: string;
 }
 
 export interface Dish {
@@ -242,4 +244,36 @@ export async function saveImage(
       ${isMain}
     )
   `;
+}
+
+export async function getRestaurantById(
+  id: number
+): Promise<Restaurant | null> {
+  try {
+    const { rows } = await sql<Restaurant>`
+      SELECT * FROM restaurants 
+      WHERE id = ${id}
+    `;
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return rows[0];
+  } catch (error) {
+    console.error("Error fetching restaurant by ID:", error);
+    throw error;
+  }
+}
+
+export async function deleteRestaurant(id: number): Promise<void> {
+  try {
+    await sql`
+      DELETE FROM restaurants 
+      WHERE id = ${id}
+    `;
+  } catch (error) {
+    console.error("Error deleting restaurant:", error);
+    throw error;
+  }
 }
