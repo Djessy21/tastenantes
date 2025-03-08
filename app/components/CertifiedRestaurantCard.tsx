@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CertifiedRestaurant, Dish } from "../types/restaurant";
+import Image from "next/image";
 
 interface CertifiedRestaurantCardProps {
   restaurant: CertifiedRestaurant;
@@ -17,10 +18,26 @@ export default function CertifiedRestaurantCard({
   isAdmin = false,
 }: CertifiedRestaurantCardProps) {
   const [showDishes, setShowDishes] = useState(false);
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [isLoadingDishes, setIsLoadingDishes] = useState(false);
 
-  const toggleDishes = (e: React.MouseEvent) => {
+  const toggleDishes = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowDishes(!showDishes);
+
+    if (!showDishes && dishes.length === 0) {
+      setIsLoadingDishes(true);
+      try {
+        const response = await fetch(
+          `/api/restaurants/${restaurant.id}/dishes`
+        );
+        const data = await response.json();
+        setDishes(data);
+      } catch (error) {
+        console.error("Error fetching dishes:", error);
+      }
+      setIsLoadingDishes(false);
+    }
   };
 
   return (
@@ -50,11 +67,12 @@ export default function CertifiedRestaurantCard({
       </div>
 
       {restaurant.image && (
-        <div className="aspect-[4/3] overflow-hidden mb-3 sm:mb-4">
-          <img
+        <div className="aspect-[4/3] overflow-hidden mb-3 sm:mb-4 relative">
+          <Image
             src={restaurant.image}
             alt={restaurant.name}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-300 hover:scale-105"
           />
         </div>
       )}
@@ -132,40 +150,52 @@ export default function CertifiedRestaurantCard({
         )}
       </div>
 
-      {showDishes && restaurant.dishes && restaurant.dishes.length > 0 && (
+      {showDishes && (
         <div className="mt-4 space-y-4 border-t border-current pt-4">
           <h4 className="text-sm uppercase tracking-wider font-medium">
             Nos Plats
           </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {restaurant.dishes.map((dish: Dish) => (
-              <div
-                key={dish.id}
-                className="space-y-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {dish.imageUrl && (
-                  <img
-                    src={dish.imageUrl}
-                    alt={dish.name}
-                    className="w-full aspect-square object-cover"
-                    loading="lazy"
-                  />
-                )}
-                <div>
-                  <h5 className="text-sm font-medium">{dish.name}</h5>
-                  {dish.description && (
-                    <p className="text-xs opacity-75 line-clamp-2">
-                      {dish.description}
-                    </p>
+          {isLoadingDishes ? (
+            <div className="text-center py-4 text-sm">
+              Chargement des plats...
+            </div>
+          ) : dishes.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {dishes.map((dish) => (
+                <div
+                  key={dish.id}
+                  className="space-y-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {dish.image_url && (
+                    <div className="relative aspect-square">
+                      <Image
+                        src={dish.image_url}
+                        alt={dish.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   )}
-                  <p className="text-xs font-medium mt-1">
-                    {dish.price.toFixed(2)} €
-                  </p>
+                  <div>
+                    <h5 className="text-sm font-medium">{dish.name}</h5>
+                    {dish.description && (
+                      <p className="text-xs opacity-75 line-clamp-2">
+                        {dish.description}
+                      </p>
+                    )}
+                    <p className="text-xs font-medium mt-1">
+                      {Number(dish.price).toFixed(2)} €
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center py-4 text-sm opacity-75">
+              Aucun plat disponible
+            </p>
+          )}
         </div>
       )}
 
