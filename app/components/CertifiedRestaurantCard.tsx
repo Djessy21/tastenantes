@@ -123,29 +123,15 @@ export default function CertifiedRestaurantCard({
 
         <div className="flex flex-col sm:flex-row gap-6">
           {/* Photo à gauche - prend tout l'espace vertical */}
-          <div
-            className="w-full sm:w-1/3 relative overflow-hidden"
-            style={{
-              minHeight: "240px",
-              height: "100%",
-            }}
-          >
+          <div className="w-full sm:w-1/3 restaurant-image-container">
             {restaurant.image ? (
               <img
                 src={restaurant.image}
                 alt={restaurant.name}
-                className="w-full h-full object-cover"
-                style={{
-                  minHeight: "240px",
-                }}
+                className="restaurant-image"
               />
             ) : (
-              <div
-                className="w-full h-full flex items-center justify-center border border-gray-200 bg-gray-50 text-gray-400"
-                style={{
-                  minHeight: "240px",
-                }}
-              >
+              <div className="w-full h-full flex items-center justify-center border border-gray-200 bg-gray-50 text-gray-400">
                 <span className="text-lg opacity-50">Photo</span>
               </div>
             )}
@@ -333,19 +319,11 @@ export default function CertifiedRestaurantCard({
                     onClick={(e) => e.stopPropagation()}
                   >
                     {dish.image_url && (
-                      <div
-                        className="relative aspect-square overflow-hidden"
-                        style={{
-                          borderRadius: "var(--dish-image-border-radius)",
-                        }}
-                      >
+                      <div className="dish-image-container">
                         <img
                           src={dish.image_url}
                           alt={dish.name}
-                          className="w-full h-full object-cover"
-                          style={{
-                            borderRadius: "var(--dish-image-border-radius)",
-                          }}
+                          className="dish-image"
                         />
                       </div>
                     )}

@@ -14,6 +14,11 @@
   --background-rgb: 255, 255, 255;
   --dish-image-border-radius: 0.5rem; /* 8px par défaut, ajustez selon vos préférences */
   --button-border-radius: 1rem; /* Arrondi des boutons, ajustez selon vos préférences */
+  --restaurant-image-height: 240px;
+  --dish-image-height: 160px;
+  --image-border-radius: 8px;
+  --button-border-radius: 4px;
+  --dish-image-border-radius: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -93,4 +98,36 @@ body {
 /* Appliquer l'arrondi à tous les boutons */
 button {
   border-radius: var(--button-border-radius);
+}
+
+/* Styles pour les images de restaurant */
+.restaurant-image-container {
+  height: var(--restaurant-image-height);
+  max-height: var(--restaurant-image-height);
+  overflow: hidden;
+  border-radius: var(--image-border-radius);
+  position: relative;
+}
+
+.restaurant-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Styles pour les images de plat */
+.dish-image-container {
+  height: var(--dish-image-height);
+  max-height: var(--dish-image-height);
+  overflow: hidden;
+  border-radius: var(--dish-image-border-radius);
+  position: relative;
+}
+
+.dish-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }

@@ -26,11 +26,11 @@ export default function RestaurantCard({
       onClick={onClick}
     >
       {restaurant.image && (
-        <div className="aspect-[4/3] overflow-hidden mb-3 sm:mb-4">
+        <div className="restaurant-image-container mb-3 sm:mb-4">
           <img
             src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${restaurant.image}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
             alt={restaurant.name}
-            className="w-full h-full object-cover"
+            className="restaurant-image"
             loading="lazy"
           />
         </div>
