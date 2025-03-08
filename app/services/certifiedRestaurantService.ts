@@ -29,7 +29,6 @@ interface AddRestaurantInput {
   certificationDate: string;
   featured: boolean;
   image_url?: string;
-  establishmentType?: string;
 }
 
 const certifiedRestaurantService = {

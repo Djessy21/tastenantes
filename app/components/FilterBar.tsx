@@ -138,11 +138,11 @@ export default function FilterBar({
                 Filtrer par cuisine ou type d'établissement
               </span>
             ) : (
-              <div className="flex flex-wrap gap-2 items-center">
+              <div className="flex flex-wrap gap-1.5 items-center">
                 {selectedCuisines.map((cuisine) => (
                   <div
                     key={cuisine}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#ef1c02] text-white max-w-[200px] truncate"
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#ff3f33] text-white max-w-[150px] truncate"
                   >
                     <span className="truncate">{cuisine}</span>
                     <button
@@ -150,12 +150,12 @@ export default function FilterBar({
                         e.stopPropagation();
                         removeCuisineFilter(cuisine);
                       }}
-                      className="ml-1.5 flex-shrink-0 text-white/80 hover:text-white"
+                      className="ml-1 flex-shrink-0 text-white/80 hover:text-white"
                       aria-label={`Supprimer le filtre ${cuisine}`}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
+                        className="h-3 w-3"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -174,7 +174,7 @@ export default function FilterBar({
                 {selectedEstablishments.map((establishment) => (
                   <div
                     key={establishment}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#ef1c02] text-white max-w-[200px] truncate"
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#ef1c02] text-white max-w-[150px] truncate"
                   >
                     <span className="truncate">{establishment}</span>
                     <button
@@ -182,12 +182,12 @@ export default function FilterBar({
                         e.stopPropagation();
                         removeEstablishmentFilter(establishment);
                       }}
-                      className="ml-1.5 flex-shrink-0 text-white/80 hover:text-white"
+                      className="ml-1 flex-shrink-0 text-white/80 hover:text-white"
                       aria-label={`Supprimer le filtre ${establishment}`}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
+                        className="h-3 w-3"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -209,7 +209,7 @@ export default function FilterBar({
                       e.stopPropagation();
                       clearAllFilters();
                     }}
-                    className="ml-1 text-sm text-stone-500 hover:text-stone-800 transition-colors"
+                    className="ml-1 text-xs text-stone-500 hover:text-stone-800 transition-colors"
                     aria-label="Effacer tous les filtres"
                   >
                     Effacer

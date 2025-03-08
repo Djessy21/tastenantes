@@ -153,10 +153,10 @@ export default function AdminPanel({
       const restaurant =
         await certifiedRestaurantService.addCertifiedRestaurant({
           ...formData,
-          rating: 5, // Valeur par défaut
+          rating: Number(formData.rating),
           certificationDate: formData.certificationDate,
           image_url: restaurantImageUrl,
-          specialNote: formData.establishmentType, // Utiliser le type d'établissement comme note spéciale
+          specialNote: "",
         });
 
       // Ajouter les plats
