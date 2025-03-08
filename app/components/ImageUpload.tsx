@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
 
 interface ImageUploadProps {
@@ -8,6 +8,7 @@ interface ImageUploadProps {
 export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,6 +30,7 @@ export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
         setIsLoading(true);
         const formData = new FormData();
         formData.append("image", file);
+        formData.append("type", "dish"); // Spécifier le type d'image
 
         const response = await fetch("/api/upload", {
           method: "POST",
@@ -40,17 +42,22 @@ export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
         }
 
         const data = await response.json();
-        onImageSelect(data.url);
+        onImageSelect(data.imageUrl); // Utiliser imageUrl au lieu de url
       } catch (error) {
         console.error("Error uploading image:", error);
         // En cas d'erreur, on utilise une image par défaut
-        onImageSelect("https://placehold.co/600x400?text=Error+Loading+Image");
+        onImageSelect("/default-dish.svg");
       } finally {
         setIsLoading(false);
       }
     },
     [onImageSelect]
   );
+
+  const handleButtonClick = () => {
+    // Déclencher le clic sur l'input file caché
+    fileInputRef.current?.click();
+  };
 
   return (
     <div className="space-y-4">
@@ -61,26 +68,27 @@ export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
           onChange={handleImageChange}
           className="hidden"
           id="image-upload"
+          ref={fileInputRef}
         />
-        <label
-          htmlFor="image-upload"
-          className="block w-full p-4 text-center border-2 border-dashed rounded-lg cursor-pointer hover:border-gray-400 transition-colors"
+        <button
+          type="button"
+          onClick={handleButtonClick}
+          className="w-full p-4 text-center border-2 border-dashed rounded-lg cursor-pointer hover:border-gray-400 transition-colors"
         >
           {isLoading ? (
             <span>Chargement...</span>
           ) : (
-            <span>Cliquez ou déposez une image ici</span>
+            <span>Cliquez pour sélectionner une image</span>
           )}
-        </label>
+        </button>
       </div>
 
       {previewUrl && (
         <div className="relative aspect-video w-full">
-          <Image
+          <img
             src={previewUrl}
             alt="Preview"
-            fill
-            className="object-cover rounded-lg"
+            className="object-cover rounded-lg w-full h-full"
           />
         </div>
       )}

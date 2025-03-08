@@ -131,8 +131,14 @@ export default function AdminPanel({
     try {
       let restaurantImageUrl = "";
 
-      // Télécharger l'image principale du restaurant si elle existe
-      if (restaurantImages.length > 0) {
+      // En environnement de production, utiliser directement les images statiques
+      if (process.env.NODE_ENV === "production") {
+        console.log(
+          "AdminPanel: Utilisation d'une image statique pour le restaurant (production)"
+        );
+        restaurantImageUrl = `/default-restaurant.svg`;
+      } else if (restaurantImages.length > 0) {
+        // Télécharger l'image principale du restaurant si elle existe
         const mainImage = restaurantImages[mainImageIndex];
         const imageFormData = new FormData();
         imageFormData.append("image", mainImage);
@@ -160,14 +166,22 @@ export default function AdminPanel({
           certificationDate: formData.certificationDate,
           featured: formData.featured,
           rating: 5,
-          image_url: restaurantImageUrl,
+          image_url: restaurantImageUrl || `/default-restaurant.svg`,
           specialNote: formData.establishmentType,
         });
 
       // Ajouter les plats
       if (dishes.length > 0) {
         for (const dish of dishes) {
-          if (dish.image) {
+          let dishImageUrl = "";
+
+          // En environnement de production, utiliser directement les images statiques
+          if (process.env.NODE_ENV === "production") {
+            console.log(
+              "AdminPanel: Utilisation d'une image statique pour le plat (production)"
+            );
+            dishImageUrl = `/default-dish.svg`;
+          } else if (dish.image) {
             // Créer un FormData pour l'upload d'image
             const formData = new FormData();
             formData.append("image", dish.image);
@@ -178,24 +192,20 @@ export default function AdminPanel({
               method: "POST",
               body: formData,
             });
-            const { imageUrl } = await response.json();
 
-            // Créer le plat avec l'URL de l'image
-            await certifiedRestaurantService.addDish(restaurant.id.toString(), {
-              name: dish.name,
-              description: dish.description,
-              price: parseFloat(dish.price),
-              image_url: imageUrl,
-            });
-          } else {
-            // Créer le plat sans image
-            await certifiedRestaurantService.addDish(restaurant.id.toString(), {
-              name: dish.name,
-              description: dish.description,
-              price: parseFloat(dish.price),
-              image_url: "",
-            });
+            if (response.ok) {
+              const { imageUrl } = await response.json();
+              dishImageUrl = imageUrl;
+            }
           }
+
+          // Créer le plat avec l'URL de l'image
+          await certifiedRestaurantService.addDish(restaurant.id.toString(), {
+            name: dish.name,
+            description: dish.description,
+            price: parseFloat(dish.price),
+            image_url: dishImageUrl || `/default-dish.svg`,
+          });
         }
       }
 
@@ -393,13 +403,23 @@ export default function AdminPanel({
               <label className="block text-xs uppercase tracking-wider mb-1">
                 Ajouter des Images
               </label>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white hover:file:bg-black/80"
-              />
+              <div className="relative">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  aria-label="Sélectionner des images"
+                />
+                <button
+                  type="button"
+                  className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-black/80 transition-colors"
+                  onClick={() => {}} // Ce bouton ne fait rien, l'input au-dessus capte le clic
+                >
+                  Sélectionner des images
+                </button>
+              </div>
             </div>
 
             {restaurantImages.length > 0 && (
@@ -508,12 +528,22 @@ export default function AdminPanel({
                   <label className="block text-xs uppercase tracking-wider mb-1">
                     Image du Plat
                   </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleDishImageUpload(index, e)}
-                    className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white hover:file:bg-black/80"
-                  />
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleDishImageUpload(index, e)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      aria-label="Sélectionner une image pour le plat"
+                    />
+                    <button
+                      type="button"
+                      className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-black/80 transition-colors"
+                      onClick={() => {}} // Ce bouton ne fait rien, l'input au-dessus capte le clic
+                    >
+                      Sélectionner une image
+                    </button>
+                  </div>
                   {dish.image && (
                     <img
                       src={URL.createObjectURL(dish.image)}

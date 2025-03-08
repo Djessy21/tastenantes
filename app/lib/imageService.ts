@@ -34,6 +34,7 @@ export async function saveImage(
   try {
     // En environnement de production ou si sharp n'est pas disponible
     if (process.env.NODE_ENV === "production" || !sharp) {
+      console.log(`Utilisation d'une image statique pour le type: ${type}`);
       // Utiliser des images statiques hébergées dans le projet
       if (type === "restaurant") {
         return `/default-restaurant.svg`;
@@ -70,6 +71,9 @@ export async function saveImage(
   } catch (error) {
     console.error("Error saving image:", error);
     // En cas d'erreur, retourner une image statique
+    console.log(
+      `Utilisation d'une image statique par défaut pour le type: ${type} (après erreur)`
+    );
     if (type === "restaurant") {
       return `/default-restaurant.svg`;
     } else if (type === "dish") {
