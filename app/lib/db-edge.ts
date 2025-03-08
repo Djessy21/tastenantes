@@ -166,73 +166,115 @@ async function checkTableSchema() {
 
 export async function initDB() {
   try {
-    // Supprimer les tables existantes
-    await sql`DROP TABLE IF EXISTS dishes CASCADE`;
-    await sql`DROP TABLE IF EXISTS restaurant_images CASCADE`;
-    await sql`DROP TABLE IF EXISTS binary_images CASCADE`;
-    await sql`DROP TABLE IF EXISTS restaurants CASCADE`;
+    console.log("DB: Début de l'initialisation de la base de données");
 
-    // Créer la table restaurants avec le nouveau schéma
-    await sql`
-      CREATE TABLE IF NOT EXISTS restaurants (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        address VARCHAR(255) NOT NULL,
-        latitude DOUBLE PRECISION,
-        longitude DOUBLE PRECISION,
-        rating NUMERIC(3,1),
-        cuisine VARCHAR(100),
-        special_note TEXT,
-        certified_by VARCHAR(100),
-        certification_date TIMESTAMP WITH TIME ZONE,
-        featured BOOLEAN DEFAULT false,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        is_certified BOOLEAN DEFAULT false,
-        image TEXT
-      )
+    // Vérifier si la table binary_images existe déjà
+    const { rows: tableCheck } = await sql`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'binary_images'
+      ) as exists
     `;
 
-    // Créer la table restaurant_images
-    await sql`
-      CREATE TABLE IF NOT EXISTS restaurant_images (
-        id SERIAL PRIMARY KEY,
-        restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-        image_url TEXT NOT NULL,
-        image_type VARCHAR(50) NOT NULL,
-        is_main BOOLEAN DEFAULT false,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      )
+    const binaryImagesExists = tableCheck[0].exists;
+    console.log(
+      `DB: La table binary_images existe déjà? ${binaryImagesExists}`
+    );
+
+    if (!binaryImagesExists) {
+      console.log("DB: Création de la table binary_images");
+      // Créer une table pour stocker les images binaires
+      await sql`
+        CREATE TABLE IF NOT EXISTS binary_images (
+          id SERIAL PRIMARY KEY,
+          image_data BYTEA NOT NULL,
+          image_type VARCHAR(50) NOT NULL,
+          mime_type VARCHAR(100) NOT NULL,
+          filename VARCHAR(255) NOT NULL,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      console.log("DB: Table binary_images créée avec succès");
+    }
+
+    // Vérifier si les autres tables existent déjà
+    const { rows: restaurantsCheck } = await sql`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'restaurants'
+      ) as exists
     `;
 
-    // Créer la table dishes avec l'URL de l'image directement
-    await sql`
-      CREATE TABLE IF NOT EXISTS dishes (
-        id SERIAL PRIMARY KEY,
-        restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        price NUMERIC(10,2) NOT NULL,
-        image_url TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
+    const restaurantsExists = restaurantsCheck[0].exists;
+    console.log(`DB: La table restaurants existe déjà? ${restaurantsExists}`);
 
-    // Créer une table pour stocker les images binaires
-    await sql`
-      CREATE TABLE IF NOT EXISTS binary_images (
-        id SERIAL PRIMARY KEY,
-        image_data BYTEA NOT NULL,
-        image_type VARCHAR(50) NOT NULL,
-        mime_type VARCHAR(100) NOT NULL,
-        filename VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
+    if (!restaurantsExists) {
+      console.log("DB: Création des tables principales");
+      // Supprimer les tables existantes
+      await sql`DROP TABLE IF EXISTS dishes CASCADE`;
+      await sql`DROP TABLE IF EXISTS restaurant_images CASCADE`;
+      await sql`DROP TABLE IF EXISTS restaurants CASCADE`;
 
+      // Créer la table restaurants avec le nouveau schéma
+      await sql`
+        CREATE TABLE IF NOT EXISTS restaurants (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          address VARCHAR(255) NOT NULL,
+          latitude DOUBLE PRECISION,
+          longitude DOUBLE PRECISION,
+          rating NUMERIC(3,1),
+          cuisine VARCHAR(100),
+          special_note TEXT,
+          certified_by VARCHAR(100),
+          certification_date TIMESTAMP WITH TIME ZONE,
+          featured BOOLEAN DEFAULT false,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          is_certified BOOLEAN DEFAULT false,
+          image TEXT
+        )
+      `;
+
+      // Créer la table restaurant_images
+      await sql`
+        CREATE TABLE IF NOT EXISTS restaurant_images (
+          id SERIAL PRIMARY KEY,
+          restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
+          image_url TEXT NOT NULL,
+          image_type VARCHAR(50) NOT NULL,
+          is_main BOOLEAN DEFAULT false,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+
+      // Créer la table dishes avec l'URL de l'image directement
+      await sql`
+        CREATE TABLE IF NOT EXISTS dishes (
+          id SERIAL PRIMARY KEY,
+          restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
+          name VARCHAR(255) NOT NULL,
+          description TEXT,
+          price NUMERIC(10,2) NOT NULL,
+          image_url TEXT,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+
+      console.log("DB: Tables principales créées avec succès");
+    }
+
+    console.log(
+      "DB: Initialisation de la base de données terminée avec succès"
+    );
     return true;
   } catch (error) {
-    console.error("Error initializing database:", error);
+    console.error(
+      "DB: Erreur lors de l'initialisation de la base de données:",
+      error
+    );
     throw error;
   }
 }
@@ -245,9 +287,16 @@ export async function storeBinaryImage(
   filename: string
 ): Promise<number> {
   try {
+    console.log(
+      `DB: Début du stockage de l'image binaire de type: ${imageType}, MIME: ${mimeType}, nom: ${filename}`
+    );
+    console.log(`DB: Taille du buffer: ${imageData.length} bytes`);
+
     // Convertir le Buffer en format hexadécimal pour PostgreSQL
     const hexData = "\\x" + imageData.toString("hex");
+    console.log(`DB: Buffer converti en format hexadécimal`);
 
+    console.log(`DB: Exécution de la requête SQL pour insérer l'image`);
     const { rows } = await sql`
       INSERT INTO binary_images (
         image_data,
@@ -263,9 +312,10 @@ export async function storeBinaryImage(
       RETURNING id
     `;
 
+    console.log(`DB: Image insérée avec succès, ID: ${rows[0].id}`);
     return rows[0].id;
   } catch (error) {
-    console.error("Error storing binary image:", error);
+    console.error("DB: Erreur lors du stockage de l'image binaire:", error);
     throw error;
   }
 }
@@ -277,6 +327,7 @@ export async function getBinaryImageById(id: number): Promise<{
   filename: string;
 } | null> {
   try {
+    console.log(`DB: Récupération de l'image binaire avec l'ID: ${id}`);
     const { rows } = await sql`
       SELECT image_data, mime_type, filename
       FROM binary_images
@@ -284,18 +335,25 @@ export async function getBinaryImageById(id: number): Promise<{
     `;
 
     if (rows.length === 0) {
+      console.log(`DB: Aucune image trouvée avec l'ID: ${id}`);
       return null;
     }
 
     // Convertir les données binaires en Buffer
     const row = rows[0];
+    console.log(
+      `DB: Image trouvée, MIME: ${row.mime_type}, nom: ${row.filename}`
+    );
     return {
       image_data: Buffer.from(row.image_data),
       mime_type: row.mime_type,
       filename: row.filename,
     };
   } catch (error) {
-    console.error("Error getting binary image:", error);
+    console.error(
+      "DB: Erreur lors de la récupération de l'image binaire:",
+      error
+    );
     throw error;
   }
 }

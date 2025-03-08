@@ -43,8 +43,13 @@ export async function saveImage(
       `ImageService: Taille du buffer: ${file.buffer.length} bytes, nom: ${file.originalname}, type MIME: ${file.mimetype}`
     );
 
+    // Détection plus robuste de l'environnement de production
+    const isProduction =
+      process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+    console.log(`ImageService: Est en production? ${isProduction}`);
+
     // En environnement de production, stocker l'image dans la base de données
-    if (process.env.NODE_ENV === "production") {
+    if (isProduction) {
       console.log(
         `ImageService: Stockage de l'image dans la base de données pour le type: ${type}`
       );
