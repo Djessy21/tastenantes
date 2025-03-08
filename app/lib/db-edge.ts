@@ -9,6 +9,12 @@ export interface Restaurant {
   created_at: string;
   updated_at: string;
   is_certified: boolean;
+  rating: number;
+  cuisine: string;
+  special_note: string;
+  certified_by: string;
+  certification_date: string;
+  featured: boolean;
 }
 
 export async function getRestaurants(): Promise<Restaurant[]> {
@@ -23,11 +29,40 @@ export async function createRestaurant(
   name: string,
   address: string,
   latitude: number,
-  longitude: number
+  longitude: number,
+  rating: number,
+  cuisine: string,
+  specialNote: string,
+  certifiedBy: string,
+  certificationDate: string,
+  featured: boolean
 ): Promise<Restaurant> {
   const { rows } = await sql<Restaurant>`
-    INSERT INTO restaurants (name, address, latitude, longitude)
-    VALUES (${name}, ${address}, ${latitude}, ${longitude})
+    INSERT INTO restaurants (
+      name, 
+      address, 
+      latitude, 
+      longitude,
+      rating,
+      cuisine,
+      special_note,
+      certified_by,
+      certification_date,
+      featured,
+      is_certified
+    ) VALUES (
+      ${name}, 
+      ${address}, 
+      ${latitude}, 
+      ${longitude},
+      ${rating},
+      ${cuisine},
+      ${specialNote},
+      ${certifiedBy},
+      ${certificationDate},
+      ${featured},
+      true
+    )
     RETURNING *
   `;
   return rows[0];
@@ -42,6 +77,12 @@ export async function initDB() {
         address VARCHAR(255) NOT NULL,
         latitude DOUBLE PRECISION,
         longitude DOUBLE PRECISION,
+        rating NUMERIC(3,1),
+        cuisine VARCHAR(100),
+        special_note TEXT,
+        certified_by VARCHAR(100),
+        certification_date TIMESTAMP WITH TIME ZONE,
+        featured BOOLEAN DEFAULT false,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         is_certified BOOLEAN DEFAULT false

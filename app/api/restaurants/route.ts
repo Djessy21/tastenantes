@@ -19,13 +19,30 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, address, latitude, longitude } = body;
+    const {
+      name,
+      address,
+      latitude,
+      longitude,
+      rating,
+      cuisine,
+      specialNote,
+      certifiedBy,
+      certificationDate,
+      featured,
+    } = body;
 
     const restaurant = await createRestaurant(
       name,
       address,
       latitude,
-      longitude
+      longitude,
+      rating,
+      cuisine,
+      specialNote,
+      certifiedBy,
+      certificationDate,
+      featured
     );
     return NextResponse.json(restaurant);
   } catch (error) {
