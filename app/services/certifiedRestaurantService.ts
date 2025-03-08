@@ -1,36 +1,5 @@
 import axios from "axios";
 import { CertifiedRestaurant, Dish, Location } from "../types/restaurant";
-import { QueryResultRow } from "@vercel/postgres";
-import { randomUUID } from "crypto";
-
-interface CertifiedRestaurantRow extends QueryResultRow {
-  id: string;
-  name: string;
-  description: string | null;
-  address: string;
-  phone: string | null;
-  email: string | null;
-  website: string | null;
-  image: string | null;
-  cuisine: string;
-  rating: number;
-  price_range: string | null;
-  opening_hours: string | null;
-  special_note: string | null;
-  latitude: number;
-  longitude: number;
-  certified_by: string;
-  certification_date: Date;
-  featured: boolean;
-  created_at: Date;
-  updated_at: Date | null;
-  // Colonnes des plats
-  dish_id: string | null;
-  dish_name: string | null;
-  dish_description: string | null;
-  dish_price: number | null;
-  dish_image_url: string | null;
-}
 
 export interface Restaurant {
   id: number;
@@ -61,7 +30,12 @@ const certifiedRestaurantService = {
     >
   ): Promise<CertifiedRestaurant> => {
     try {
-      const response = await axios.post("/api/restaurants", restaurant);
+      const response = await axios.post("/api/restaurants", {
+        name: restaurant.name,
+        address: restaurant.address,
+        latitude: restaurant.location.lat,
+        longitude: restaurant.location.lng,
+      });
       return response.data;
     } catch (error) {
       console.error("Error adding certified restaurant:", error);
@@ -76,37 +50,7 @@ const certifiedRestaurantService = {
     >
   ): Promise<void> => {
     try {
-      const setClause = Object.entries(updates)
-        .map(([key], index) => {
-          const dbKey = key.replace(
-            /[A-Z]/g,
-            (letter) => `_${letter.toLowerCase()}`
-          );
-          return `${dbKey} = $${index + 2}`;
-        })
-        .join(", ");
-
-      const values = Object.values(updates).map((value) => {
-        if (
-          value &&
-          typeof value === "object" &&
-          "lat" in value &&
-          "lng" in value
-        ) {
-          return (value as Location).lat;
-        }
-        return value ?? null;
-      });
-
-      await axios.put(`/api/restaurants/${id}`, {
-        ...updates,
-        ...(values.length > 0
-          ? {
-              latitude: values[0],
-              longitude: values[1],
-            }
-          : {}),
-      });
+      await axios.put(`/api/restaurants/${id}`, updates);
     } catch (error) {
       console.error("Error updating certified restaurant:", error);
       throw error;
@@ -149,7 +93,7 @@ const certifiedRestaurantService = {
 
   deleteDish: async (id: string): Promise<void> => {
     try {
-      await axios.delete(`/api/restaurants/${id}/dishes/${id}`);
+      await axios.delete(`/api/dishes/${id}`);
     } catch (error) {
       console.error("Error deleting dish:", error);
       throw error;
