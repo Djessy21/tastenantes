@@ -33,11 +33,12 @@ export async function POST(request: NextRequest) {
       // En cas d'erreur, retourner une URL de placeholder
       let placeholderUrl = "";
       if (type === "restaurant") {
-        placeholderUrl = "https://placehold.co/800x600/png?text=Restaurant";
+        placeholderUrl =
+          "https://via.placeholder.com/800x600.png?text=Restaurant";
       } else if (type === "dish") {
-        placeholderUrl = "https://placehold.co/400x300/png?text=Plat";
+        placeholderUrl = "https://via.placeholder.com/400x300.png?text=Plat";
       } else {
-        placeholderUrl = `https://placehold.co/600x400/png?text=${encodeURIComponent(
+        placeholderUrl = `https://via.placeholder.com/600x400.png?text=${encodeURIComponent(
           type
         )}`;
       }

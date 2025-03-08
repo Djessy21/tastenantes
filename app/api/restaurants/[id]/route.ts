@@ -28,7 +28,8 @@ export async function GET(
     const transformedRestaurant = {
       ...restaurant,
       image:
-        restaurant.image || "https://placehold.co/800x600/png?text=Restaurant",
+        restaurant.image ||
+        "https://via.placeholder.com/800x600.png?text=Restaurant",
       certifiedBy: restaurant.certified_by,
       certificationDate: restaurant.certification_date,
       specialNote: restaurant.special_note,

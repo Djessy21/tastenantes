@@ -36,11 +36,11 @@ export async function saveImage(
     if (process.env.NODE_ENV === "production" || !sharp) {
       // Générer des URLs de placeholder selon le type
       if (type === "restaurant") {
-        return `https://placehold.co/800x600/png?text=Restaurant`;
+        return `https://via.placeholder.com/800x600.png?text=Restaurant`;
       } else if (type === "dish") {
-        return `https://placehold.co/400x300/png?text=Plat`;
+        return `https://via.placeholder.com/400x300.png?text=Plat`;
       } else {
-        return `https://placehold.co/600x400/png?text=${encodeURIComponent(
+        return `https://via.placeholder.com/600x400.png?text=${encodeURIComponent(
           type
         )}`;
       }
@@ -73,11 +73,11 @@ export async function saveImage(
     console.error("Error saving image:", error);
     // En cas d'erreur, retourner une image de placeholder
     if (type === "restaurant") {
-      return `https://placehold.co/800x600/png?text=Restaurant`;
+      return `https://via.placeholder.com/800x600.png?text=Restaurant`;
     } else if (type === "dish") {
-      return `https://placehold.co/400x300/png?text=Plat`;
+      return `https://via.placeholder.com/400x300.png?text=Plat`;
     } else {
-      return `https://placehold.co/600x400/png?text=${encodeURIComponent(
+      return `https://via.placeholder.com/600x400.png?text=${encodeURIComponent(
         type
       )}`;
     }

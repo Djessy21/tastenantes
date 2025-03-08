@@ -22,7 +22,7 @@ export async function GET(
     const transformedDishes = dishes.map((dish) => {
       // Si aucune image n'est définie, utiliser une image placeholder
       if (!dish.image_url) {
-        dish.image_url = "https://placehold.co/400x300/png?text=Plat";
+        dish.image_url = "https://via.placeholder.com/400x300.png?text=Plat";
       }
       return dish;
     });

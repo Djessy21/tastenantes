@@ -8,6 +8,7 @@ const nextConfig = {
       "uploadthing.com", // Si vous utilisez UploadThing
       "utfs.io", // Pour UploadThing
       "placehold.co",
+      "via.placeholder.com",
     ],
     unoptimized: true,
   },
