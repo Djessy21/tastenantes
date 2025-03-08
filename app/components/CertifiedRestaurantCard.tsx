@@ -18,21 +18,30 @@ export default function CertifiedRestaurantCard({
   isAdmin = false,
 }: CertifiedRestaurantCardProps) {
   const [showDishes, setShowDishes] = useState(false);
-  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [loadedDishes, setLoadedDishes] = useState<Dish[]>([]);
   const [isLoadingDishes, setIsLoadingDishes] = useState(false);
+
+  // Utiliser les plats du restaurant s'ils existent, sinon utiliser les plats chargés
+  const dishes =
+    restaurant.dishes?.length > 0 ? restaurant.dishes : loadedDishes;
 
   const toggleDishes = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowDishes(!showDishes);
 
-    if (!showDishes && dishes.length === 0) {
+    // Charger les plats seulement si on ouvre la section et qu'il n'y a pas déjà des plats
+    if (
+      !showDishes &&
+      !restaurant.dishes?.length &&
+      loadedDishes.length === 0
+    ) {
       setIsLoadingDishes(true);
       try {
         const response = await fetch(
           `/api/restaurants/${restaurant.id}/dishes`
         );
         const data = await response.json();
-        setDishes(data);
+        setLoadedDishes(data);
       } catch (error) {
         console.error("Error fetching dishes:", error);
       }
@@ -196,20 +205,6 @@ export default function CertifiedRestaurantCard({
               Aucun plat disponible
             </p>
           )}
-        </div>
-      )}
-
-      {restaurant.dishes && restaurant.dishes.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold mb-2">Plats Signature</h3>
-          <div className="space-y-2">
-            {restaurant.dishes.map((dish: Dish) => (
-              <div key={dish.id} className="flex justify-between items-center">
-                <span>{dish.name}</span>
-                <span className="font-semibold">{dish.price}€</span>
-              </div>
-            ))}
-          </div>
         </div>
       )}
 

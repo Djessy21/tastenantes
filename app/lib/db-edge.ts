@@ -80,10 +80,13 @@ export async function createRestaurant(
 
 export async function getDishes(restaurantId: number): Promise<Dish[]> {
   const { rows } = await sql<Dish>`
-    SELECT d.*, i.image_url
+    SELECT 
+      d.*,
+      ri.image_url
     FROM dishes d
-    LEFT JOIN restaurant_images i ON i.id = d.image_id
+    LEFT JOIN restaurant_images ri ON ri.id = d.image_id
     WHERE d.restaurant_id = ${restaurantId}
+      AND (ri.image_type = 'dish' OR ri.image_type IS NULL)
     ORDER BY d.created_at DESC
   `;
   return rows;
