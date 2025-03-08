@@ -102,7 +102,7 @@ export default function CertifiedRestaurantCard({
 
   return (
     <div
-      className={`dior-card p-0 transition-all duration-300 relative mt-2 rounded-lg ${
+      className={`dior-card p-0 transition-all duration-300 relative rounded-lg ${
         isSelected
           ? "shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-gray-200"
           : "shadow-[0_5px_15px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)]"

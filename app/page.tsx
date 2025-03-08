@@ -223,9 +223,9 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="pt-48 sm:pt-52 md:pt-44">
+      <main className="pt-56 sm:pt-60 md:pt-52">
         <div className="dior-container">
-          <div className="space-y-8">
+          <div className="space-y-6">
             {loading ? (
               <div className="text-center py-8 dior-text">
                 DÉCOUVERTE DE L&apos;EXCELLENCE CULINAIRE...
@@ -233,7 +233,7 @@ export default function Home() {
             ) : (
               <>
                 {featuredRestaurants.length > 0 && (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {featuredRestaurants.map((restaurant) => (
                       <CertifiedRestaurantCard
                         key={restaurant.id}
@@ -251,7 +251,7 @@ export default function Home() {
                 )}
 
                 {nonFeaturedCertifiedRestaurants.length > 0 && (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {nonFeaturedCertifiedRestaurants.map((restaurant) => (
                       <CertifiedRestaurantCard
                         key={restaurant.id}
@@ -269,7 +269,7 @@ export default function Home() {
                 )}
 
                 {filteredRestaurants.length > 0 && (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {filteredRestaurants.map((restaurant) => (
                       <RestaurantCard
                         key={restaurant.id}

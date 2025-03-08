@@ -113,8 +113,8 @@ export default function FilterBar({
         <div
           className="px-5 py-3.5 flex items-center cursor-pointer"
           onClick={() => {
-            setShowSuggestions(true);
-            setSearchFocused(true);
+            setShowSuggestions(!showSuggestions);
+            setSearchFocused(!showSuggestions);
           }}
         >
           <svg
@@ -224,6 +224,11 @@ export default function FilterBar({
               className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                 showSuggestions ? "bg-stone-100" : "bg-transparent"
               }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSuggestions(!showSuggestions);
+                setSearchFocused(!showSuggestions);
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
