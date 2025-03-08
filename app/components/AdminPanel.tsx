@@ -133,37 +133,61 @@ export default function AdminPanel({
 
       // Télécharger l'image principale du restaurant si elle existe
       if (restaurantImages.length > 0) {
+        console.log(
+          `AdminPanel: ${restaurantImages.length} images sélectionnées, index principal: ${mainImageIndex}`
+        );
+        console.log(
+          `AdminPanel: Type de l'image principale:`,
+          restaurantImages[mainImageIndex].type
+        );
+        console.log(
+          `AdminPanel: Taille de l'image principale: ${restaurantImages[mainImageIndex].size} bytes`
+        );
+
         // Télécharger l'image principale du restaurant si elle existe
         const mainImage = restaurantImages[mainImageIndex];
         const imageFormData = new FormData();
         imageFormData.append("image", mainImage);
         imageFormData.append("type", "restaurant");
 
-        console.log("Envoi de l'image du restaurant à l'API d'upload");
+        console.log(
+          "AdminPanel: Envoi de l'image du restaurant à l'API d'upload"
+        );
         const imageResponse = await fetch("/api/upload", {
           method: "POST",
           body: imageFormData,
         });
 
+        console.log(
+          `AdminPanel: Statut de la réponse: ${imageResponse.status}`
+        );
+
         if (imageResponse.ok) {
-          const { imageUrl } = await imageResponse.json();
-          restaurantImageUrl = imageUrl;
+          const responseData = await imageResponse.json();
+          console.log(`AdminPanel: Données de réponse:`, responseData);
+          restaurantImageUrl = responseData.imageUrl;
           console.log(
-            `Image du restaurant uploadée avec succès: ${restaurantImageUrl}`
+            `AdminPanel: Image du restaurant uploadée avec succès: ${restaurantImageUrl}`
           );
         } else {
+          const errorText = await imageResponse.text();
           console.error(
-            "Erreur lors de l'upload de l'image du restaurant:",
-            await imageResponse.text()
+            "AdminPanel: Erreur lors de l'upload de l'image du restaurant:",
+            errorText
           );
           restaurantImageUrl = `/default-restaurant.svg`;
         }
       } else {
+        console.log(
+          "AdminPanel: Aucune image sélectionnée, utilisation de l'image par défaut"
+        );
         restaurantImageUrl = `/default-restaurant.svg`;
       }
 
       // Créer le restaurant avec l'image
-      console.log(`Création du restaurant avec l'image: ${restaurantImageUrl}`);
+      console.log(
+        `AdminPanel: Création du restaurant avec l'image: ${restaurantImageUrl}`
+      );
       const restaurant =
         await certifiedRestaurantService.addCertifiedRestaurant({
           name: formData.name,

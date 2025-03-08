@@ -33,10 +33,20 @@ export async function saveImage(
   type: string
 ): Promise<string> {
   try {
+    console.log(
+      `ImageService: Début du traitement de l'image de type: ${type}`
+    );
+    console.log(
+      `ImageService: Environnement: ${process.env.NODE_ENV}, Vercel: ${process.env.VERCEL}, Vercel Env: ${process.env.VERCEL_ENV}`
+    );
+    console.log(
+      `ImageService: Taille du buffer: ${file.buffer.length} bytes, nom: ${file.originalname}, type MIME: ${file.mimetype}`
+    );
+
     // En environnement de production, stocker l'image dans la base de données
     if (process.env.NODE_ENV === "production") {
       console.log(
-        `Stockage de l'image dans la base de données pour le type: ${type}`
+        `ImageService: Stockage de l'image dans la base de données pour le type: ${type}`
       );
 
       try {
@@ -44,6 +54,9 @@ export async function saveImage(
         let imageBuffer = file.buffer;
 
         // Stocker l'image dans la base de données
+        console.log(
+          `ImageService: Appel de storeBinaryImage avec un buffer de ${imageBuffer.length} bytes`
+        );
         const imageId = await storeBinaryImage(
           imageBuffer,
           type,
@@ -51,14 +64,21 @@ export async function saveImage(
           file.originalname
         );
 
+        console.log(`ImageService: Image stockée avec succès, ID: ${imageId}`);
+
         // Retourner l'URL de l'API qui servira l'image
-        return `/api/images/${imageId}`;
+        const imageUrl = `/api/images/${imageId}`;
+        console.log(`ImageService: URL de l'image générée: ${imageUrl}`);
+        return imageUrl;
       } catch (dbError) {
         console.error(
-          "Erreur lors du stockage de l'image dans la base de données:",
+          "ImageService: Erreur lors du stockage de l'image dans la base de données:",
           dbError
         );
         // En cas d'erreur, utiliser une image statique
+        console.log(
+          `ImageService: Utilisation d'une image statique pour le type: ${type} (après erreur DB)`
+        );
         if (type === "restaurant") {
           return `/default-restaurant.svg`;
         } else if (type === "dish") {
@@ -68,6 +88,9 @@ export async function saveImage(
         }
       }
     } else {
+      console.log(
+        `ImageService: Stockage de l'image sur le système de fichiers local`
+      );
       // En développement avec sharp disponible
       // Créer le dossier uploads s'il n'existe pas
       const uploadsDir = path.join(process.cwd(), "public", "uploads", type);
@@ -80,23 +103,38 @@ export async function saveImage(
       )}`;
       const filepath = path.join(uploadsDir, filename);
 
+      console.log(`ImageService: Chemin du fichier: ${filepath}`);
+
       // Optimiser et sauvegarder l'image
-      await sharp(file.buffer)
-        .resize(800, 600, {
-          fit: "inside",
-          withoutEnlargement: true,
-        })
-        .jpeg({ quality: 80 })
-        .toFile(filepath);
+      if (!sharp) {
+        console.log(
+          `ImageService: Sharp n'est pas disponible, sauvegarde directe du buffer`
+        );
+        await fs.writeFile(filepath, file.buffer);
+      } else {
+        console.log(`ImageService: Optimisation de l'image avec Sharp`);
+        await sharp(file.buffer)
+          .resize(800, 600, {
+            fit: "inside",
+            withoutEnlargement: true,
+          })
+          .jpeg({ quality: 80 })
+          .toFile(filepath);
+      }
 
       // Retourner l'URL relative pour l'accès via le navigateur
-      return `/uploads/${type}/${filename}`;
+      const imageUrl = `/uploads/${type}/${filename}`;
+      console.log(`ImageService: URL de l'image générée: ${imageUrl}`);
+      return imageUrl;
     }
   } catch (error) {
-    console.error("Error saving image:", error);
+    console.error(
+      "ImageService: Erreur générale lors du traitement de l'image:",
+      error
+    );
     // En cas d'erreur, retourner une image statique
     console.log(
-      `Utilisation d'une image statique par défaut pour le type: ${type} (après erreur)`
+      `ImageService: Utilisation d'une image statique par défaut pour le type: ${type} (après erreur générale)`
     );
     if (type === "restaurant") {
       return `/default-restaurant.svg`;
