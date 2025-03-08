@@ -123,7 +123,7 @@ export default function CertifiedRestaurantCard({
 
         <div className="flex flex-col sm:flex-row">
           {/* Photo à gauche - prend tout l'espace vertical */}
-          <div className="w-full sm:w-1/3 restaurant-image-container">
+          <div className="w-full sm:w-2/5 restaurant-image-container">
             {restaurant.image ? (
               <img
                 src={restaurant.image}
@@ -138,7 +138,7 @@ export default function CertifiedRestaurantCard({
           </div>
 
           {/* Informations à droite - avec meilleure organisation */}
-          <div className="w-full sm:w-2/3 flex flex-col justify-between p-4 sm:p-6">
+          <div className="w-full sm:w-3/5 flex flex-col justify-between p-4 sm:p-6">
             <div>
               {/* En-tête avec nom */}
               <div className="mb-3">
