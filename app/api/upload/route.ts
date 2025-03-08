@@ -14,18 +14,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const buffer = Buffer.from(await image.arrayBuffer());
-    const imageUrl = await imageService.saveImage(
-      {
-        buffer,
-        originalname: image.name,
-        mimetype: image.type,
-        size: image.size,
-      },
-      type
-    );
+    try {
+      const buffer = Buffer.from(await image.arrayBuffer());
+      const imageUrl = await imageService.saveImage(
+        {
+          buffer,
+          originalname: image.name,
+          mimetype: image.type,
+          size: image.size,
+        },
+        type
+      );
 
-    return NextResponse.json({ imageUrl });
+      return NextResponse.json({ imageUrl });
+    } catch (imageError) {
+      console.error("Error processing image:", imageError);
+
+      // En cas d'erreur, retourner une URL de placeholder
+      let placeholderUrl = "";
+      if (type === "restaurant") {
+        placeholderUrl = "https://placehold.co/800x600/png?text=Restaurant";
+      } else if (type === "dish") {
+        placeholderUrl = "https://placehold.co/400x300/png?text=Plat";
+      } else {
+        placeholderUrl = `https://placehold.co/600x400/png?text=${encodeURIComponent(
+          type
+        )}`;
+      }
+
+      return NextResponse.json({ imageUrl: placeholderUrl });
+    }
   } catch (error) {
     console.error("Error uploading image:", error);
     return NextResponse.json(

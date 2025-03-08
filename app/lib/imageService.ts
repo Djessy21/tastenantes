@@ -1,6 +1,13 @@
-import sharp from "sharp";
 import path from "path";
 import fs from "fs/promises";
+
+// Import sharp uniquement en développement
+let sharp: any;
+if (process.env.NODE_ENV === "development") {
+  import("sharp").then((module) => {
+    sharp = module.default;
+  });
+}
 
 interface UploadedFile {
   buffer: Buffer;
@@ -25,24 +32,20 @@ export async function saveImage(
   type: string
 ): Promise<string> {
   try {
-    // En environnement de production (Vercel), on ne peut pas écrire sur le système de fichiers
-    if (process.env.VERCEL_ENV === "production") {
-      // Générer un nom de fichier unique
-      const filename = `${Date.now()}-${file.originalname.replace(
-        /\s+/g,
-        "-"
-      )}`;
-
-      // En production, on utilise des images de placeholder spécifiques selon le type
+    // En environnement de production ou si sharp n'est pas disponible
+    if (process.env.NODE_ENV === "production" || !sharp) {
+      // Générer des URLs de placeholder selon le type
       if (type === "restaurant") {
-        return `https://placehold.co/800x600?text=Restaurant`;
+        return `https://placehold.co/800x600/png?text=Restaurant`;
       } else if (type === "dish") {
-        return `https://placehold.co/400x300?text=Plat`;
+        return `https://placehold.co/400x300/png?text=Plat`;
       } else {
-        return `https://placehold.co/600x400?text=${encodeURIComponent(type)}`;
+        return `https://placehold.co/600x400/png?text=${encodeURIComponent(
+          type
+        )}`;
       }
     } else {
-      // En développement, on continue d'utiliser le système de fichiers local
+      // En développement avec sharp disponible
       // Créer le dossier uploads s'il n'existe pas
       const uploadsDir = path.join(process.cwd(), "public", "uploads", type);
       await fs.mkdir(uploadsDir, { recursive: true });
@@ -70,11 +73,13 @@ export async function saveImage(
     console.error("Error saving image:", error);
     // En cas d'erreur, retourner une image de placeholder
     if (type === "restaurant") {
-      return `https://placehold.co/800x600?text=Restaurant`;
+      return `https://placehold.co/800x600/png?text=Restaurant`;
     } else if (type === "dish") {
-      return `https://placehold.co/400x300?text=Plat`;
+      return `https://placehold.co/400x300/png?text=Plat`;
     } else {
-      return `https://placehold.co/600x400?text=${encodeURIComponent(type)}`;
+      return `https://placehold.co/600x400/png?text=${encodeURIComponent(
+        type
+      )}`;
     }
   }
 }
@@ -82,7 +87,7 @@ export async function saveImage(
 export const imageService = {
   async deleteImage(imageUrl: string) {
     // Ne pas essayer de supprimer des images en production
-    if (process.env.VERCEL_ENV === "production") {
+    if (process.env.NODE_ENV === "production") {
       return;
     }
 

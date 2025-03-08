@@ -16,7 +16,7 @@ export async function GET() {
 
       // Si aucune image n'est définie, utiliser une image placeholder
       if (!restaurant.image) {
-        restaurant.image = "https://placehold.co/800x600?text=Restaurant";
+        restaurant.image = "https://placehold.co/800x600/png?text=Restaurant";
       }
 
       // Transformer les noms de champs pour correspondre à l'interface CertifiedRestaurant
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
       image:
         restaurant.image ||
         image_url ||
-        "https://placehold.co/800x600?text=Restaurant",
+        "https://placehold.co/800x600/png?text=Restaurant",
       certifiedBy: restaurant.certified_by,
       certificationDate: restaurant.certification_date,
       specialNote: restaurant.special_note,

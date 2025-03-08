@@ -131,13 +131,13 @@ export default function CertifiedRestaurantCard({
             }}
           >
             {restaurant.image ? (
-              <Image
+              <img
                 src={restaurant.image}
                 alt={restaurant.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, 33vw"
-                priority
+                className="w-full h-full object-cover"
+                style={{
+                  minHeight: "240px",
+                }}
               />
             ) : (
               <div
@@ -339,11 +339,10 @@ export default function CertifiedRestaurantCard({
                           borderRadius: "var(--dish-image-border-radius)",
                         }}
                       >
-                        <Image
+                        <img
                           src={dish.image_url}
                           alt={dish.name}
-                          fill
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                           style={{
                             borderRadius: "var(--dish-image-border-radius)",
                           }}
