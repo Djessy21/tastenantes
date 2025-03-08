@@ -68,36 +68,81 @@ export async function createRestaurant(
   return rows[0];
 }
 
-export async function initDB() {
+async function checkTableSchema() {
   try {
-    await sql`
-      CREATE TABLE IF NOT EXISTS restaurants (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        address VARCHAR(255) NOT NULL,
-        latitude DOUBLE PRECISION,
-        longitude DOUBLE PRECISION,
-        rating NUMERIC(3,1),
-        cuisine VARCHAR(100),
-        special_note TEXT,
-        certified_by VARCHAR(100),
-        certification_date TIMESTAMP WITH TIME ZONE,
-        featured BOOLEAN DEFAULT false,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        is_certified BOOLEAN DEFAULT false
-      )
+    const { rows } = await sql`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'restaurants'
     `;
 
-    await sql`
-      CREATE TABLE IF NOT EXISTS restaurant_images (
-        id SERIAL PRIMARY KEY,
-        restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-        image_url TEXT NOT NULL,
-        image_type VARCHAR(50),
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
+    const requiredColumns = [
+      "rating",
+      "cuisine",
+      "special_note",
+      "certified_by",
+      "certification_date",
+      "featured",
+    ];
+
+    const existingColumns = rows.map((row) => row.column_name);
+    const missingColumns = requiredColumns.filter(
+      (col) => !existingColumns.includes(col)
+    );
+
+    if (missingColumns.length > 0) {
+      console.log("Missing columns:", missingColumns);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error checking table schema:", error);
+    return false;
+  }
+}
+
+export async function initDB() {
+  try {
+    // Vérifier si le schéma est correct
+    const isSchemaValid = await checkTableSchema();
+
+    if (!isSchemaValid) {
+      // Supprimer les tables existantes
+      await sql`DROP TABLE IF EXISTS restaurant_images CASCADE`;
+      await sql`DROP TABLE IF EXISTS restaurants CASCADE`;
+
+      // Créer la table restaurants avec le nouveau schéma
+      await sql`
+        CREATE TABLE IF NOT EXISTS restaurants (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          address VARCHAR(255) NOT NULL,
+          latitude DOUBLE PRECISION,
+          longitude DOUBLE PRECISION,
+          rating NUMERIC(3,1),
+          cuisine VARCHAR(100),
+          special_note TEXT,
+          certified_by VARCHAR(100),
+          certification_date TIMESTAMP WITH TIME ZONE,
+          featured BOOLEAN DEFAULT false,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          is_certified BOOLEAN DEFAULT false
+        )
+      `;
+
+      // Créer la table restaurant_images
+      await sql`
+        CREATE TABLE IF NOT EXISTS restaurant_images (
+          id SERIAL PRIMARY KEY,
+          restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
+          image_url TEXT NOT NULL,
+          image_type VARCHAR(50),
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+    }
 
     return true;
   } catch (error) {
