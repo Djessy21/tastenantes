@@ -12,7 +12,7 @@ export interface Restaurant {
 }
 
 export async function getRestaurants(): Promise<Restaurant[]> {
-  const { rows } = await sql`
+  const { rows } = await sql<Restaurant>`
     SELECT * FROM restaurants 
     ORDER BY created_at DESC
   `;
@@ -25,7 +25,7 @@ export async function createRestaurant(
   latitude: number,
   longitude: number
 ): Promise<Restaurant> {
-  const { rows } = await sql`
+  const { rows } = await sql<Restaurant>`
     INSERT INTO restaurants (name, address, latitude, longitude)
     VALUES (${name}, ${address}, ${latitude}, ${longitude})
     RETURNING *

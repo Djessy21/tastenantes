@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { initialize } from "./lib/init";
+import { initDB } from "./lib/db-edge";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 // Initialiser la base de données au démarrage
-initialize().catch(console.error);
+initDB().catch(console.error);
 
 export const metadata: Metadata = {
   title: "Taste Nantes",

@@ -10,6 +10,24 @@ export interface Restaurant {
   created_at: string;
   updated_at: string;
   is_certified: boolean;
+  rating: number;
+  cuisine: string;
+  specialNote: string;
+  certifiedBy: string;
+  certificationDate: string;
+  featured: boolean;
+}
+
+interface AddRestaurantInput {
+  name: string;
+  address: string;
+  location: { lat: number; lng: number };
+  rating: number;
+  cuisine: string;
+  specialNote: string;
+  certifiedBy: string;
+  certificationDate: string;
+  featured: boolean;
 }
 
 const certifiedRestaurantService = {
@@ -23,17 +41,21 @@ const certifiedRestaurantService = {
     }
   },
 
-  addCertifiedRestaurant: async (restaurant: {
-    name: string;
-    address: string;
-    location: { lat: number; lng: number };
-  }): Promise<CertifiedRestaurant> => {
+  addCertifiedRestaurant: async (
+    restaurant: AddRestaurantInput
+  ): Promise<CertifiedRestaurant> => {
     try {
       const response = await axios.post("/api/restaurants", {
         name: restaurant.name,
         address: restaurant.address,
         latitude: restaurant.location.lat,
         longitude: restaurant.location.lng,
+        rating: restaurant.rating,
+        cuisine: restaurant.cuisine,
+        specialNote: restaurant.specialNote,
+        certifiedBy: restaurant.certifiedBy,
+        certificationDate: restaurant.certificationDate,
+        featured: restaurant.featured,
       });
       return response.data;
     } catch (error) {
