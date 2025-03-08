@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import db from "@/app/lib/db.server";
+import db from "../../../server/db";
 
 export async function GET() {
   try {
-    const restaurants = await db.query(
+    const result = await db.query(
       "SELECT * FROM restaurants ORDER BY created_at DESC"
     );
-    return NextResponse.json(restaurants);
+    return NextResponse.json(result.rows);
   } catch (error) {
     console.error("Error fetching restaurants:", error);
     return NextResponse.json(
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       [name, address, latitude, longitude]
     );
 
-    return NextResponse.json(result[0]);
+    return NextResponse.json(result.rows[0]);
   } catch (error) {
     console.error("Error creating restaurant:", error);
     return NextResponse.json(
