@@ -7,6 +7,7 @@ const nextConfig = {
       "s3.amazonaws.com", // Si vous utilisez AWS S3
       "uploadthing.com", // Si vous utilisez UploadThing
       "utfs.io", // Pour UploadThing
+      "placehold.co",
     ],
     unoptimized: true,
   },
@@ -21,6 +22,8 @@ const nextConfig = {
         tls: false,
         fs: false,
         pg: false,
+        path: false,
+        crypto: false,
       };
     }
     return config;

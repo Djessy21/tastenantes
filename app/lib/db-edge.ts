@@ -23,7 +23,7 @@ export interface Dish {
   name: string;
   description: string;
   price: number;
-  image_url?: string;
+  image_url: string;
   created_at: string;
 }
 
@@ -45,7 +45,8 @@ export async function createRestaurant(
   specialNote: string,
   certifiedBy: string,
   certificationDate: string,
-  featured: boolean
+  featured: boolean,
+  image_url: string = ""
 ): Promise<Restaurant> {
   const { rows } = await sql<Restaurant>`
     INSERT INTO restaurants (
@@ -59,7 +60,8 @@ export async function createRestaurant(
       certified_by,
       certification_date,
       featured,
-      is_certified
+      is_certified,
+      image
     ) VALUES (
       ${name}, 
       ${address}, 
@@ -71,7 +73,8 @@ export async function createRestaurant(
       ${certifiedBy},
       ${certificationDate},
       ${featured},
-      true
+      true,
+      ${image_url}
     )
     RETURNING *
   `;
@@ -81,14 +84,18 @@ export async function createRestaurant(
 export async function getDishes(restaurantId: number): Promise<Dish[]> {
   const { rows } = await sql<Dish>`
     SELECT 
-      d.*,
-      ri.image_url
+      d.id,
+      d.restaurant_id,
+      d.name,
+      d.description,
+      d.price,
+      d.image_url,
+      d.created_at
     FROM dishes d
-    LEFT JOIN restaurant_images ri ON ri.id = d.image_id
     WHERE d.restaurant_id = ${restaurantId}
-      AND (ri.image_type = 'dish' OR ri.image_type IS NULL)
     ORDER BY d.created_at DESC
   `;
+
   return rows;
 }
 
@@ -97,21 +104,8 @@ export async function createDish(
   name: string,
   description: string,
   price: number,
-  imageUrl?: string
+  imageUrl: string
 ): Promise<Dish> {
-  let imageId = null;
-
-  if (imageUrl) {
-    const {
-      rows: [image],
-    } = await sql`
-      INSERT INTO restaurant_images (restaurant_id, image_url, image_type)
-      VALUES (${restaurantId}, ${imageUrl}, 'dish')
-      RETURNING id
-    `;
-    imageId = image.id;
-  }
-
   const {
     rows: [dish],
   } = await sql<Dish>`
@@ -120,21 +114,18 @@ export async function createDish(
       name,
       description,
       price,
-      image_id
+      image_url
     ) VALUES (
       ${restaurantId},
       ${name},
       ${description},
       ${price},
-      ${imageId}
+      ${imageUrl}
     )
     RETURNING *
   `;
 
-  return {
-    ...dish,
-    image_url: imageUrl,
-  };
+  return dish;
 }
 
 async function checkTableSchema() {
@@ -173,63 +164,82 @@ async function checkTableSchema() {
 
 export async function initDB() {
   try {
-    // Vérifier si le schéma est correct
-    const isSchemaValid = await checkTableSchema();
+    // Supprimer les tables existantes
+    await sql`DROP TABLE IF EXISTS dishes CASCADE`;
+    await sql`DROP TABLE IF EXISTS restaurant_images CASCADE`;
+    await sql`DROP TABLE IF EXISTS restaurants CASCADE`;
 
-    if (!isSchemaValid) {
-      // Supprimer les tables existantes
-      await sql`DROP TABLE IF EXISTS dishes CASCADE`;
-      await sql`DROP TABLE IF EXISTS restaurant_images CASCADE`;
-      await sql`DROP TABLE IF EXISTS restaurants CASCADE`;
+    // Créer la table restaurants avec le nouveau schéma
+    await sql`
+      CREATE TABLE IF NOT EXISTS restaurants (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        address VARCHAR(255) NOT NULL,
+        latitude DOUBLE PRECISION,
+        longitude DOUBLE PRECISION,
+        rating NUMERIC(3,1),
+        cuisine VARCHAR(100),
+        special_note TEXT,
+        certified_by VARCHAR(100),
+        certification_date TIMESTAMP WITH TIME ZONE,
+        featured BOOLEAN DEFAULT false,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        is_certified BOOLEAN DEFAULT false,
+        image TEXT
+      )
+    `;
 
-      // Créer la table restaurants avec le nouveau schéma
-      await sql`
-        CREATE TABLE IF NOT EXISTS restaurants (
-          id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL,
-          address VARCHAR(255) NOT NULL,
-          latitude DOUBLE PRECISION,
-          longitude DOUBLE PRECISION,
-          rating NUMERIC(3,1),
-          cuisine VARCHAR(100),
-          special_note TEXT,
-          certified_by VARCHAR(100),
-          certification_date TIMESTAMP WITH TIME ZONE,
-          featured BOOLEAN DEFAULT false,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-          is_certified BOOLEAN DEFAULT false
-        )
-      `;
+    // Créer la table restaurant_images
+    await sql`
+      CREATE TABLE IF NOT EXISTS restaurant_images (
+        id SERIAL PRIMARY KEY,
+        restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
+        image_url TEXT NOT NULL,
+        image_type VARCHAR(50) NOT NULL,
+        is_main BOOLEAN DEFAULT false,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
 
-      // Créer la table restaurant_images
-      await sql`
-        CREATE TABLE IF NOT EXISTS restaurant_images (
-          id SERIAL PRIMARY KEY,
-          restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-          image_url TEXT NOT NULL,
-          image_type VARCHAR(50),
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        )
-      `;
-
-      // Créer la table dishes
-      await sql`
-        CREATE TABLE IF NOT EXISTS dishes (
-          id SERIAL PRIMARY KEY,
-          restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-          name VARCHAR(255) NOT NULL,
-          description TEXT,
-          price NUMERIC(10,2) NOT NULL,
-          image_id INTEGER REFERENCES restaurant_images(id),
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        )
-      `;
-    }
+    // Créer la table dishes avec l'URL de l'image directement
+    await sql`
+      CREATE TABLE IF NOT EXISTS dishes (
+        id SERIAL PRIMARY KEY,
+        restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        price NUMERIC(10,2) NOT NULL,
+        image_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
 
     return true;
   } catch (error) {
     console.error("Error initializing database:", error);
     throw error;
   }
+}
+
+// Ajouter une fonction pour sauvegarder une image
+export async function saveImage(
+  restaurantId: number,
+  imageUrl: string,
+  imageType: string,
+  isMain: boolean = false
+): Promise<void> {
+  await sql`
+    INSERT INTO restaurant_images (
+      restaurant_id,
+      image_url,
+      image_type,
+      is_main
+    ) VALUES (
+      ${restaurantId},
+      ${imageUrl},
+      ${imageType},
+      ${isMain}
+    )
+  `;
 }

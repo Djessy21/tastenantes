@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       certifiedBy,
       certificationDate,
       featured,
+      image_url,
     } = body;
 
     const restaurant = await createRestaurant(
@@ -42,7 +43,8 @@ export async function POST(request: Request) {
       specialNote,
       certifiedBy,
       certificationDate,
-      featured
+      featured,
+      image_url || ""
     );
     return NextResponse.json(restaurant);
   } catch (error) {

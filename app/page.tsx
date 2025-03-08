@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import RestaurantCard from "./components/RestaurantCard";
 import CertifiedRestaurantCard from "./components/CertifiedRestaurantCard";
 import AdminPanel from "./components/AdminPanel";
+import FilterBar from "./components/FilterBar";
 import { Restaurant, restaurantService } from "./services/restaurantService";
 import certifiedRestaurantService from "./services/certifiedRestaurantService";
 import { CertifiedRestaurant } from "./types/restaurant";
@@ -18,6 +19,13 @@ export default function Home() {
   >(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<{
+    cuisines: string[];
+    establishments: string[];
+  }>({
+    cuisines: [],
+    establishments: [],
+  });
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
@@ -60,7 +68,7 @@ export default function Home() {
 
   const handleToggleFeatured = async (restaurant: CertifiedRestaurant) => {
     try {
-      await certifiedRestaurantService.toggleFeatured(restaurant.id);
+      await certifiedRestaurantService.toggleFeatured(restaurant.id.toString());
       fetchCertifiedRestaurants();
     } catch (error) {
       console.error("Error toggling featured status:", error);
@@ -71,16 +79,60 @@ export default function Home() {
     setIsAdmin(!isAdmin);
   };
 
-  const filteredRestaurants = restaurants.filter(
-    (restaurant) =>
-      restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleFilterChange = (newFilters: {
+    cuisines: string[];
+    establishments: string[];
+  }) => {
+    setFilters(newFilters);
+  };
+
+  // Filtrer les restaurants en fonction des filtres sélectionnés
+  const filteredRestaurants = restaurants.filter((restaurant) => {
+    // Si aucun filtre n'est sélectionné, afficher tous les restaurants
+    if (filters.cuisines.length === 0 && filters.establishments.length === 0) {
+      return true;
+    }
+
+    // Vérifier si le restaurant correspond aux filtres de cuisine
+    const matchesCuisine =
+      filters.cuisines.length === 0 ||
+      filters.cuisines.some((cuisine) =>
+        restaurant.cuisine.toLowerCase().includes(cuisine.toLowerCase())
+      );
+
+    // Pour les restaurants normaux, nous n'avons pas d'information sur le type d'établissement
+    // Donc on considère qu'ils correspondent toujours au filtre d'établissement
+    return matchesCuisine;
+  });
 
   const filteredCertifiedRestaurants = certifiedRestaurants.filter(
-    (restaurant) =>
-      restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase())
+    (restaurant) => {
+      // Si aucun filtre n'est sélectionné, afficher tous les restaurants
+      if (
+        filters.cuisines.length === 0 &&
+        filters.establishments.length === 0
+      ) {
+        return true;
+      }
+
+      // Vérifier si le restaurant correspond aux filtres de cuisine
+      const matchesCuisine =
+        filters.cuisines.length === 0 ||
+        filters.cuisines.some((cuisine) =>
+          restaurant.cuisine.toLowerCase().includes(cuisine.toLowerCase())
+        );
+
+      // Vérifier si le restaurant correspond aux filtres de type d'établissement
+      const matchesEstablishment =
+        filters.establishments.length === 0 ||
+        filters.establishments.some((establishment) =>
+          restaurant.specialNote
+            ?.toLowerCase()
+            .includes(establishment.toLowerCase())
+        );
+
+      return matchesCuisine && matchesEstablishment;
+    }
   );
 
   const featuredRestaurants = filteredCertifiedRestaurants.filter(
@@ -90,9 +142,57 @@ export default function Home() {
     (r) => !r.featured
   );
 
+  const handleRestaurantDelete = () => {
+    fetchCertifiedRestaurants();
+    if (selectedRestaurant) {
+      setSelectedRestaurant(null);
+    }
+  };
+
+  // Listes des types de cuisine et d'établissement
+  const cuisineTypes = [
+    "Française",
+    "Italienne",
+    "Japonaise",
+    "Chinoise",
+    "Indienne",
+    "Mexicaine",
+    "Libanaise",
+    "Thaïlandaise",
+    "Américaine",
+    "Espagnole",
+    "Grecque",
+    "Marocaine",
+    "Vietnamienne",
+    "Coréenne",
+    "Brésilienne",
+    "Végétarienne",
+    "Végane",
+    "Fruits de mer",
+    "Fusion",
+    "Autre",
+  ];
+
+  const establishmentTypes = [
+    "Restaurant",
+    "Pizzeria",
+    "Coffee Shop",
+    "Burger",
+    "Fast Food",
+    "Bistro",
+    "Brasserie",
+    "Trattoria",
+    "Pub",
+    "Bar à vin",
+    "Crêperie",
+    "Salon de thé",
+    "Food Truck",
+    "Autre",
+  ];
+
   return (
     <div className="min-h-screen bg-white">
-      <header className="fixed top-0 left-0 right-0 bg-white z-50">
+      <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]">
         <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-black/10">
           <div className="flex flex-col items-center gap-2 w-full">
             <h1 className="dior-heading text-center text-3xl font-bold">
@@ -105,13 +205,11 @@ export default function Home() {
               {isAdmin ? "Mode Admin" : "Mode Client"}
             </button>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-md">
-            <input
-              type="text"
-              placeholder="RECHERCHER DES RESTAURANTS"
-              className="dior-input w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+            <FilterBar
+              cuisineTypes={cuisineTypes}
+              establishmentTypes={establishmentTypes}
+              onFilterChange={handleFilterChange}
             />
             {isAdmin && (
               <button
@@ -125,7 +223,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="pt-28 sm:pt-24">
+      <main className="pt-40 sm:pt-44 md:pt-36">
         <div className="dior-container">
           <div className="space-y-6">
             {loading ? (
@@ -148,6 +246,7 @@ export default function Home() {
                         onToggleFeatured={() =>
                           handleToggleFeatured(restaurant)
                         }
+                        onDelete={handleRestaurantDelete}
                         isAdmin={isAdmin}
                       />
                     ))}
@@ -168,6 +267,7 @@ export default function Home() {
                         onToggleFeatured={() =>
                           handleToggleFeatured(restaurant)
                         }
+                        onDelete={handleRestaurantDelete}
                         isAdmin={isAdmin}
                       />
                     ))}

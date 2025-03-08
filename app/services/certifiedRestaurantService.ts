@@ -24,10 +24,12 @@ interface AddRestaurantInput {
   location: { lat: number; lng: number };
   rating: number;
   cuisine: string;
-  specialNote: string;
+  specialNote?: string;
   certifiedBy: string;
   certificationDate: string;
   featured: boolean;
+  image_url?: string;
+  establishmentType?: string;
 }
 
 const certifiedRestaurantService = {
@@ -56,6 +58,7 @@ const certifiedRestaurantService = {
         certifiedBy: restaurant.certifiedBy,
         certificationDate: restaurant.certificationDate,
         featured: restaurant.featured,
+        image_url: restaurant.image_url,
       });
       return response.data;
     } catch (error) {
@@ -100,7 +103,12 @@ const certifiedRestaurantService = {
 
   addDish: async (
     restaurantId: string,
-    dish: Omit<Dish, "id" | "restaurantId">
+    dish: {
+      name: string;
+      description: string;
+      price: number;
+      image_url: string;
+    }
   ): Promise<Dish> => {
     try {
       const response = await axios.post(

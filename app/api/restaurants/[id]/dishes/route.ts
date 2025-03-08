@@ -26,14 +26,14 @@ export async function POST(
 ) {
   try {
     const restaurantId = parseInt(params.id);
-    const { name, description, price, imageUrl } = await request.json();
+    const { name, description, price, image_url } = await request.json();
 
     const dish = await createDish(
       restaurantId,
       name,
       description,
       price,
-      imageUrl
+      image_url || ""
     );
     return NextResponse.json(dish);
   } catch (error) {

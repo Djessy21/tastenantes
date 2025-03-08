@@ -23,9 +23,8 @@ export default function AdminPanel({
   const [formData, setFormData] = useState({
     name: "",
     address: "",
-    cuisine: "",
-    rating: 0,
-    specialNote: "",
+    cuisine: "Française",
+    establishmentType: "Restaurant",
     certifiedBy: "",
     certificationDate: new Date().toISOString(),
     featured: false,
@@ -38,6 +37,48 @@ export default function AdminPanel({
   const [dishes, setDishes] = useState<DishForm[]>([]);
   const [restaurantImages, setRestaurantImages] = useState<File[]>([]);
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
+
+  // Liste des types de cuisine les plus répandus
+  const cuisineTypes = [
+    "Française",
+    "Italienne",
+    "Japonaise",
+    "Chinoise",
+    "Indienne",
+    "Mexicaine",
+    "Libanaise",
+    "Thaïlandaise",
+    "Américaine",
+    "Espagnole",
+    "Grecque",
+    "Marocaine",
+    "Vietnamienne",
+    "Coréenne",
+    "Brésilienne",
+    "Végétarienne",
+    "Végane",
+    "Fruits de mer",
+    "Fusion",
+    "Autre",
+  ];
+
+  // Liste des types d'établissements
+  const establishmentTypes = [
+    "Restaurant",
+    "Pizzeria",
+    "Coffee Shop",
+    "Burger",
+    "Fast Food",
+    "Bistro",
+    "Brasserie",
+    "Trattoria",
+    "Pub",
+    "Bar à vin",
+    "Crêperie",
+    "Salon de thé",
+    "Food Truck",
+    "Autre",
+  ];
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -88,19 +129,79 @@ export default function AdminPanel({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let restaurantImageUrl = "";
+
+      // Télécharger l'image principale du restaurant si elle existe
+      if (restaurantImages.length > 0) {
+        const mainImage = restaurantImages[mainImageIndex];
+        const imageFormData = new FormData();
+        imageFormData.append("image", mainImage);
+        imageFormData.append("type", "restaurant");
+
+        const imageResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: imageFormData,
+        });
+
+        if (imageResponse.ok) {
+          const { imageUrl } = await imageResponse.json();
+          restaurantImageUrl = imageUrl;
+        }
+      }
+
+      // Créer le restaurant avec l'image
       const restaurant =
         await certifiedRestaurantService.addCertifiedRestaurant({
           ...formData,
-          rating: Number(formData.rating),
+          rating: 5, // Valeur par défaut
           certificationDate: formData.certificationDate,
+          image_url: restaurantImageUrl,
+          specialNote: formData.establishmentType, // Utiliser le type d'établissement comme note spéciale
         });
+
+      // Ajouter les plats
+      if (dishes.length > 0) {
+        for (const dish of dishes) {
+          if (dish.image) {
+            // Créer un FormData pour l'upload d'image
+            const formData = new FormData();
+            formData.append("image", dish.image);
+            formData.append("type", "dish");
+
+            // Upload de l'image
+            const response = await fetch("/api/upload", {
+              method: "POST",
+              body: formData,
+            });
+            const { imageUrl } = await response.json();
+
+            // Créer le plat avec l'URL de l'image
+            await certifiedRestaurantService.addDish(restaurant.id.toString(), {
+              name: dish.name,
+              description: dish.description,
+              price: parseFloat(dish.price),
+              image_url: imageUrl,
+            });
+          } else {
+            // Créer le plat sans image
+            await certifiedRestaurantService.addDish(restaurant.id.toString(), {
+              name: dish.name,
+              description: dish.description,
+              price: parseFloat(dish.price),
+              image_url: "",
+            });
+          }
+        }
+      }
+
       onRestaurantAdded(restaurant);
+
+      // Réinitialiser le formulaire
       setFormData({
         name: "",
         address: "",
-        cuisine: "",
-        rating: 0,
-        specialNote: "",
+        cuisine: "Française",
+        establishmentType: "Restaurant",
         certifiedBy: "",
         certificationDate: new Date().toISOString(),
         featured: false,
@@ -109,6 +210,12 @@ export default function AdminPanel({
           lng: 0,
         },
       });
+      setDishes([]);
+      setRestaurantImages([]);
+      setMainImageIndex(0);
+
+      // Fermer la fenêtre
+      onClose();
     } catch (error) {
       console.error("Error adding restaurant:", error);
     }
@@ -185,49 +292,43 @@ export default function AdminPanel({
               <label className="block text-xs uppercase tracking-wider mb-1">
                 Type de Cuisine
               </label>
-              <input
-                type="text"
+              <select
                 required
                 className="dior-input"
                 value={formData.cuisine}
                 onChange={(e) =>
                   setFormData({ ...formData, cuisine: e.target.value })
                 }
-              />
+              >
+                {cuisineTypes.map((cuisine) => (
+                  <option key={cuisine} value={cuisine}>
+                    {cuisine}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
               <label className="block text-xs uppercase tracking-wider mb-1">
-                Note (1-5)
+                Type d'Établissement
               </label>
-              <input
-                type="number"
+              <select
                 required
-                min="1"
-                max="5"
-                step="0.1"
                 className="dior-input"
-                value={formData.rating}
+                value={formData.establishmentType}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    rating: parseFloat(e.target.value),
+                    establishmentType: e.target.value,
                   })
                 }
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs uppercase tracking-wider mb-1">
-                Note Spéciale
-              </label>
-              <textarea
-                className="dior-input min-h-[100px] resize-none"
-                value={formData.specialNote}
-                onChange={(e) =>
-                  setFormData({ ...formData, specialNote: e.target.value })
-                }
-              />
+              >
+                {establishmentTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -252,6 +353,7 @@ export default function AdminPanel({
                   }
                 />
               </div>
+
               <div>
                 <label className="block text-xs uppercase tracking-wider mb-1">
                   Longitude
@@ -419,9 +521,23 @@ export default function AdminPanel({
             ))}
           </div>
 
-          <button type="submit" className="w-full dior-button mt-6">
-            Ajouter le Restaurant
-          </button>
+          <div className="flex justify-end space-x-4 mt-8">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-black text-black hover:bg-black hover:text-white transition-colors"
+              style={{ borderRadius: "var(--button-border-radius)" }}
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-black text-white hover:bg-black/90 transition-colors"
+              style={{ borderRadius: "var(--button-border-radius)" }}
+            >
+              Ajouter
+            </button>
+          </div>
         </form>
       </div>
     </div>

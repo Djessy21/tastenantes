@@ -12,6 +12,8 @@
   --foreground: #171717;
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 255, 255, 255;
+  --dish-image-border-radius: 0.5rem; /* 8px par défaut, ajustez selon vos préférences */
+  --button-border-radius: 1rem; /* Arrondi des boutons, ajustez selon vos préférences */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,7 +40,7 @@ body {
   }
 
   .dior-card {
-    @apply bg-white border-none transition-transform duration-300 hover:-translate-y-1;
+    @apply bg-white transition-all duration-300;
   }
 
   .dior-text {
@@ -50,7 +52,8 @@ body {
   }
 
   .dior-button {
-    @apply bg-black text-white px-6 py-3 sm:px-8 sm:py-4 uppercase tracking-wider text-sm transition-all duration-300 hover:bg-gray-800;
+    @apply px-4 py-2 bg-black text-white uppercase tracking-wider text-xs font-medium transition-colors hover:bg-black/90;
+    border-radius: var(--button-border-radius);
   }
 
   .dior-input {
@@ -85,4 +88,9 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 2px;
+}
+
+/* Appliquer l'arrondi à tous les boutons */
+button {
+  border-radius: var(--button-border-radius);
 }
