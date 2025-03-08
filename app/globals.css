@@ -118,8 +118,8 @@ button {
 
 /* Styles pour les images de plat */
 .dish-image-container {
-  height: var(--dish-image-height);
-  max-height: var(--dish-image-height);
+  aspect-ratio: 1 / 1; /* Assure un ratio carré */
+  width: 100%;
   overflow: hidden;
   border-radius: var(--dish-image-border-radius);
   position: relative;

@@ -311,11 +311,11 @@ export default function CertifiedRestaurantCard({
                 Chargement des plats...
               </div>
             ) : dishes.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {dishes.map((dish) => (
                   <div
                     key={dish.id}
-                    className="space-y-2"
+                    className="space-y-3 bg-gray-50 rounded-lg p-3 shadow-sm"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {dish.image_url && (
@@ -332,18 +332,18 @@ export default function CertifiedRestaurantCard({
                         <div>
                           <h5 className="text-sm font-medium">{dish.name}</h5>
                           {dish.description && (
-                            <p className="text-xs opacity-75 line-clamp-2">
+                            <p className="text-xs text-gray-600 line-clamp-2 mt-1">
                               {dish.description}
                             </p>
                           )}
-                          <p className="text-xs font-medium mt-1">
+                          <p className="text-sm font-medium mt-2 text-black">
                             {parseFloat(String(dish.price)).toFixed(2)} €
                           </p>
                         </div>
                         {isAdmin && (
                           <button
                             onClick={() => handleDishDelete(dish.id)}
-                            className="text-xs text-red-500 hover:text-red-700 ml-2"
+                            className="text-xs bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 px-2 py-1 rounded-md transition-colors"
                           >
                             Supprimer
                           </button>
