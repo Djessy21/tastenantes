@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CertifiedRestaurant, Dish, Location } from "../types/restaurant";
+import type { CertifiedRestaurant, Dish } from "../types/restaurant";
 
 export interface Restaurant {
   id: number;
@@ -23,12 +23,11 @@ const certifiedRestaurantService = {
     }
   },
 
-  addCertifiedRestaurant: async (
-    restaurant: Omit<
-      CertifiedRestaurant,
-      "id" | "dishes" | "createdAt" | "updatedAt"
-    >
-  ): Promise<CertifiedRestaurant> => {
+  addCertifiedRestaurant: async (restaurant: {
+    name: string;
+    address: string;
+    location: { lat: number; lng: number };
+  }): Promise<CertifiedRestaurant> => {
     try {
       const response = await axios.post("/api/restaurants", {
         name: restaurant.name,
@@ -45,9 +44,11 @@ const certifiedRestaurantService = {
 
   updateCertifiedRestaurant: async (
     id: string,
-    updates: Partial<
-      Omit<CertifiedRestaurant, "id" | "dishes" | "createdAt" | "updatedAt">
-    >
+    updates: Partial<{
+      name: string;
+      address: string;
+      location: { lat: number; lng: number };
+    }>
   ): Promise<void> => {
     try {
       await axios.put(`/api/restaurants/${id}`, updates);
