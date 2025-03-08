@@ -121,7 +121,7 @@ export default function CertifiedRestaurantCard({
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row">
+        <div className="flex flex-col sm:flex-row h-full">
           {/* Photo à gauche - prend tout l'espace vertical */}
           <div className="w-full sm:w-2/5 restaurant-image-container">
             {restaurant.image ? (
