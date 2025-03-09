@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useAuthModal } from "../contexts/AuthModalContext";
 
 export default function RegisterForm() {
   const [name, setName] = useState("");
@@ -15,6 +16,7 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { openLoginModal } = useAuthModal();
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -105,7 +107,7 @@ export default function RegisterForm() {
         if (!loginResponse.ok) {
           // L'utilisateur a été créé mais la connexion a échoué
           // Rediriger vers la page de connexion
-          router.push("/login?registered=true");
+          openLoginModal();
           return;
         }
 
@@ -120,14 +122,13 @@ export default function RegisterForm() {
 
         if (!avatarResponse.ok) {
           // L'avatar n'a pas pu être uploadé, mais l'utilisateur est créé et connecté
-          // Rediriger vers la page d'accueil
-          router.push("/");
+          router.refresh();
           return;
         }
       }
 
-      // Rediriger vers la page d'accueil
-      router.push("/");
+      // Rafraîchir la page
+      router.refresh();
     } catch (error) {
       setError("Une erreur est survenue lors de l'inscription");
       console.error("Register error:", error);
@@ -137,9 +138,7 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Créer un compte</h2>
-
+    <div className="w-full">
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
           {error}
@@ -278,13 +277,17 @@ export default function RegisterForm() {
           {loading ? "Inscription en cours..." : "S'inscrire"}
         </button>
 
-        {/* Lien vers la page de connexion */}
+        {/* Lien vers la connexion */}
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Vous avez déjà un compte ?{" "}
-            <a href="/login" className="font-medium text-black hover:underline">
+            <button
+              type="button"
+              onClick={openLoginModal}
+              className="font-medium text-black hover:underline"
+            >
               Se connecter
-            </a>
+            </button>
           </p>
         </div>
       </form>

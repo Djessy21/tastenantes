@@ -4,6 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import { useAuthModal } from "../contexts/AuthModalContext";
 
 export default function AuthButton() {
   const { data: session, status } = useSession();
@@ -11,6 +12,7 @@ export default function AuthButton() {
   const isAdmin = session?.user?.role === "admin";
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { openLoginModal } = useAuthModal();
 
   // Fermer le dropdown quand on clique en dehors
   useEffect(() => {
@@ -119,8 +121,8 @@ export default function AuthButton() {
   }
 
   return (
-    <Link
-      href="/login"
+    <button
+      onClick={openLoginModal}
       className="h-10 w-10 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors"
     >
       <svg
@@ -137,6 +139,6 @@ export default function AuthButton() {
           d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
         />
       </svg>
-    </Link>
+    </button>
   );
 }

@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuthModal } from "../contexts/AuthModalContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { openRegisterModal } = useAuthModal();
 
   // Vérifier si l'utilisateur vient de s'inscrire
   useEffect(() => {
@@ -39,7 +41,6 @@ export default function LoginForm() {
       if (result?.error) {
         setError("Identifiants invalides");
       } else {
-        router.push("/");
         router.refresh();
       }
     } catch (error) {
@@ -51,9 +52,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Connexion</h2>
-
+    <div className="w-full">
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
           {error}
@@ -109,16 +108,17 @@ export default function LoginForm() {
           {loading ? "Connexion en cours..." : "Se connecter"}
         </button>
 
-        {/* Lien vers la page d'inscription */}
+        {/* Lien vers l'inscription */}
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Vous n'avez pas de compte ?{" "}
-            <a
-              href="/register"
+            <button
+              type="button"
+              onClick={openRegisterModal}
               className="font-medium text-black hover:underline"
             >
               S'inscrire
-            </a>
+            </button>
           </p>
         </div>
       </form>
