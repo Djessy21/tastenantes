@@ -5,6 +5,7 @@ import { Dish } from "../lib/db-edge";
 import AddDishForm from "./AddDishForm";
 import DishesModal from "./DishesModal";
 import { CertifiedRestaurant } from "../types/restaurant";
+import { motion } from "framer-motion";
 
 interface CertifiedRestaurantCardProps {
   restaurant: CertifiedRestaurant;
@@ -180,48 +181,111 @@ export default function CertifiedRestaurantCard({
               <div className="mt-auto">
                 {/* Boutons d'action */}
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <button
+                  <motion.button
                     onClick={openDishesModal}
-                    className="text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors"
-                    style={{ borderRadius: "var(--button-border-radius)" }}
+                    className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                   >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
                     Voir les plats
-                  </button>
+                  </motion.button>
 
                   {isAdmin && (
                     <>
-                      <button
+                      <motion.button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowAddDishForm(!showAddDishForm);
                         }}
-                        className="text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors"
+                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         style={{ borderRadius: "var(--button-border-radius)" }}
                       >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
                         {showAddDishForm ? "Annuler" : "Ajouter un plat"}
-                      </button>
+                      </motion.button>
 
-                      <button
+                      <motion.button
                         onClick={(e) => {
                           e.stopPropagation();
                           onToggleFeatured?.();
                         }}
-                        className="text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors"
+                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         style={{ borderRadius: "var(--button-border-radius)" }}
                       >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                          />
+                        </svg>
                         {restaurant.featured
                           ? "Retirer vedette"
                           : "Mettre en vedette"}
-                      </button>
+                      </motion.button>
 
-                      <button
+                      <motion.button
                         onClick={handleDelete}
                         disabled={isDeleting}
-                        className="text-xs uppercase tracking-wider px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        whileHover={{ scale: isDeleting ? 1 : 1.03 }}
+                        whileTap={{ scale: isDeleting ? 1 : 0.97 }}
                         style={{ borderRadius: "var(--button-border-radius)" }}
                       >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
                         {isDeleting ? "Suppression..." : "Supprimer"}
-                      </button>
+                      </motion.button>
                     </>
                   )}
                 </div>
