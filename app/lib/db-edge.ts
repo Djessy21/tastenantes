@@ -19,6 +19,7 @@ export interface Restaurant {
   image_url?: string;
   website?: string;
   instagram?: string;
+  photo_credit?: string;
 }
 
 export interface Dish {
@@ -29,6 +30,7 @@ export interface Dish {
   price: number;
   image_url: string;
   created_at: string;
+  photo_credit?: string;
 }
 
 export async function getRestaurants(): Promise<Restaurant[]> {
@@ -52,7 +54,8 @@ export async function createRestaurant(
   featured: boolean,
   image_url: string = "",
   website: string = "",
-  instagram: string = ""
+  instagram: string = "",
+  photo_credit: string = ""
 ): Promise<Restaurant> {
   const { rows } = await sql<Restaurant>`
     INSERT INTO restaurants (
@@ -69,7 +72,8 @@ export async function createRestaurant(
       is_certified,
       image,
       website,
-      instagram
+      instagram,
+      photo_credit
     ) VALUES (
       ${name}, 
       ${address}, 
@@ -84,7 +88,8 @@ export async function createRestaurant(
       true,
       ${image_url},
       ${website},
-      ${instagram}
+      ${instagram},
+      ${photo_credit}
     )
     RETURNING *
   `;
@@ -114,28 +119,28 @@ export async function createDish(
   name: string,
   description: string,
   price: number,
-  imageUrl: string
+  imageUrl: string,
+  photo_credit: string = ""
 ): Promise<Dish> {
-  const {
-    rows: [dish],
-  } = await sql<Dish>`
+  const { rows } = await sql<Dish>`
     INSERT INTO dishes (
-      restaurant_id,
-      name,
-      description,
+      restaurant_id, 
+      name, 
+      description, 
       price,
-      image_url
+      image_url,
+      photo_credit
     ) VALUES (
-      ${restaurantId},
-      ${name},
-      ${description},
+      ${restaurantId}, 
+      ${name}, 
+      ${description}, 
       ${price},
-      ${imageUrl}
+      ${imageUrl},
+      ${photo_credit}
     )
     RETURNING *
   `;
-
-  return dish;
+  return rows[0];
 }
 
 async function checkTableSchema() {
@@ -432,15 +437,16 @@ export async function updateRestaurant(
   featured: boolean,
   image_url: string = "",
   website: string = "",
-  instagram: string = ""
+  instagram: string = "",
+  photo_credit: string = ""
 ): Promise<Restaurant> {
   try {
-    // Vérifier si les colonnes website et instagram existent
+    // Vérifier si les colonnes website, instagram et photo_credit existent
     const checkColumnsResult = await sql`
       SELECT column_name 
       FROM information_schema.columns 
       WHERE table_name = 'restaurants' 
-      AND column_name IN ('website', 'instagram');
+      AND column_name IN ('website', 'instagram', 'photo_credit');
     `;
 
     const existingColumns = checkColumnsResult.rows.map(
@@ -448,12 +454,34 @@ export async function updateRestaurant(
     );
     const hasWebsiteColumn = existingColumns.includes("website");
     const hasInstagramColumn = existingColumns.includes("instagram");
+    const hasPhotoCreditColumn = existingColumns.includes("photo_credit");
 
     // Construire la requête SQL en fonction des colonnes existantes
     let query;
 
-    if (hasWebsiteColumn && hasInstagramColumn) {
-      // Les deux colonnes existent
+    if (hasWebsiteColumn && hasInstagramColumn && hasPhotoCreditColumn) {
+      // Toutes les colonnes existent
+      query = sql<Restaurant>`
+        UPDATE restaurants
+        SET 
+          name = ${name}, 
+          address = ${address}, 
+          latitude = ${latitude}, 
+          longitude = ${longitude},
+          cuisine = ${cuisine},
+          special_note = ${specialNote},
+          certified_by = ${certifiedBy},
+          featured = ${featured},
+          image = ${image_url},
+          website = ${website},
+          instagram = ${instagram},
+          photo_credit = ${photo_credit},
+          updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `;
+    } else if (hasWebsiteColumn && hasInstagramColumn) {
+      // Seulement website et instagram existent
       query = sql<Restaurant>`
         UPDATE restaurants
         SET 
@@ -473,7 +501,7 @@ export async function updateRestaurant(
         RETURNING *
       `;
     } else {
-      // Une ou les deux colonnes n'existent pas
+      // Aucune des colonnes n'existe
       query = sql<Restaurant>`
         UPDATE restaurants
         SET 

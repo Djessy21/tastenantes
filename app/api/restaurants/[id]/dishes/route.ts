@@ -55,11 +55,10 @@ export async function POST(
     }
 
     const body = await request.json();
-    console.log("Données reçues:", JSON.stringify(body));
+    const { name, description, price, imageUrl, photo_credit } = body;
 
-    const { name, description, price, image_url } = body;
-
-    if (!name || price === undefined) {
+    // Vérifier que les champs requis sont présents
+    if (!name || !price) {
       return NextResponse.json(
         { error: "Name and price are required" },
         { status: 400 }
@@ -72,7 +71,8 @@ export async function POST(
       name,
       description || "",
       price,
-      image_url || "/default-dish.svg"
+      imageUrl || "",
+      photo_credit || ""
     );
 
     console.log(`Plat créé avec succès: ${dish.id}`);

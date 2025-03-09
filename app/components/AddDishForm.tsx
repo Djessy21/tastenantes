@@ -14,15 +14,24 @@ export default function AddDishForm({
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [photoCredit, setPhotoCredit] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError("");
     setIsSubmitting(true);
+    setError("");
 
     try {
+      // Vérifier que le prix est un nombre valide
+      if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+        setError("Le prix doit être un nombre positif");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Créer le plat
       const response = await fetch(`/api/restaurants/${restaurantId}/dishes`, {
         method: "POST",
         headers: {
@@ -33,11 +42,12 @@ export default function AddDishForm({
           description,
           price: parseFloat(price),
           imageUrl,
+          photo_credit: photoCredit,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to add dish");
+        throw new Error("Erreur lors de la création du plat");
       }
 
       // Réinitialiser le formulaire
@@ -45,9 +55,12 @@ export default function AddDishForm({
       setDescription("");
       setPrice("");
       setImageUrl("");
+      setPhotoCredit("");
+
+      // Notifier le parent que le plat a été ajouté
       onDishAdded();
-    } catch (err) {
-      console.error("Error adding dish:", err);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du plat:", error);
       setError("Une erreur est survenue lors de l'ajout du plat");
     } finally {
       setIsSubmitting(false);
@@ -108,11 +121,15 @@ export default function AddDishForm({
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Image du plat
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Image et crédit photo
         </label>
-        <ImageUpload onImageSelect={setImageUrl} />
+        <ImageUpload
+          onImageSelect={setImageUrl}
+          onCreditSelect={setPhotoCredit}
+          initialCredit={photoCredit}
+        />
       </div>
 
       {error && <div className="text-red-600 text-sm">{error}</div>}

@@ -69,6 +69,7 @@ export default function EditRestaurantModal({
     featured: false,
     website: "",
     instagram: "",
+    photo_credit: "",
     location: {
       lat: 0,
       lng: 0,
@@ -92,6 +93,7 @@ export default function EditRestaurantModal({
         featured: restaurant.featured,
         website: restaurant.website || "",
         instagram: restaurant.instagram || "",
+        photo_credit: restaurant.photo_credit || "",
         location: restaurant.location || { lat: 0, lng: 0 },
       });
 
@@ -160,6 +162,7 @@ export default function EditRestaurantModal({
           featured: formData.featured,
           website: formData.website,
           instagram: formData.instagram,
+          photo_credit: formData.photo_credit,
           image: updatedImageUrl,
           location: formData.location,
         }),
@@ -265,7 +268,7 @@ export default function EditRestaurantModal({
                       </div>
                     )}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <ImageUpload
                       onImageSelect={(imageUrl) => {
                         // Convertir l'URL de données en File
@@ -282,10 +285,11 @@ export default function EditRestaurantModal({
                             });
                         }
                       }}
+                      onCreditSelect={(credit) =>
+                        setFormData({ ...formData, photo_credit: credit })
+                      }
+                      initialCredit={formData.photo_credit}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Format recommandé: JPG, PNG ou WebP, max 5MB
-                    </p>
                   </div>
                 </div>
               </div>

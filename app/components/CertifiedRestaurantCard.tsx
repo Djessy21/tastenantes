@@ -7,6 +7,7 @@ import DishesModal from "./DishesModal";
 import { CertifiedRestaurant } from "../types/restaurant";
 import { motion } from "framer-motion";
 import EditRestaurantModal from "./EditRestaurantModal";
+import PhotoCredit from "./PhotoCredit";
 
 interface CertifiedRestaurantCardProps {
   restaurant: CertifiedRestaurant;
@@ -108,13 +109,23 @@ export default function CertifiedRestaurantCard({
 
           <div className="flex flex-col sm:flex-row">
             {/* Photo à gauche - prend tout l'espace vertical */}
-            <div className="w-full sm:w-1/3 restaurant-image-container">
+            <div className="w-full sm:w-1/3 restaurant-image-container relative">
               {restaurant.image ? (
-                <img
-                  src={restaurant.image}
-                  alt={restaurant.name}
-                  className="restaurant-image"
-                />
+                <>
+                  <img
+                    src={restaurant.image}
+                    alt={restaurant.name}
+                    className="restaurant-image"
+                  />
+                  {restaurant.photo_credit && (
+                    <PhotoCredit
+                      credit={restaurant.photo_credit}
+                      position="bottom-right"
+                      theme="dark"
+                      size="small"
+                    />
+                  )}
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center border border-gray-200 bg-gray-50 text-gray-400">
                   <span className="text-lg opacity-50">Photo</span>

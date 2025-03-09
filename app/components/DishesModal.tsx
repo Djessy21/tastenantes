@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dish } from "../lib/db-edge";
+import PhotoCredit from "./PhotoCredit";
 
 interface DishesModalProps {
   isOpen: boolean;
@@ -268,30 +269,24 @@ export default function DishesModal({
                       onClick={() => setSelectedDish(dish)}
                     >
                       {dish.image_url ? (
-                        <div className="h-52 w-full relative overflow-hidden">
+                        <div className="h-48 w-full relative">
                           <img
                             src={dish.image_url}
                             alt={dish.name}
-                            className="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
+                            className="h-full w-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                          {dish.photo_credit && (
+                            <PhotoCredit
+                              credit={dish.photo_credit}
+                              position="bottom-right"
+                              theme="dark"
+                              size="small"
+                            />
+                          )}
                         </div>
                       ) : (
-                        <div className="h-52 w-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-12 w-12"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={1.5}
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
+                        <div className="h-48 w-full bg-gray-100 flex items-center justify-center text-gray-400">
+                          <span>Pas d'image</span>
                         </div>
                       )}
 
@@ -397,12 +392,20 @@ export default function DishesModal({
 
                 <div className="flex flex-col md:flex-row">
                   {selectedDish.image_url ? (
-                    <div className="w-full md:w-1/2 h-64 md:h-auto">
+                    <div className="w-full md:w-1/2 h-64 md:h-auto relative">
                       <img
                         src={selectedDish.image_url}
                         alt={selectedDish.name}
                         className="h-full w-full object-cover"
                       />
+                      {selectedDish.photo_credit && (
+                        <PhotoCredit
+                          credit={selectedDish.photo_credit}
+                          position="bottom-left"
+                          theme="dark"
+                          size="medium"
+                        />
+                      )}
                     </div>
                   ) : (
                     <div className="w-full md:w-1/2 h-64 md:h-auto bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400">

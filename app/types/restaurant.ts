@@ -10,6 +10,7 @@ export interface Dish {
   price: number;
   image_url?: string;
   restaurantId: string;
+  photo_credit?: string;
 }
 
 export interface Restaurant {
@@ -21,6 +22,7 @@ export interface Restaurant {
   location: Location;
   website?: string;
   instagram?: string;
+  photo_credit?: string;
 }
 
 export interface CertifiedRestaurant extends Restaurant {
@@ -39,4 +41,5 @@ export interface CertifiedRestaurant extends Restaurant {
   updatedAt?: string;
   website?: string;
   instagram?: string;
+  photo_credit?: string;
 }

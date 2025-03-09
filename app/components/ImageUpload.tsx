@@ -3,11 +3,20 @@ import Image from "next/image";
 
 interface ImageUploadProps {
   onImageSelect: (imageUrl: string) => void;
+  onCreditSelect?: (credit: string) => void;
+  initialCredit?: string;
+  showCreditField?: boolean;
 }
 
-export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
+export default function ImageUpload({
+  onImageSelect,
+  onCreditSelect,
+  initialCredit = "",
+  showCreditField = true,
+}: ImageUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [photoCredit, setPhotoCredit] = useState(initialCredit);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = useCallback(
@@ -54,6 +63,14 @@ export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
     [onImageSelect]
   );
 
+  const handleCreditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCredit = e.target.value;
+    setPhotoCredit(newCredit);
+    if (onCreditSelect) {
+      onCreditSelect(newCredit);
+    }
+  };
+
   const handleButtonClick = () => {
     // Déclencher le clic sur l'input file caché
     fileInputRef.current?.click();
@@ -90,6 +107,24 @@ export default function ImageUpload({ onImageSelect }: ImageUploadProps) {
             alt="Preview"
             className="object-cover rounded-lg w-full h-full"
           />
+        </div>
+      )}
+
+      {showCreditField && (
+        <div className="mt-3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Crédit photo
+          </label>
+          <input
+            type="text"
+            value={photoCredit}
+            onChange={handleCreditChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+            placeholder="@photographe ou Nom du photographe"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Compte Instagram (avec @) ou nom du photographe
+          </p>
         </div>
       )}
     </div>

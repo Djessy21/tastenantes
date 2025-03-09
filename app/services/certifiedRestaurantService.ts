@@ -33,6 +33,7 @@ interface AddRestaurantInput {
   image_url?: string;
   website?: string;
   instagram?: string;
+  photo_credit?: string;
 }
 
 const certifiedRestaurantService = {
@@ -64,6 +65,7 @@ const certifiedRestaurantService = {
         image_url: restaurant.image_url,
         website: restaurant.website,
         instagram: restaurant.instagram,
+        photo_credit: restaurant.photo_credit,
       });
       return response.data;
     } catch (error) {

@@ -31,6 +31,7 @@ export default function AdminPanel({
     featured: false,
     website: "",
     instagram: "",
+    photo_credit: "",
     location: {
       lat: 0,
       lng: 0,
@@ -205,6 +206,7 @@ export default function AdminPanel({
           specialNote: formData.establishmentType,
           website: formData.website,
           instagram: formData.instagram,
+          photo_credit: formData.photo_credit,
         });
 
       // Ajouter les plats
@@ -270,6 +272,7 @@ export default function AdminPanel({
         featured: false,
         website: "",
         instagram: "",
+        photo_credit: "",
         location: {
           lat: 0,
           lng: 0,
@@ -510,60 +513,86 @@ export default function AdminPanel({
             </div>
 
             {/* Images du restaurant */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               <h3 className="text-sm uppercase tracking-wider font-medium">
                 Images du Restaurant
               </h3>
 
-              <div>
-                <label className="block text-xs uppercase tracking-wider mb-1">
-                  Ajouter des Images
-                </label>
-                <div className="relative">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-wider mb-1">
+                    Images
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    {restaurantImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className={`relative w-24 h-24 border rounded-lg overflow-hidden ${
+                          index === mainImageIndex
+                            ? "ring-2 ring-black"
+                            : "hover:ring-2 hover:ring-gray-300"
+                        }`}
+                        onClick={() => setMainImageIndex(index)}
+                      >
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt={`Restaurant image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {index === mainImageIndex && (
+                          <div className="absolute top-1 right-1 bg-black text-white text-xs px-1.5 py-0.5 rounded">
+                            Principal
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    <label className="w-24 h-24 flex items-center justify-center border-2 border-dashed rounded-lg cursor-pointer hover:border-gray-400">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                      />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Cliquez sur une image pour la définir comme principale
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider mb-1">
+                    Crédit photo
+                  </label>
                   <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    aria-label="Sélectionner des images"
+                    type="text"
+                    className="dior-input"
+                    placeholder="@photographe ou Nom du photographe"
+                    value={formData.photo_credit}
+                    onChange={(e) =>
+                      setFormData({ ...formData, photo_credit: e.target.value })
+                    }
                   />
-                  <button
-                    type="button"
-                    className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-black/80 transition-colors"
-                    onClick={() => {}} // Ce bouton ne fait rien, l'input au-dessus capte le clic
-                  >
-                    Sélectionner des images
-                  </button>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Compte Instagram (avec @) ou nom du photographe
+                  </p>
                 </div>
               </div>
-
-              {restaurantImages.length > 0 && (
-                <div className="grid grid-cols-3 gap-4">
-                  {restaurantImages.map((image, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={URL.createObjectURL(image)}
-                        alt={`Restaurant ${index + 1}`}
-                        className="w-full aspect-square object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setMainImageIndex(index)}
-                        className={`absolute inset-0 flex items-center justify-center text-xs uppercase ${
-                          index === mainImageIndex
-                            ? "bg-black/50 text-white"
-                            : "bg-transparent hover:bg-black/30 hover:text-white"
-                        }`}
-                      >
-                        {index === mainImageIndex
-                          ? "Image Principale"
-                          : "Définir comme Principale"}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Plats */}

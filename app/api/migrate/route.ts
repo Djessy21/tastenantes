@@ -1,18 +1,38 @@
 import { NextResponse } from "next/server";
-import { addWebsiteInstagramColumns } from "@/app/lib/db-migration";
+import {
+  addWebsiteInstagramColumns,
+  addPhotoCreditsColumns,
+} from "@/app/lib/db-migration";
 
 export const runtime = "edge";
 
 export async function GET(request: Request) {
   try {
-    // Exécuter la migration
-    const result = await addWebsiteInstagramColumns();
+    // Exécuter les migrations
+    const websiteInstagramResult = await addWebsiteInstagramColumns();
+    const photoCreditsResult = await addPhotoCreditsColumns();
 
-    if (result.success) {
-      return NextResponse.json({ message: result.message });
+    if (websiteInstagramResult.success && photoCreditsResult.success) {
+      return NextResponse.json({
+        message: "Toutes les migrations ont été exécutées avec succès",
+        details: {
+          websiteInstagram: websiteInstagramResult.message,
+          photoCredits: photoCreditsResult.message,
+        },
+      });
     } else {
       return NextResponse.json(
-        { error: "Migration failed", details: result.error },
+        {
+          error: "Certaines migrations ont échoué",
+          details: {
+            websiteInstagram: websiteInstagramResult.success
+              ? websiteInstagramResult.message
+              : websiteInstagramResult.error,
+            photoCredits: photoCreditsResult.success
+              ? photoCreditsResult.message
+              : photoCreditsResult.error,
+          },
+        },
         { status: 500 }
       );
     }
