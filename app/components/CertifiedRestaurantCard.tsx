@@ -6,6 +6,7 @@ import AddDishForm from "./AddDishForm";
 import DishesModal from "./DishesModal";
 import { CertifiedRestaurant } from "../types/restaurant";
 import { motion } from "framer-motion";
+import EditRestaurantModal from "./EditRestaurantModal";
 
 interface CertifiedRestaurantCardProps {
   restaurant: CertifiedRestaurant;
@@ -13,6 +14,7 @@ interface CertifiedRestaurantCardProps {
   isSelected?: boolean;
   onToggleFeatured?: () => void;
   onDelete?: () => void;
+  onUpdate?: (updatedRestaurant: CertifiedRestaurant) => void;
   isAdmin?: boolean;
 }
 
@@ -22,11 +24,13 @@ export default function CertifiedRestaurantCard({
   isSelected,
   onToggleFeatured,
   onDelete,
+  onUpdate,
   isAdmin = false,
 }: CertifiedRestaurantCardProps) {
   const [showAddDishForm, setShowAddDishForm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDishesModalOpen, setIsDishesModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -62,6 +66,16 @@ export default function CertifiedRestaurantCard({
   const openDishesModal = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDishesModalOpen(true);
+  };
+
+  const openEditModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditModalOpen(true);
+  };
+
+  const handleRestaurantUpdated = (updatedRestaurant: CertifiedRestaurant) => {
+    onUpdate?.(updatedRestaurant);
+    setIsEditModalOpen(false);
   };
 
   // Fonction pour ouvrir un lien externe sans déclencher l'événement onClick du parent
@@ -275,6 +289,30 @@ export default function CertifiedRestaurantCard({
                   {isAdmin && (
                     <>
                       <motion.button
+                        onClick={openEditModal}
+                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        style={{ borderRadius: "var(--button-border-radius)" }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                        Modifier
+                      </motion.button>
+
+                      <motion.button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowAddDishForm(!showAddDishForm);
@@ -374,7 +412,19 @@ export default function CertifiedRestaurantCard({
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  Validée par Taste Nantes
+                  Validée par{" "}
+                  <button
+                    className="ml-1 text-pink-600 hover:underline"
+                    onClick={(e) =>
+                      restaurant.certifiedBy &&
+                      openExternalLink(
+                        e,
+                        `https://instagram.com/${restaurant.certifiedBy}`
+                      )
+                    }
+                  >
+                    @{restaurant.certifiedBy}
+                  </button>
                 </div>
               </div>
             </div>
@@ -403,6 +453,14 @@ export default function CertifiedRestaurantCard({
         onClose={() => setIsDishesModalOpen(false)}
         restaurantId={restaurant.id}
         restaurantName={restaurant.name}
+      />
+
+      {/* Modal pour éditer le restaurant */}
+      <EditRestaurantModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        restaurant={restaurant}
+        onRestaurantUpdated={handleRestaurantUpdated}
       />
     </>
   );

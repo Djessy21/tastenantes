@@ -2,7 +2,7 @@ import { useState, FormEvent } from "react";
 import ImageUpload from "./ImageUpload";
 
 interface AddDishFormProps {
-  restaurantId: number;
+  restaurantId: string;
   onDishAdded: () => void;
 }
 
@@ -32,7 +32,7 @@ export default function AddDishForm({
           name,
           description,
           price: parseFloat(price),
-          image_url: imageUrl,
+          imageUrl,
         }),
       });
 

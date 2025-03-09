@@ -17,6 +17,8 @@ export interface Restaurant {
   featured: boolean;
   image?: string;
   image_url?: string;
+  website?: string;
+  instagram?: string;
 }
 
 export interface Dish {
@@ -48,7 +50,9 @@ export async function createRestaurant(
   certifiedBy: string,
   certificationDate: string,
   featured: boolean,
-  image_url: string = ""
+  image_url: string = "",
+  website: string = "",
+  instagram: string = ""
 ): Promise<Restaurant> {
   const { rows } = await sql<Restaurant>`
     INSERT INTO restaurants (
@@ -63,7 +67,9 @@ export async function createRestaurant(
       certification_date,
       featured,
       is_certified,
-      image
+      image,
+      website,
+      instagram
     ) VALUES (
       ${name}, 
       ${address}, 
@@ -76,7 +82,9 @@ export async function createRestaurant(
       ${certificationDate},
       ${featured},
       true,
-      ${image_url}
+      ${image_url},
+      ${website},
+      ${instagram}
     )
     RETURNING *
   `;
@@ -408,6 +416,86 @@ export async function deleteRestaurant(id: number): Promise<void> {
     `;
   } catch (error) {
     console.error("Error deleting restaurant:", error);
+    throw error;
+  }
+}
+
+export async function updateRestaurant(
+  id: number,
+  name: string,
+  address: string,
+  latitude: number,
+  longitude: number,
+  cuisine: string,
+  specialNote: string,
+  certifiedBy: string,
+  featured: boolean,
+  image_url: string = "",
+  website: string = "",
+  instagram: string = ""
+): Promise<Restaurant> {
+  try {
+    // Vérifier si les colonnes website et instagram existent
+    const checkColumnsResult = await sql`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'restaurants' 
+      AND column_name IN ('website', 'instagram');
+    `;
+
+    const existingColumns = checkColumnsResult.rows.map(
+      (row) => row.column_name
+    );
+    const hasWebsiteColumn = existingColumns.includes("website");
+    const hasInstagramColumn = existingColumns.includes("instagram");
+
+    // Construire la requête SQL en fonction des colonnes existantes
+    let query;
+
+    if (hasWebsiteColumn && hasInstagramColumn) {
+      // Les deux colonnes existent
+      query = sql<Restaurant>`
+        UPDATE restaurants
+        SET 
+          name = ${name}, 
+          address = ${address}, 
+          latitude = ${latitude}, 
+          longitude = ${longitude},
+          cuisine = ${cuisine},
+          special_note = ${specialNote},
+          certified_by = ${certifiedBy},
+          featured = ${featured},
+          image = ${image_url},
+          website = ${website},
+          instagram = ${instagram},
+          updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `;
+    } else {
+      // Une ou les deux colonnes n'existent pas
+      query = sql<Restaurant>`
+        UPDATE restaurants
+        SET 
+          name = ${name}, 
+          address = ${address}, 
+          latitude = ${latitude}, 
+          longitude = ${longitude},
+          cuisine = ${cuisine},
+          special_note = ${specialNote},
+          certified_by = ${certifiedBy},
+          featured = ${featured},
+          image = ${image_url},
+          updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING *
+      `;
+    }
+
+    const { rows } = await query;
+    return rows[0];
+  } catch (error) {
+    console.error("Error updating restaurant:", error);
     throw error;
   }
 }

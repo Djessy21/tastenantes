@@ -29,6 +29,8 @@ export default function AdminPanel({
     certifiedBy: "",
     certificationDate: new Date().toISOString(),
     featured: false,
+    website: "",
+    instagram: "",
     location: {
       lat: 0,
       lng: 0,
@@ -201,6 +203,8 @@ export default function AdminPanel({
           rating: 5,
           image_url: restaurantImageUrl,
           specialNote: formData.establishmentType,
+          website: formData.website,
+          instagram: formData.instagram,
         });
 
       // Ajouter les plats
@@ -264,6 +268,8 @@ export default function AdminPanel({
         certifiedBy: "",
         certificationDate: new Date().toISOString(),
         featured: false,
+        website: "",
+        instagram: "",
         location: {
           lat: 0,
           lng: 0,
@@ -391,6 +397,47 @@ export default function AdminPanel({
                 </select>
               </div>
 
+              <div>
+                <label className="block text-xs uppercase tracking-wider mb-1">
+                  Site Web
+                </label>
+                <input
+                  type="url"
+                  className="dior-input"
+                  placeholder="https://www.example.com"
+                  value={formData.website}
+                  onChange={(e) =>
+                    setFormData({ ...formData, website: e.target.value })
+                  }
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Optionnel - URL complète avec http:// ou https://
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-wider mb-1">
+                  Instagram
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    @
+                  </span>
+                  <input
+                    type="text"
+                    className="dior-input pl-7"
+                    placeholder="nomdurestaurant"
+                    value={formData.instagram}
+                    onChange={(e) =>
+                      setFormData({ ...formData, instagram: e.target.value })
+                    }
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Optionnel - Nom d'utilisateur sans le @
+                </p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs uppercase tracking-wider mb-1">
@@ -435,6 +482,30 @@ export default function AdminPanel({
                     }
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-wider mb-1">
+                  Validé par
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    @
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    className="dior-input pl-7"
+                    placeholder="compte_instagram_validateur"
+                    value={formData.certifiedBy}
+                    onChange={(e) =>
+                      setFormData({ ...formData, certifiedBy: e.target.value })
+                    }
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Compte Instagram du validateur (sans le @)
+                </p>
               </div>
             </div>
 

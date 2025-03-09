@@ -144,9 +144,41 @@ export default function Home() {
   );
 
   const handleRestaurantDelete = () => {
+    // Rafraîchir la liste des restaurants certifiés
     fetchCertifiedRestaurants();
-    if (selectedRestaurant) {
-      setSelectedRestaurant(null);
+    // Désélectionner le restaurant
+    setSelectedRestaurant(null);
+  };
+
+  const handleRestaurantUpdate = (updatedRestaurant: CertifiedRestaurant) => {
+    // Mettre à jour la liste des restaurants certifiés
+    setCertifiedRestaurants((prevRestaurants) =>
+      prevRestaurants.map((restaurant) =>
+        restaurant.id === updatedRestaurant.id ? updatedRestaurant : restaurant
+      )
+    );
+
+    // Si le restaurant mis à jour est sélectionné, mettre à jour la sélection
+    if (selectedRestaurant?.id === updatedRestaurant.id) {
+      setSelectedRestaurant(updatedRestaurant);
+    }
+  };
+
+  const runMigration = async () => {
+    try {
+      const response = await fetch("/api/migrate");
+      if (!response.ok) {
+        throw new Error("Erreur lors de la migration");
+      }
+      const data = await response.json();
+      alert(data.message || "Migration réussie");
+      // Rafraîchir la liste des restaurants
+      fetchCertifiedRestaurants();
+    } catch (error) {
+      console.error("Erreur lors de la migration:", error);
+      alert(
+        "Erreur lors de la migration. Consultez la console pour plus de détails."
+      );
     }
   };
 
@@ -211,12 +243,21 @@ export default function Home() {
               onFilterChange={handleFilterChange}
             />
             {isAdmin && (
-              <button
-                onClick={() => setShowAdminPanel(true)}
-                className="dior-button whitespace-nowrap w-full sm:w-auto"
-              >
-                + Ajouter
-              </button>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => setShowAdminPanel(true)}
+                  className="dior-button whitespace-nowrap w-full sm:w-auto"
+                >
+                  + Ajouter
+                </button>
+                <button
+                  onClick={runMigration}
+                  className="dior-button whitespace-nowrap w-full sm:w-auto bg-gray-700 hover:bg-gray-800"
+                  title="Ajouter les colonnes website et instagram à la base de données"
+                >
+                  Migrer DB
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -246,6 +287,7 @@ export default function Home() {
                           handleToggleFeatured(restaurant)
                         }
                         onDelete={handleRestaurantDelete}
+                        onUpdate={handleRestaurantUpdate}
                         isAdmin={isAdmin}
                       />
                     ))}
@@ -264,6 +306,7 @@ export default function Home() {
                           handleToggleFeatured(restaurant)
                         }
                         onDelete={handleRestaurantDelete}
+                        onUpdate={handleRestaurantUpdate}
                         isAdmin={isAdmin}
                       />
                     ))}

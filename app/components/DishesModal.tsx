@@ -7,7 +7,7 @@ import { Dish } from "../lib/db-edge";
 interface DishesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  restaurantId: number;
+  restaurantId: string;
   restaurantName: string;
 }
 

@@ -56,6 +56,8 @@ export async function POST(request: Request) {
       certificationDate,
       featured,
       image_url,
+      website,
+      instagram,
     } = body;
 
     console.log("Création du restaurant:", name);
@@ -70,7 +72,9 @@ export async function POST(request: Request) {
       certifiedBy,
       certificationDate,
       featured,
-      image_url || ""
+      image_url || "",
+      website || "",
+      instagram || ""
     );
 
     // Transformer le restaurant pour assurer la cohérence des noms de champs
@@ -80,6 +84,8 @@ export async function POST(request: Request) {
       certifiedBy: restaurant.certified_by,
       certificationDate: restaurant.certification_date,
       specialNote: restaurant.special_note,
+      website: restaurant.website,
+      instagram: restaurant.instagram,
     };
 
     console.log("Restaurant créé avec succès:", transformedRestaurant);

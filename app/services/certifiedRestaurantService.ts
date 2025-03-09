@@ -16,6 +16,8 @@ export interface Restaurant {
   certifiedBy: string;
   certificationDate: string;
   featured: boolean;
+  website?: string;
+  instagram?: string;
 }
 
 interface AddRestaurantInput {
@@ -29,6 +31,8 @@ interface AddRestaurantInput {
   certificationDate: string;
   featured: boolean;
   image_url?: string;
+  website?: string;
+  instagram?: string;
 }
 
 const certifiedRestaurantService = {
@@ -58,6 +62,8 @@ const certifiedRestaurantService = {
         certificationDate: restaurant.certificationDate,
         featured: restaurant.featured,
         image_url: restaurant.image_url,
+        website: restaurant.website,
+        instagram: restaurant.instagram,
       });
       return response.data;
     } catch (error) {

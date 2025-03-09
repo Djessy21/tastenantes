@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getRestaurantById, deleteRestaurant } from "@/app/lib/db-edge";
+import {
+  getRestaurantById,
+  updateRestaurant,
+  deleteRestaurant,
+} from "@/app/lib/db-edge";
 
 export const runtime = "edge";
 
@@ -8,15 +12,15 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const restaurantId = parseInt(params.id);
-    if (isNaN(restaurantId)) {
+    const id = parseInt(params.id);
+    if (isNaN(id)) {
       return NextResponse.json(
         { error: "Invalid restaurant ID" },
         { status: 400 }
       );
     }
 
-    const restaurant = await getRestaurantById(restaurantId);
+    const restaurant = await getRestaurantById(id);
     if (!restaurant) {
       return NextResponse.json(
         { error: "Restaurant not found" },
@@ -27,7 +31,8 @@ export async function GET(
     // Transformer le restaurant pour assurer la cohérence des noms de champs
     const transformedRestaurant = {
       ...restaurant,
-      image: restaurant.image || `/default-restaurant.svg`,
+      image:
+        restaurant.image || restaurant.image_url || `/default-restaurant.svg`,
       certifiedBy: restaurant.certified_by,
       certificationDate: restaurant.certification_date,
       specialNote: restaurant.special_note,
@@ -43,21 +48,106 @@ export async function GET(
   }
 }
 
-export async function DELETE(
+export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const restaurantId = parseInt(params.id);
-    if (isNaN(restaurantId)) {
+    const id = parseInt(params.id);
+    if (isNaN(id)) {
       return NextResponse.json(
         { error: "Invalid restaurant ID" },
         { status: 400 }
       );
     }
 
-    await deleteRestaurant(restaurantId);
-    return NextResponse.json({ message: "Restaurant deleted successfully" });
+    const body = await request.json();
+    const {
+      name,
+      address,
+      cuisine,
+      specialNote,
+      certifiedBy,
+      featured,
+      website,
+      instagram,
+      image,
+      location,
+    } = body;
+
+    // Vérifier si le restaurant existe
+    const existingRestaurant = await getRestaurantById(id);
+    if (!existingRestaurant) {
+      return NextResponse.json(
+        { error: "Restaurant not found" },
+        { status: 404 }
+      );
+    }
+
+    // Mettre à jour le restaurant
+    const updatedRestaurant = await updateRestaurant(
+      id,
+      name,
+      address,
+      location?.lat || existingRestaurant.latitude,
+      location?.lng || existingRestaurant.longitude,
+      cuisine,
+      specialNote,
+      certifiedBy,
+      featured,
+      image || existingRestaurant.image || "",
+      website || "",
+      instagram || ""
+    );
+
+    // Transformer le restaurant pour assurer la cohérence des noms de champs
+    const transformedRestaurant = {
+      ...updatedRestaurant,
+      image:
+        updatedRestaurant.image ||
+        updatedRestaurant.image_url ||
+        `/default-restaurant.svg`,
+      certifiedBy: updatedRestaurant.certified_by,
+      certificationDate: updatedRestaurant.certification_date,
+      specialNote: updatedRestaurant.special_note,
+    };
+
+    return NextResponse.json(transformedRestaurant);
+  } catch (error) {
+    console.error("Error updating restaurant:", error);
+    return NextResponse.json(
+      { error: "Failed to update restaurant" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = parseInt(params.id);
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { error: "Invalid restaurant ID" },
+        { status: 400 }
+      );
+    }
+
+    // Vérifier si le restaurant existe
+    const restaurant = await getRestaurantById(id);
+    if (!restaurant) {
+      return NextResponse.json(
+        { error: "Restaurant not found" },
+        { status: 404 }
+      );
+    }
+
+    // Supprimer le restaurant
+    await deleteRestaurant(id);
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting restaurant:", error);
     return NextResponse.json(
