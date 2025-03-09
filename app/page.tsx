@@ -223,7 +223,10 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="pt-72 sm:pt-52 md:pt-44">
+      {/* Espace réservé pour le header */}
+      <div className="h-48 sm:h-40 md:h-36"></div>
+
+      <main className="pt-4">
         <div className="dior-container">
           <div className="space-y-6">
             {loading ? (
