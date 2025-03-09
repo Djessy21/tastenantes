@@ -223,7 +223,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="pt-56 sm:pt-60 md:pt-52">
+      <main className="pt-64 sm:pt-68 md:pt-60">
         <div className="dior-container">
           <div className="space-y-6">
             {loading ? (
