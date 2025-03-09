@@ -195,11 +195,14 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]">
         <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-black/10">
-          <div className="flex flex-col items-center gap-2 w-full">
-            <h1 className="dior-heading text-center text-3xl font-bold">
+          <div className="flex justify-between items-center w-full">
+            <div className="flex-1"></div> {/* Espace à gauche */}
+            <h1 className="dior-heading text-center text-3xl font-bold flex-1">
               Taste Nantes
             </h1>
-            <AuthButton />
+            <div className="flex-1 flex justify-end">
+              <AuthButton />
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
             <FilterBar
