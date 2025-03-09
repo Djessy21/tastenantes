@@ -192,7 +192,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50] pb-4 sm:pb-2 md:pb-0">
+      <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]">
         <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-black/10">
           <div className="flex flex-col items-center gap-2 w-full">
             <h1 className="dior-heading text-center text-3xl font-bold">
@@ -223,7 +223,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="pt-40 sm:pt-36 md:pt-32">
+      <main className="pt-72 sm:pt-52 md:pt-44">
         <div className="dior-container">
           <div className="space-y-6">
             {loading ? (
