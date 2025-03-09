@@ -22,9 +22,12 @@ export default function AuthButton() {
   if (session) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-600">
+        <Link
+          href="/profile"
+          className="text-xs text-gray-600 hover:text-gray-900 transition-colors"
+        >
           {isAdmin ? "Admin" : "Utilisateur"}: {session.user.email}
-        </span>
+        </Link>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
           className="text-xs uppercase tracking-wider px-3 py-1 border border-black/20 hover:border-black transition-colors"
