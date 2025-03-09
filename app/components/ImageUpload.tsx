@@ -6,6 +6,7 @@ interface ImageUploadProps {
   onCreditSelect?: (credit: string) => void;
   initialCredit?: string;
   showCreditField?: boolean;
+  imageType?: "dish" | "restaurant";
 }
 
 export default function ImageUpload({
@@ -13,6 +14,7 @@ export default function ImageUpload({
   onCreditSelect,
   initialCredit = "",
   showCreditField = true,
+  imageType = "dish",
 }: ImageUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function ImageUpload({
         setIsLoading(true);
         const formData = new FormData();
         formData.append("image", file);
-        formData.append("type", "dish"); // Spécifier le type d'image
+        formData.append("type", imageType); // Utiliser le type d'image spécifié
 
         const response = await fetch("/api/upload", {
           method: "POST",
@@ -55,12 +57,12 @@ export default function ImageUpload({
       } catch (error) {
         console.error("Error uploading image:", error);
         // En cas d'erreur, on utilise une image par défaut
-        onImageSelect("/default-dish.svg");
+        onImageSelect(`/default-${imageType}.svg`);
       } finally {
         setIsLoading(false);
       }
     },
-    [onImageSelect]
+    [onImageSelect, imageType]
   );
 
   const handleCreditChange = (e: React.ChangeEvent<HTMLInputElement>) => {

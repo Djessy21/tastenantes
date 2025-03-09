@@ -43,6 +43,19 @@ export async function saveImage(
       `ImageService: Taille du buffer: ${file.buffer.length} bytes, nom: ${file.originalname}, type MIME: ${file.mimetype}`
     );
 
+    // Vérifier que le buffer n'est pas vide
+    if (!file.buffer || file.buffer.length === 0) {
+      console.error("ImageService: Buffer d'image vide");
+      // Retourner une image par défaut
+      if (type === "restaurant") {
+        return `/default-restaurant.svg`;
+      } else if (type === "dish") {
+        return `/default-dish.svg`;
+      } else {
+        return `/default-image.svg`;
+      }
+    }
+
     // Détection plus robuste de l'environnement de production
     const isProduction =
       process.env.NODE_ENV === "production" || process.env.VERCEL === "1";

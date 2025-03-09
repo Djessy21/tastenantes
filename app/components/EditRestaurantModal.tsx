@@ -74,6 +74,7 @@ export default function EditRestaurantModal({
       lat: 0,
       lng: 0,
     },
+    tempImageUrl: "",
   });
 
   const [newImage, setNewImage] = useState<File | null>(null);
@@ -95,6 +96,7 @@ export default function EditRestaurantModal({
         instagram: restaurant.instagram || "",
         photo_credit: restaurant.photo_credit || "",
         location: restaurant.location || { lat: 0, lng: 0 },
+        tempImageUrl: restaurant.image || "",
       });
 
       // Initialiser l'aperçu de l'image avec l'image actuelle du restaurant
@@ -122,10 +124,14 @@ export default function EditRestaurantModal({
     setError(null);
 
     try {
-      let updatedImageUrl = restaurant.image;
+      let updatedImageUrl = formData.tempImageUrl || restaurant.image;
 
       // Si une nouvelle image a été sélectionnée, la télécharger
       if (newImage) {
+        console.log(
+          "Téléchargement d'une nouvelle image pour le restaurant:",
+          restaurant.id
+        );
         const imageFormData = new FormData();
         imageFormData.append("image", newImage);
         imageFormData.append("type", "restaurant");
@@ -138,6 +144,7 @@ export default function EditRestaurantModal({
         if (imageResponse.ok) {
           const responseData = await imageResponse.json();
           updatedImageUrl = responseData.imageUrl;
+          console.log("Nouvelle URL d'image obtenue:", updatedImageUrl);
         } else {
           const errorText = await imageResponse.text();
           console.error("Erreur lors de l'upload de l'image:", errorText);
@@ -145,9 +152,25 @@ export default function EditRestaurantModal({
           setIsSubmitting(false);
           return;
         }
+      } else {
+        console.log("Utilisation de l'URL d'image existante:", updatedImageUrl);
       }
 
       // Mettre à jour le restaurant
+      console.log("Mise à jour du restaurant avec les données:", {
+        name: formData.name,
+        address: formData.address,
+        cuisine: formData.cuisine,
+        specialNote: formData.specialNote,
+        certifiedBy: formData.certifiedBy,
+        featured: formData.featured,
+        website: formData.website,
+        instagram: formData.instagram,
+        photo_credit: formData.photo_credit,
+        image: updatedImageUrl,
+        location: formData.location,
+      });
+
       const response = await fetch(`/api/restaurants/${restaurant.id}`, {
         method: "PUT",
         headers: {
@@ -170,12 +193,14 @@ export default function EditRestaurantModal({
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Erreur de réponse API:", errorData);
         throw new Error(
           errorData.error || "Erreur lors de la mise à jour du restaurant"
         );
       }
 
       const updatedRestaurant = await response.json();
+      console.log("Restaurant mis à jour avec succès:", updatedRestaurant);
       onRestaurantUpdated(updatedRestaurant);
       onClose();
     } catch (error) {
@@ -271,8 +296,13 @@ export default function EditRestaurantModal({
                   <div className="flex-1">
                     <ImageUpload
                       onImageSelect={(imageUrl) => {
-                        // Convertir l'URL de données en File
+                        console.log(
+                          "Image sélectionnée dans ImageUpload:",
+                          imageUrl
+                        );
+                        // Si c'est une URL de données, convertir en File
                         if (imageUrl.startsWith("data:")) {
+                          console.log("Conversion de l'URL de données en File");
                           fetch(imageUrl)
                             .then((res) => res.blob())
                             .then((blob) => {
@@ -281,14 +311,40 @@ export default function EditRestaurantModal({
                                 "restaurant-image.jpg",
                                 { type: "image/jpeg" }
                               );
+                              console.log(
+                                "File créé à partir de l'URL de données"
+                              );
                               handleImageChange(file);
-                            });
+                            })
+                            .catch((err) =>
+                              console.error(
+                                "Erreur lors de la conversion de l'URL de données:",
+                                err
+                              )
+                            );
+                        } else if (
+                          imageUrl.startsWith("/api/") ||
+                          imageUrl.startsWith("/uploads/")
+                        ) {
+                          // Si c'est une URL d'API ou d'uploads, mettre à jour directement l'URL de l'image
+                          console.log(
+                            "URL d'image reçue, mise à jour de l'aperçu:",
+                            imageUrl
+                          );
+                          setImagePreview(imageUrl);
+                          // Stocker l'URL dans un état local pour l'utiliser lors de la soumission
+                          setFormData((prev) => ({
+                            ...prev,
+                            tempImageUrl: imageUrl, // Nous utiliserons cette URL temporaire lors de la soumission
+                          }));
                         }
                       }}
-                      onCreditSelect={(credit) =>
-                        setFormData({ ...formData, photo_credit: credit })
-                      }
+                      onCreditSelect={(credit) => {
+                        console.log("Crédit photo mis à jour:", credit);
+                        setFormData({ ...formData, photo_credit: credit });
+                      }}
                       initialCredit={formData.photo_credit}
+                      imageType="restaurant"
                     />
                   </div>
                 </div>
