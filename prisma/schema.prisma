@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modèles pour NextAuth.js
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  roleId        String    @default("user")
+  accounts      Account[]
+  sessions      Session[]
+  role          Role      @relation(fields: [roleId], references: [id])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Modèle pour la gestion des rôles
+model Role {
+  id          String @id
+  name        String
+  description String
+  users       User[]
+}
+
+model Restaurant {
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(255)
+  address           String              @db.VarChar(255)
+  latitude          Float?
+  longitude         Float?
+  rating            Decimal?            @db.Decimal(3, 1)
+  cuisine           String?             @db.VarChar(100)
+  specialNote       String?             @map("special_note")
+  certifiedBy       String?             @map("certified_by") @db.VarChar(100)
+  certificationDate DateTime?           @map("certification_date") @db.Timestamptz(6)
+  featured          Boolean?            @default(false)
+  createdAt         DateTime?           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime?           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  is_certified      Boolean?            @default(false)
+  image             String?
+  dishes            Dish[]
+  restaurant_images restaurant_images[]
+
+  @@map("restaurants")
+}
+
+model Dish {
+  id           Int         @id @default(autoincrement())
+  restaurantId Int?        @map("restaurant_id")
+  name         String      @db.VarChar(255)
+  description  String?
+  price        Decimal     @db.Decimal(10, 2)
+  imageUrl     String?     @map("image_url")
+  createdAt    DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("dishes")
+}
+
+model binary_images {
+  id         Int       @id @default(autoincrement())
+  image_data Bytes
+  image_type String    @db.VarChar(50)
+  mime_type  String    @db.VarChar(100)
+  filename   String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model restaurant_images {
+  id            Int         @id @default(autoincrement())
+  restaurant_id Int?
+  image_url     String
+  image_type    String      @db.VarChar(50)
+  is_main       Boolean?    @default(false)
+  created_at    DateTime?   @default(now()) @db.Timestamptz(6)
+  restaurants   Restaurant? @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}

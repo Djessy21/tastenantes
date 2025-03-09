@@ -8,6 +8,8 @@ import FilterBar from "./components/FilterBar";
 import { Restaurant, restaurantService } from "./services/restaurantService";
 import certifiedRestaurantService from "./services/certifiedRestaurantService";
 import { CertifiedRestaurant } from "./types/restaurant";
+import AuthButton from "./components/AuthButton";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -26,8 +28,11 @@ export default function Home() {
     cuisines: [],
     establishments: [],
   });
-  const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+
+  // Utiliser la session pour déterminer si l'utilisateur est admin
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "admin";
 
   useEffect(() => {
     // Fetch restaurants
@@ -73,10 +78,6 @@ export default function Home() {
     } catch (error) {
       console.error("Error toggling featured status:", error);
     }
-  };
-
-  const toggleAdmin = () => {
-    setIsAdmin(!isAdmin);
   };
 
   const handleFilterChange = (newFilters: {
@@ -198,12 +199,7 @@ export default function Home() {
             <h1 className="dior-heading text-center text-3xl font-bold">
               Taste Nantes
             </h1>
-            <button
-              onClick={toggleAdmin}
-              className="text-xs uppercase tracking-wider px-3 py-1 border border-black/20 hover:border-black transition-colors"
-            >
-              {isAdmin ? "Mode Admin" : "Mode Client"}
-            </button>
+            <AuthButton />
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
             <FilterBar
