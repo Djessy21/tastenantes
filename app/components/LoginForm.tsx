@@ -1,20 +1,33 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Vérifier si l'utilisateur vient de s'inscrire
+  useEffect(() => {
+    const registered = searchParams.get("registered");
+    if (registered === "true") {
+      setSuccess(
+        "Inscription réussie ! Vous pouvez maintenant vous connecter."
+      );
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     try {
       const result = await signIn("credentials", {
@@ -44,6 +57,12 @@ export default function LoginForm() {
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
           {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
+          {success}
         </div>
       )}
 
@@ -89,6 +108,19 @@ export default function LoginForm() {
         >
           {loading ? "Connexion en cours..." : "Se connecter"}
         </button>
+
+        {/* Lien vers la page d'inscription */}
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-600">
+            Vous n'avez pas de compte ?{" "}
+            <a
+              href="/register"
+              className="font-medium text-black hover:underline"
+            >
+              S'inscrire
+            </a>
+          </p>
+        </div>
       </form>
     </div>
   );
