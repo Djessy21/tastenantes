@@ -105,7 +105,8 @@ export async function getDishes(restaurantId: number): Promise<Dish[]> {
       d.description,
       d.price,
       d.image_url,
-      d.created_at
+      d.created_at,
+      d.photo_credit
     FROM dishes d
     WHERE d.restaurant_id = ${restaurantId}
     ORDER BY d.created_at DESC
