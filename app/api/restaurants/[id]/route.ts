@@ -73,6 +73,7 @@ export async function PUT(
       instagram,
       image,
       location,
+      photo_credit,
     } = body;
 
     // Vérifier si le restaurant existe
@@ -97,7 +98,8 @@ export async function PUT(
       featured,
       image || existingRestaurant.image || "",
       website || "",
-      instagram || ""
+      instagram || "",
+      photo_credit || existingRestaurant.photo_credit || ""
     );
 
     // Transformer le restaurant pour assurer la cohérence des noms de champs
