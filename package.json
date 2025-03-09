@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "init-db": "ts-node scripts/init-local-db.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "create-admin": "ts-node scripts/create-admin.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",
