@@ -1,8 +1,8 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
 import { compare } from "bcrypt";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import prisma from "./prisma";
 
 // Étendre les types de NextAuth
 declare module "next-auth" {
@@ -26,8 +26,6 @@ declare module "next-auth/jwt" {
     role?: string;
   }
 }
-
-const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
