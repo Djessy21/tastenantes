@@ -64,6 +64,12 @@ export default function CertifiedRestaurantCard({
     setIsDishesModalOpen(true);
   };
 
+  // Fonction pour ouvrir un lien externe sans déclencher l'événement onClick du parent
+  const openExternalLink = (e: React.MouseEvent, url: string) => {
+    e.stopPropagation();
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <>
       <div
@@ -151,7 +157,7 @@ export default function CertifiedRestaurantCard({
                   </div>
 
                   {/* Adresse avec icône */}
-                  <div className="flex items-start text-sm">
+                  <div className="flex items-start text-sm mb-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4 mr-1 mt-0.5 text-gray-500"
@@ -174,6 +180,68 @@ export default function CertifiedRestaurantCard({
                     </svg>
                     <span className="opacity-75">{restaurant.address}</span>
                   </div>
+
+                  {/* Site web avec icône */}
+                  {restaurant.website && (
+                    <div className="flex items-start text-sm mb-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1 mt-0.5 text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"
+                        />
+                      </svg>
+                      <button
+                        className="opacity-75 text-blue-600 hover:underline"
+                        onClick={(e) =>
+                          openExternalLink(e, restaurant.website || "#")
+                        }
+                      >
+                        {restaurant.website?.replace(
+                          /^https?:\/\/(www\.)?/,
+                          ""
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Instagram avec icône */}
+                  {restaurant.instagram && (
+                    <div className="flex items-start text-sm">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1 mt-0.5 text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"
+                        />
+                      </svg>
+                      <button
+                        className="opacity-75 text-pink-600 hover:underline"
+                        onClick={(e) =>
+                          openExternalLink(
+                            e,
+                            `https://instagram.com/${restaurant.instagram}`
+                          )
+                        }
+                      >
+                        @{restaurant.instagram}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -198,7 +266,7 @@ export default function CertifiedRestaurantCard({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                       />
                     </svg>
                     Voir les plats

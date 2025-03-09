@@ -4,35 +4,39 @@ export interface Location {
 }
 
 export interface Dish {
-  id: number;
-  restaurant_id: number;
+  id: string;
   name: string;
-  description: string;
+  description?: string;
   price: number;
-  image_url: string;
-  created_at: string;
+  image_url?: string;
+  restaurantId: string;
 }
 
 export interface Restaurant {
-  id: number;
+  id: string;
   name: string;
   address: string;
-  latitude: number;
-  longitude: number;
-  rating: number;
   cuisine: string;
-  special_note: string;
-  certified_by: string;
-  certification_date: string;
-  featured: boolean;
-  created_at: string;
-  updated_at: string;
-  is_certified: boolean;
-  image?: string;
+  rating: number;
+  location: Location;
+  website?: string;
+  instagram?: string;
 }
 
 export interface CertifiedRestaurant extends Restaurant {
+  description?: string;
+  phone?: string;
+  email?: string;
+  image?: string;
+  priceRange?: string;
+  openingHours?: string;
+  dishes: Dish[];
+  featured: boolean;
+  specialNote?: string;
   certifiedBy: string;
   certificationDate: string;
-  specialNote: string;
+  createdAt: string;
+  updatedAt?: string;
+  website?: string;
+  instagram?: string;
 }
