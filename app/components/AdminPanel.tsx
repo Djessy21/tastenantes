@@ -81,6 +81,8 @@ export default function AdminPanel({
     "Crêperie",
     "Salon de thé",
     "Food Truck",
+    "Boulangerie",
+    "Chocolaterie",
     "Autre",
   ];
 

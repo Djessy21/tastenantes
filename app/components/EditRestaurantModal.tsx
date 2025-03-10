@@ -57,6 +57,8 @@ export default function EditRestaurantModal({
     "Crêperie",
     "Salon de thé",
     "Food Truck",
+    "Boulangerie",
+    "Chocolaterie",
     "Autre",
   ];
 
