@@ -279,7 +279,7 @@ export default function DishesModal({
                             <PhotoCredit
                               credit={dish.photo_credit}
                               position="bottom-right"
-                              theme="dark"
+                              theme="light"
                               size="small"
                             />
                           )}
