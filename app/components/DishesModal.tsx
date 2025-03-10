@@ -233,7 +233,7 @@ export default function DishesModal({
                         {dishes[currentIndex].photo_credit && (
                           <div className="absolute bottom-2 right-2">
                             <PhotoCredit
-                              credit={dishes[currentIndex].photo_credit}
+                              credit={dishes[currentIndex].photo_credit || ""}
                               position="bottom-right"
                               theme="dark"
                               size="small"
