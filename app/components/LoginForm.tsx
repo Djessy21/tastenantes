@@ -15,7 +15,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { openRegisterModal } = useAuthModal();
+  const { openRegisterModal, closeModal } = useAuthModal();
 
   // Vérifier si l'utilisateur vient de s'inscrire
   useEffect(() => {
@@ -43,6 +43,7 @@ export default function LoginForm() {
       if (result?.error) {
         setError("Identifiants invalides");
       } else {
+        closeModal(); // Fermer le modal après une connexion réussie
         router.refresh();
       }
     } catch (error) {
