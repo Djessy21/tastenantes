@@ -14,13 +14,10 @@ const testRestaurants = [
     cuisine: "Française",
     specialNote: "Bistro",
     certifiedBy: "Chef Jean",
-    certificationDate: new Date().toISOString(),
+    certificationDate: new Date(),
     featured: Math.random() > 0.8, // 20% de chance d'être en vedette
     image:
       "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000",
-    photo_credit: "Unsplash",
-    website: "https://example.com/petit-gourmet",
-    instagram: "petitgourmet",
   },
   {
     name: "Saveurs d'Asie",
@@ -31,13 +28,10 @@ const testRestaurants = [
     cuisine: "Asiatique",
     specialNote: "Restaurant",
     certifiedBy: "Chef Li",
-    certificationDate: new Date().toISOString(),
+    certificationDate: new Date(),
     featured: Math.random() > 0.8,
     image:
       "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1000",
-    photo_credit: "Unsplash",
-    website: "https://example.com/saveurs-asie",
-    instagram: "saveursasie",
   },
   {
     name: "Pasta Bella",
@@ -48,13 +42,10 @@ const testRestaurants = [
     cuisine: "Italienne",
     specialNote: "Trattoria",
     certifiedBy: "Chef Marco",
-    certificationDate: new Date().toISOString(),
+    certificationDate: new Date(),
     featured: Math.random() > 0.8,
     image:
       "https://images.unsplash.com/photo-1579684947550-22e945225d9a?q=80&w=1000",
-    photo_credit: "Unsplash",
-    website: "https://example.com/pasta-bella",
-    instagram: "pastabella",
   },
   {
     name: "Le Jardin Vert",
@@ -65,13 +56,10 @@ const testRestaurants = [
     cuisine: "Végétarienne",
     specialNote: "Restaurant",
     certifiedBy: "Chef Vert",
-    certificationDate: new Date().toISOString(),
+    certificationDate: new Date(),
     featured: Math.random() > 0.8,
     image:
       "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?q=80&w=1000",
-    photo_credit: "Unsplash",
-    website: "https://example.com/jardin-vert",
-    instagram: "jardinvert",
   },
   {
     name: "Burger Deluxe",
@@ -82,13 +70,10 @@ const testRestaurants = [
     cuisine: "Américaine",
     specialNote: "Burger",
     certifiedBy: "Chef Burger",
-    certificationDate: new Date().toISOString(),
+    certificationDate: new Date(),
     featured: Math.random() > 0.8,
     image:
       "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=1000",
-    photo_credit: "Unsplash",
-    website: "https://example.com/burger-deluxe",
-    instagram: "burgerdeluxe",
   },
 ];
 
@@ -231,14 +216,9 @@ function generateRandomRestaurant() {
     specialNote:
       establishmentTypes[Math.floor(Math.random() * establishmentTypes.length)],
     certifiedBy: `Chef ${chefs[Math.floor(Math.random() * chefs.length)]}`,
-    certificationDate: new Date().toISOString(),
+    certificationDate: new Date(),
     featured: Math.random() > 0.8, // 20% de chance d'être en vedette
     image: `https://source.unsplash.com/random/800x600/?restaurant,${Math.random()}`,
-    photo_credit: "Unsplash",
-    website: `https://example.com/${Math.random()
-      .toString(36)
-      .substring(2, 8)}`,
-    instagram: Math.random().toString(36).substring(2, 10),
   };
 }
 
