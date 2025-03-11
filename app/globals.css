@@ -14,7 +14,7 @@
   --background-rgb: 255, 255, 255;
   --dish-image-border-radius: 0.5rem; /* 8px par défaut, ajustez selon vos préférences */
   --button-border-radius: 1rem; /* Arrondi des boutons, ajustez selon vos préférences */
-  --restaurant-image-height: 280px;
+  --restaurant-image-height: 400px; /* Augmenté pour un format plus haut */
   --dish-image-height: 160px;
   --image-border-radius: 8px;
   --button-border-radius: 4px;
@@ -206,3 +206,11 @@ button {
 .snap-center {
   scroll-snap-align: center;
 }
+
+/* Suppression du style spécifique ajouté précédemment */
+/* @media (min-width: 640px) {
+  .restaurant-image-container {
+    width: 240px;
+    height: 320px;
+  }
+} */

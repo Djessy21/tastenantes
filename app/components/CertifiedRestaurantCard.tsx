@@ -92,20 +92,20 @@ export default function CertifiedRestaurantCard({
           isSelected
             ? "shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-gray-200"
             : "shadow-[0_5px_15px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)]"
-        }`}
-        onClick={onClick}
-      >
+      }`}
+      onClick={onClick}
+    >
         <div className="relative z-20">
-          <div className="absolute top-4 right-4 flex gap-2 z-10">
-            {restaurant.featured && (
-              <div
+      <div className="absolute top-4 right-4 flex gap-2 z-10">
+        {restaurant.featured && (
+          <div
                 className="h-3 w-3 text-yellow-500"
                 title="Restaurant en vedette"
-              >
+          >
                 ★
-              </div>
-            )}
           </div>
+        )}
+      </div>
 
           <div className="flex flex-col sm:flex-row">
             {/* Photo à gauche - prend tout l'espace vertical */}
@@ -114,8 +114,23 @@ export default function CertifiedRestaurantCard({
                 <>
                   <img
                     src={restaurant.image}
-                    alt={restaurant.name}
+            alt={restaurant.name}
                     className="restaurant-image"
+                    onError={(e) => {
+                      console.error(
+                        `Erreur de chargement de l'image: ${restaurant.image}`
+                      );
+                      // Remplacer par l'image par défaut
+                      e.currentTarget.src = "/default-restaurant.svg";
+                      // Masquer le crédit photo si on utilise l'image par défaut
+                      const creditElement =
+                        e.currentTarget.parentElement?.querySelector(
+                          ".photo-credit"
+                        ) as HTMLElement | null;
+                      if (creditElement) {
+                        creditElement.style.display = "none";
+                      }
+                    }}
                   />
                   {restaurant.photo_credit && (
                     <PhotoCredit
@@ -129,8 +144,8 @@ export default function CertifiedRestaurantCard({
               ) : (
                 <div className="w-full h-full flex items-center justify-center border border-gray-200 bg-gray-50 text-gray-400">
                   <span className="text-lg opacity-50">Photo</span>
-                </div>
-              )}
+        </div>
+      )}
             </div>
 
             {/* Informations à droite - avec meilleure organisation */}
@@ -139,8 +154,8 @@ export default function CertifiedRestaurantCard({
                 {/* En-tête avec nom */}
                 <div className="mb-3">
                   <h3 className="text-xl font-medium mb-2">
-                    {restaurant.name}
-                  </h3>
+        {restaurant.name}
+      </h3>
 
                   {/* Type d'établissement et cuisine avec badges */}
                   <div className="flex flex-wrap gap-2 mb-3">
@@ -160,7 +175,7 @@ export default function CertifiedRestaurantCard({
                         />
                       </svg>
                       {restaurant.specialNote || "Restaurant"}
-                    </span>
+            </span>
 
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-700">
                       <svg
@@ -178,8 +193,8 @@ export default function CertifiedRestaurantCard({
                         />
                       </svg>
                       {restaurant.cuisine}
-                    </span>
-                  </div>
+          </span>
+        </div>
 
                   {/* Adresse avec icône */}
                   <div className="flex items-start text-sm mb-2">
@@ -204,7 +219,7 @@ export default function CertifiedRestaurantCard({
                       />
                     </svg>
                     <span className="opacity-75">{restaurant.address}</span>
-                  </div>
+      </div>
 
                   {/* Site web avec icône */}
                   {restaurant.website && (
@@ -247,14 +262,19 @@ export default function CertifiedRestaurantCard({
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="5"
+                          ry="5"
+                          stroke-width="2"
                         />
+                        <circle cx="12" cy="12" r="3.5" stroke-width="2" />
+                        <circle cx="17.5" cy="6.5" r=".75" stroke-width="2" />
                       </svg>
-                      <button
+        <button
                         className="opacity-75 text-pink-600 hover:underline"
                         onClick={(e) =>
                           openExternalLink(
@@ -264,7 +284,7 @@ export default function CertifiedRestaurantCard({
                         }
                       >
                         @{restaurant.instagram}
-                      </button>
+        </button>
                     </div>
                   )}
                 </div>
@@ -351,8 +371,8 @@ export default function CertifiedRestaurantCard({
                       </motion.button>
 
                       <motion.button
-                        onClick={(e) => {
-                          e.stopPropagation();
+            onClick={(e) => {
+              e.stopPropagation();
                           onToggleFeatured?.();
                         }}
                         className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
@@ -404,8 +424,8 @@ export default function CertifiedRestaurantCard({
                         {isDeleting ? "Suppression..." : "Supprimer"}
                       </motion.button>
                     </>
-                  )}
-                </div>
+        )}
+      </div>
 
                 {/* Certification */}
                 <div className="text-xs opacity-50 flex items-center">

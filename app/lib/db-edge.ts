@@ -306,6 +306,16 @@ export async function storeBinaryImage(
     );
     console.log(`DB: Taille du buffer: ${imageData.length} bytes`);
 
+    // Nettoyer le nom du fichier pour éviter les problèmes avec les caractères spéciaux
+    const cleanFilename = filename
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Supprimer les accents
+      .replace(/[^\x00-\x7F]/g, "") // Supprimer les caractères non-ASCII
+      .replace(/[']/g, "'") // Remplacer les apostrophes typographiques par des apostrophes simples
+      .replace(/[^a-zA-Z0-9.-]/g, "_"); // Remplacer les autres caractères spéciaux par des underscores
+
+    console.log(`DB: Nom de fichier nettoyé: ${cleanFilename}`);
+
     // Convertir le Buffer en format hexadécimal pour PostgreSQL
     const hexData = "\\x" + imageData.toString("hex");
     console.log(`DB: Buffer converti en format hexadécimal`);
@@ -321,7 +331,7 @@ export async function storeBinaryImage(
         ${hexData}::bytea,
         ${imageType},
         ${mimeType},
-        ${filename}
+        ${cleanFilename}
       )
       RETURNING id
     `;
