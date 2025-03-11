@@ -9,7 +9,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { getEnvironment } from "../app/lib/env";
+import { getEnvironment, isProduction, isPreview } from "../app/lib/env";
 
 // Initialiser le client Prisma
 const prisma = new PrismaClient();
@@ -32,7 +32,7 @@ async function updateRestaurantImages() {
   // Vérifier l'environnement pour éviter de modifier accidentellement les données de production
   const env = getEnvironment();
 
-  if (env === "production") {
+  if (isProduction() && !isPreview()) {
     console.error(
       "⛔ ATTENTION: Ce script ne peut pas être exécuté en environnement de production."
     );
@@ -48,6 +48,12 @@ async function updateRestaurantImages() {
 
     console.warn(
       "⚠️ Option --force détectée. Modification des données de production..."
+    );
+  } else if (isPreview()) {
+    console.log("🔍 Environnement de preview détecté. Exécution du script...");
+  } else {
+    console.log(
+      "🔧 Environnement de développement détecté. Exécution du script..."
     );
   }
 
