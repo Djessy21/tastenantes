@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { initDB } from "./lib/db-edge";
 import Providers from "./providers";
+import Footer from "./components/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,8 +25,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${inter.className} antialiased`}>
-        <Providers>{children}</Providers>
+      <body
+        className={`${inter.className} antialiased min-h-screen flex flex-col`}
+      >
+        <Providers>
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
