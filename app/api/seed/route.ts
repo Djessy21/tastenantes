@@ -77,6 +77,20 @@ const testRestaurants = [
   },
 ];
 
+// Liste d'images de restaurants de haute qualité
+const restaurantImages = [
+  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000",
+  "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1000",
+  "https://images.unsplash.com/photo-1579684947550-22e945225d9a?q=80&w=1000",
+  "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?q=80&w=1000",
+  "https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=1000",
+  "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000",
+  "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1000",
+  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1000",
+  "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?q=80&w=1000",
+  "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?q=80&w=1000",
+];
+
 // Fonction pour générer un nom de restaurant aléatoire
 function generateRandomRestaurantName() {
   const prefixes = [
@@ -206,6 +220,10 @@ function generateRandomRestaurant() {
 
   const coordinates = generateRandomCoordinates();
 
+  // Sélectionner une image aléatoire dans notre liste
+  const randomImage =
+    restaurantImages[Math.floor(Math.random() * restaurantImages.length)];
+
   return {
     name: generateRandomRestaurantName(),
     address: generateRandomAddress(),
@@ -218,7 +236,7 @@ function generateRandomRestaurant() {
     certifiedBy: `Chef ${chefs[Math.floor(Math.random() * chefs.length)]}`,
     certificationDate: new Date(),
     featured: Math.random() > 0.8, // 20% de chance d'être en vedette
-    image: `https://source.unsplash.com/random/800x600/?restaurant,${Math.random()}`,
+    image: randomImage, // Utiliser une image constante de notre liste
   };
 }
 

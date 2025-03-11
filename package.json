@@ -13,7 +13,8 @@
     "init-db": "ts-node --project tsconfig.node.json scripts/init-local-db.ts",
     "postinstall": "prisma generate",
     "create-admin": "ts-node --project tsconfig.node.json scripts/create-admin.ts",
-    "clear-restaurants": "ts-node --project tsconfig.node.json scripts/clear-restaurants.ts"
+    "clear-restaurants": "ts-node --project tsconfig.node.json scripts/clear-restaurants.ts",
+    "update-images": "ts-node --project tsconfig.node.json scripts/update-restaurant-images.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",
