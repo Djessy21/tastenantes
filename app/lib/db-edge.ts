@@ -33,10 +33,15 @@ export interface Dish {
   photo_credit?: string;
 }
 
-export async function getRestaurants(): Promise<Restaurant[]> {
+export async function getRestaurants(
+  page = 1,
+  limit = 10
+): Promise<Restaurant[]> {
+  const offset = (page - 1) * limit;
   const { rows } = await sql<Restaurant>`
     SELECT * FROM restaurants 
     ORDER BY created_at DESC
+    LIMIT ${limit} OFFSET ${offset}
   `;
   return rows;
 }

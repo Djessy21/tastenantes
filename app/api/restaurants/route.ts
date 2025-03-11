@@ -3,9 +3,29 @@ import { getRestaurants, createRestaurant } from "@/app/lib/db-edge";
 
 export const runtime = "edge";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const restaurants = await getRestaurants();
+    // Récupérer les paramètres de pagination de l'URL
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "10", 10);
+
+    // Valider les paramètres
+    if (isNaN(page) || page < 1) {
+      return NextResponse.json(
+        { error: "Le paramètre 'page' doit être un nombre positif" },
+        { status: 400 }
+      );
+    }
+
+    if (isNaN(limit) || limit < 1 || limit > 50) {
+      return NextResponse.json(
+        { error: "Le paramètre 'limit' doit être un nombre entre 1 et 50" },
+        { status: 400 }
+      );
+    }
+
+    const restaurants = await getRestaurants(page, limit);
 
     // Transformer les restaurants pour assurer la cohérence des noms de champs
     const transformedRestaurants = restaurants.map((restaurant) => {

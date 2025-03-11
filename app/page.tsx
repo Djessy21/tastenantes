@@ -274,6 +274,25 @@ export default function Home() {
     }
   };
 
+  const seedTestRestaurants = async () => {
+    try {
+      const response = await fetch("/api/seed");
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'ajout des restaurants de test");
+      }
+      const data = await response.json();
+      alert(data.message || "Restaurants de test ajoutés avec succès");
+      // Rafraîchir la liste des restaurants
+      resetCertifiedScroll();
+      fetchCertifiedRestaurants(1);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout des restaurants de test:", error);
+      alert(
+        "Erreur lors de l'ajout des restaurants de test. Consultez la console pour plus de détails."
+      );
+    }
+  };
+
   // Listes des types de cuisine et d'établissement
   const cuisineTypes = [
     "Française",
@@ -348,6 +367,13 @@ export default function Home() {
                   title="Ajouter les colonnes website et instagram à la base de données"
                 >
                   Migrer DB
+                </button>
+                <button
+                  onClick={seedTestRestaurants}
+                  className="dior-button whitespace-nowrap w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+                  title="Ajouter des restaurants de test pour l'infinite scroll"
+                >
+                  Ajouter 30 restaurants
                 </button>
               </div>
             )}
