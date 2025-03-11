@@ -1,38 +1,56 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Taste Nantes
 
-## Getting Started
+Application de découverte des restaurants à Nantes.
 
-First, run the development server:
+## Configuration des environnements
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Ce projet utilise trois environnements distincts :
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 1. Environnement de développement (local)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **URL** : http://localhost:3000
+- **Base de données** : Base de données locale ou de développement
+- **Variables d'environnement** : Définies dans le fichier `.env.local`
+- **Badge** : Badge vert "DEVELOPMENT" visible dans l'en-tête
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Environnement de preview (Vercel)
 
-## Learn More
+- **URL** : https://tastenantes-git-preview-username.vercel.app
+- **Base de données** : Base de données de prévisualisation
+- **Variables d'environnement** : Définies dans Vercel avec l'override "Preview"
+- **Badge** : Badge bleu "PREVIEW" visible dans l'en-tête
+- **Fonctionnalités spéciales** : Bouton "Réinitialiser DB" pour vider la base de données
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Environnement de production (Vercel)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **URL** : https://tastenantes.vercel.app
+- **Base de données** : Base de données de production
+- **Variables d'environnement** : Définies dans Vercel pour "Production"
+- **Badge** : Aucun badge visible
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Configuration sur Vercel
 
-## Deploy on Vercel
+Pour configurer correctement les environnements sur Vercel :
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Allez dans "Settings" > "Environment Variables"
+2. Ajoutez les variables d'environnement nécessaires
+3. Pour chaque variable, utilisez le bouton "Override" pour définir des valeurs différentes pour "Production" et "Preview"
+4. Assurez-vous que `NEXT_PUBLIC_VERCEL_ENV` est défini sur "production" pour l'environnement de production et sur "preview" pour l'environnement de preview
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
+### Variables d'environnement importantes
+
+- `DATABASE_URL` : URL de la base de données (différente pour chaque environnement)
+- `NEXT_PUBLIC_VERCEL_ENV` : Environnement actuel ("development", "preview" ou "production")
+- `NEXTAUTH_SECRET` : Secret pour NextAuth (peut être le même pour tous les environnements)
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` : Clé API Google Maps
+
+## Workflow de développement
+
+1. Développez et testez localement
+2. Poussez sur une branche de feature ou sur la branche `preview`
+3. Vérifiez le déploiement de preview sur Vercel
+4. Une fois satisfait, fusionnez dans `main` pour déployer en production
+
+## Réinitialisation de la base de données de preview
+
+En environnement de preview, les administrateurs ont accès à un bouton "Réinitialiser DB" qui permet de vider la base de données. Cela est utile pour tester avec un état initial propre.

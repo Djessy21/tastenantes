@@ -11,6 +11,7 @@ import { CertifiedRestaurant } from "./types/restaurant";
 import AuthButton from "./components/AuthButton";
 import { useSession } from "next-auth/react";
 import { useInfiniteScroll } from "./hooks/useInfiniteScroll";
+import { isPreview, currentEnvironment } from "./lib/env";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -293,6 +294,41 @@ export default function Home() {
     }
   };
 
+  const resetPreviewDatabase = async () => {
+    if (!isPreview()) {
+      alert("Cette action n'est autorisée que dans l'environnement de preview");
+      return;
+    }
+
+    if (
+      confirm(
+        "Êtes-vous sûr de vouloir réinitialiser la base de données de preview ? Toutes les données seront supprimées."
+      )
+    ) {
+      try {
+        const response = await fetch("/api/reset-preview-db", {
+          method: "POST",
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Échec de la réinitialisation");
+        }
+
+        const data = await response.json();
+        alert(data.message);
+
+        // Rafraîchir les données
+        resetCertifiedScroll();
+        resetRegularScroll();
+        fetchInitialData();
+      } catch (error) {
+        console.error("Erreur lors de la réinitialisation:", error);
+        alert("Erreur lors de la réinitialisation de la base de données");
+      }
+    }
+  };
+
   // Listes des types de cuisine et d'établissement
   const cuisineTypes = [
     "Française",
@@ -342,9 +378,17 @@ export default function Home() {
             <div className="flex-1"></div> {/* Espace à gauche */}
             <h1 className="dior-heading text-center text-3xl font-bold flex-1">
               Taste Nantes
-              <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full uppercase">
-                Preview
-              </span>
+              {currentEnvironment !== "production" && (
+                <span
+                  className={`ml-2 text-xs ${
+                    currentEnvironment === "preview"
+                      ? "bg-blue-600"
+                      : "bg-green-600"
+                  } text-white px-2 py-1 rounded-full uppercase`}
+                >
+                  {currentEnvironment}
+                </span>
+              )}
             </h1>
             <div className="flex-1 flex justify-end">
               <AuthButton />
@@ -378,6 +422,15 @@ export default function Home() {
                 >
                   Ajouter 30 restaurants
                 </button>
+                {isPreview() && (
+                  <button
+                    onClick={resetPreviewDatabase}
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-600 hover:bg-red-700"
+                    title="Réinitialiser la base de données de preview"
+                  >
+                    Réinitialiser DB
+                  </button>
+                )}
               </div>
             )}
           </div>
