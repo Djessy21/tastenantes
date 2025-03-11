@@ -7,12 +7,12 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && npx ts-node --transpile-only prisma/setup.ts && next build",
+    "build": "prisma generate && npx ts-node --project tsconfig.node.json prisma/setup.ts && next build",
     "start": "next start",
     "lint": "next lint",
-    "init-db": "ts-node scripts/init-local-db.ts",
+    "init-db": "ts-node --project tsconfig.node.json scripts/init-local-db.ts",
     "postinstall": "prisma generate",
-    "create-admin": "ts-node scripts/create-admin.ts"
+    "create-admin": "ts-node --project tsconfig.node.json scripts/create-admin.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.8.0",
