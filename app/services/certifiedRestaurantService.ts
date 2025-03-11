@@ -37,9 +37,17 @@ interface AddRestaurantInput {
 }
 
 const certifiedRestaurantService = {
-  getCertifiedRestaurants: async (): Promise<CertifiedRestaurant[]> => {
+  getCertifiedRestaurants: async ({
+    page = 1,
+    limit = 10,
+  }: {
+    page?: number;
+    limit?: number;
+  } = {}): Promise<CertifiedRestaurant[]> => {
     try {
-      const response = await axios.get("/api/restaurants");
+      const response = await axios.get(
+        `/api/restaurants?page=${page}&limit=${limit}`
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching certified restaurants:", error);

@@ -6,7 +6,7 @@ import AuthGuard from "./AuthGuard";
 interface AdminPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  onRestaurantAdded: (restaurant: CertifiedRestaurant) => void;
+  onRestaurantAdded: (restaurant?: CertifiedRestaurant) => void;
 }
 
 interface DishForm {

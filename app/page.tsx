@@ -10,6 +10,9 @@ import certifiedRestaurantService from "./services/certifiedRestaurantService";
 import { CertifiedRestaurant } from "./types/restaurant";
 import AuthButton from "./components/AuthButton";
 import { useSession } from "next-auth/react";
+import { useInfiniteScroll } from "./hooks/useInfiniteScroll";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function Home() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -19,7 +22,7 @@ export default function Home() {
   const [selectedRestaurant, setSelectedRestaurant] = useState<
     (Restaurant | CertifiedRestaurant) | null
   >(null);
-  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<{
     cuisines: string[];
@@ -30,61 +33,124 @@ export default function Home() {
   });
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
+  // Hooks pour l'infinite scroll
+  const {
+    page: regularPage,
+    loading: regularLoading,
+    setLoading: setRegularLoading,
+    hasMore: regularHasMore,
+    setHasMore: setRegularHasMore,
+    lastElementRef: regularLastElementRef,
+    reset: resetRegularScroll,
+  } = useInfiniteScroll();
+
+  const {
+    page: certifiedPage,
+    loading: certifiedLoading,
+    setLoading: setCertifiedLoading,
+    hasMore: certifiedHasMore,
+    setHasMore: setCertifiedHasMore,
+    lastElementRef: certifiedLastElementRef,
+    reset: resetCertifiedScroll,
+  } = useInfiniteScroll();
+
   // Utiliser la session pour déterminer si l'utilisateur est admin
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin";
 
   useEffect(() => {
-    // Fetch restaurants
-    fetchRestaurants();
-    // Fetch certified restaurants
-    fetchCertifiedRestaurants();
+    // Fetch initial data
+    fetchInitialData();
   }, []);
 
-  const fetchRestaurants = async () => {
-    setLoading(true);
+  // Charger plus de restaurants quand la page change
+  useEffect(() => {
+    if (regularPage > 1) {
+      fetchMoreRestaurants();
+    }
+  }, [regularPage]);
+
+  // Charger plus de restaurants certifiés quand la page change
+  useEffect(() => {
+    if (certifiedPage > 1) {
+      fetchMoreCertifiedRestaurants();
+    }
+  }, [certifiedPage]);
+
+  // Réinitialiser le scroll infini quand les filtres changent
+  useEffect(() => {
+    resetRegularScroll();
+    resetCertifiedScroll();
+    fetchInitialData();
+  }, [filters]);
+
+  const fetchInitialData = async () => {
+    setInitialLoading(true);
+    try {
+      await Promise.all([fetchRestaurants(1), fetchCertifiedRestaurants(1)]);
+    } catch (error) {
+      console.error("Error fetching initial data:", error);
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+
+  const fetchRestaurants = async (page = 1) => {
+    setRegularLoading(true);
     try {
       const results = await restaurantService.searchNearby({
         lat: 48.8566,
         lng: 2.3522,
+        page,
+        limit: ITEMS_PER_PAGE,
       });
-      setRestaurants(results);
+
+      if (page === 1) {
+        setRestaurants(results);
+      } else {
+        setRestaurants((prev) => [...prev, ...results]);
+      }
+
+      setRegularHasMore(results.length === ITEMS_PER_PAGE);
     } catch (error) {
       console.error("Error fetching restaurants:", error);
+    } finally {
+      setRegularLoading(false);
     }
-    setLoading(false);
   };
 
-  const fetchCertifiedRestaurants = async () => {
+  const fetchMoreRestaurants = () => {
+    if (!regularLoading && regularHasMore) {
+      fetchRestaurants(regularPage);
+    }
+  };
+
+  const fetchCertifiedRestaurants = async (page = 1) => {
+    setCertifiedLoading(true);
     try {
-      const results =
-        await certifiedRestaurantService.getCertifiedRestaurants();
-      setCertifiedRestaurants(results);
+      const results = await certifiedRestaurantService.getCertifiedRestaurants({
+        page,
+        limit: ITEMS_PER_PAGE,
+      });
+
+      if (page === 1) {
+        setCertifiedRestaurants(results);
+      } else {
+        setCertifiedRestaurants((prev) => [...prev, ...results]);
+      }
+
+      setCertifiedHasMore(results.length === ITEMS_PER_PAGE);
     } catch (error) {
       console.error("Error fetching certified restaurants:", error);
+    } finally {
+      setCertifiedLoading(false);
     }
   };
 
-  const handleRestaurantClick = (
-    restaurant: Restaurant | CertifiedRestaurant
-  ) => {
-    setSelectedRestaurant(restaurant);
-  };
-
-  const handleToggleFeatured = async (restaurant: CertifiedRestaurant) => {
-    try {
-      await certifiedRestaurantService.toggleFeatured(restaurant.id.toString());
-      fetchCertifiedRestaurants();
-    } catch (error) {
-      console.error("Error toggling featured status:", error);
+  const fetchMoreCertifiedRestaurants = () => {
+    if (!certifiedLoading && certifiedHasMore) {
+      fetchCertifiedRestaurants(certifiedPage);
     }
-  };
-
-  const handleFilterChange = (newFilters: {
-    cuisines: string[];
-    establishments: string[];
-  }) => {
-    setFilters(newFilters);
   };
 
   // Filtrer les restaurants en fonction des filtres sélectionnés
@@ -143,9 +209,34 @@ export default function Home() {
     (r) => !r.featured
   );
 
+  const handleRestaurantClick = (
+    restaurant: Restaurant | CertifiedRestaurant
+  ) => {
+    setSelectedRestaurant(restaurant);
+  };
+
+  const handleToggleFeatured = async (restaurant: CertifiedRestaurant) => {
+    try {
+      await certifiedRestaurantService.toggleFeatured(restaurant.id.toString());
+      // Recharger les restaurants certifiés
+      resetCertifiedScroll();
+      fetchCertifiedRestaurants(1);
+    } catch (error) {
+      console.error("Error toggling featured status:", error);
+    }
+  };
+
+  const handleFilterChange = (newFilters: {
+    cuisines: string[];
+    establishments: string[];
+  }) => {
+    setFilters(newFilters);
+  };
+
   const handleRestaurantDelete = () => {
     // Rafraîchir la liste des restaurants certifiés
-    fetchCertifiedRestaurants();
+    resetCertifiedScroll();
+    fetchCertifiedRestaurants(1);
     // Désélectionner le restaurant
     setSelectedRestaurant(null);
   };
@@ -173,7 +264,8 @@ export default function Home() {
       const data = await response.json();
       alert(data.message || "Migration réussie");
       // Rafraîchir la liste des restaurants
-      fetchCertifiedRestaurants();
+      resetCertifiedScroll();
+      fetchCertifiedRestaurants(1);
     } catch (error) {
       console.error("Erreur lors de la migration:", error);
       alert(
@@ -269,7 +361,7 @@ export default function Home() {
       <main className="pt-4">
         <div className="dior-container">
           <div className="space-y-6">
-            {loading ? (
+            {initialLoading ? (
               <div className="text-center py-8 dior-text">
                 DÉCOUVERTE DE L&apos;EXCELLENCE CULINAIRE...
               </div>
@@ -277,6 +369,9 @@ export default function Home() {
               <>
                 {featuredRestaurants.length > 0 && (
                   <div className="space-y-6">
+                    <h2 className="text-xl font-semibold">
+                      Restaurants en vedette
+                    </h2>
                     {featuredRestaurants.map((restaurant) => (
                       <CertifiedRestaurantCard
                         key={restaurant.id}
@@ -296,33 +391,69 @@ export default function Home() {
 
                 {nonFeaturedCertifiedRestaurants.length > 0 && (
                   <div className="space-y-6">
-                    {nonFeaturedCertifiedRestaurants.map((restaurant) => (
-                      <CertifiedRestaurantCard
-                        key={restaurant.id}
-                        restaurant={restaurant}
-                        onClick={() => handleRestaurantClick(restaurant)}
-                        isSelected={selectedRestaurant?.id === restaurant.id}
-                        onToggleFeatured={() =>
-                          handleToggleFeatured(restaurant)
-                        }
-                        onDelete={handleRestaurantDelete}
-                        onUpdate={handleRestaurantUpdate}
-                        isAdmin={isAdmin}
-                      />
-                    ))}
+                    <h2 className="text-xl font-semibold">
+                      Restaurants certifiés
+                    </h2>
+                    {nonFeaturedCertifiedRestaurants.map(
+                      (restaurant, index) => (
+                        <div
+                          key={restaurant.id}
+                          ref={
+                            index === nonFeaturedCertifiedRestaurants.length - 1
+                              ? certifiedLastElementRef
+                              : null
+                          }
+                        >
+                          <CertifiedRestaurantCard
+                            restaurant={restaurant}
+                            onClick={() => handleRestaurantClick(restaurant)}
+                            isSelected={
+                              selectedRestaurant?.id === restaurant.id
+                            }
+                            onToggleFeatured={() =>
+                              handleToggleFeatured(restaurant)
+                            }
+                            onDelete={handleRestaurantDelete}
+                            onUpdate={handleRestaurantUpdate}
+                            isAdmin={isAdmin}
+                          />
+                        </div>
+                      )
+                    )}
+                    {certifiedLoading && (
+                      <div className="text-center py-4">
+                        <div className="dior-text">CHARGEMENT...</div>
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {filteredRestaurants.length > 0 && (
                   <div className="space-y-6">
-                    {filteredRestaurants.map((restaurant) => (
-                      <RestaurantCard
+                    <h2 className="text-xl font-semibold">
+                      Autres restaurants à proximité
+                    </h2>
+                    {filteredRestaurants.map((restaurant, index) => (
+                      <div
                         key={restaurant.id}
-                        restaurant={restaurant}
-                        onClick={() => handleRestaurantClick(restaurant)}
-                        isSelected={selectedRestaurant?.id === restaurant.id}
-                      />
+                        ref={
+                          index === filteredRestaurants.length - 1
+                            ? regularLastElementRef
+                            : null
+                        }
+                      >
+                        <RestaurantCard
+                          restaurant={restaurant}
+                          onClick={() => handleRestaurantClick(restaurant)}
+                          isSelected={selectedRestaurant?.id === restaurant.id}
+                        />
+                      </div>
                     ))}
+                    {regularLoading && (
+                      <div className="text-center py-4">
+                        <div className="dior-text">CHARGEMENT...</div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -343,7 +474,10 @@ export default function Home() {
       <AdminPanel
         isOpen={showAdminPanel}
         onClose={() => setShowAdminPanel(false)}
-        onRestaurantAdded={fetchCertifiedRestaurants}
+        onRestaurantAdded={(restaurant) => {
+          resetCertifiedScroll();
+          fetchCertifiedRestaurants(1);
+        }}
       />
     </div>
   );

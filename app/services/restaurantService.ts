@@ -18,21 +18,36 @@ export interface Restaurant {
 const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export const restaurantService = {
-  async searchNearby(
-    location: Location,
-    radius: number = 1500
-  ): Promise<Restaurant[]> {
+  async searchNearby({
+    lat,
+    lng,
+    page = 1,
+    limit = 10,
+  }: {
+    lat: number;
+    lng: number;
+    page?: number;
+    limit?: number;
+  }): Promise<Restaurant[]> {
     try {
+      // Simuler la pagination côté client car l'API Google Places ne supporte pas la pagination directement
       const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.lat},${location.lng}&radius=${radius}&type=restaurant&key=${GOOGLE_PLACES_API_KEY}`
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=restaurant&key=${GOOGLE_PLACES_API_KEY}`
       );
 
-      return response.data.results.map((place: any) => ({
+      const allResults = response.data.results;
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedResults = allResults.slice(startIndex, endIndex);
+
+      return paginatedResults.map((place: any) => ({
         id: place.place_id,
         name: place.name,
         rating: place.rating || 0,
         address: place.vicinity,
-        cuisine: place.types?.includes("restaurant") ? "Restaurant" : "Unknown",
+        cuisine: place.types?.includes("restaurant")
+          ? "Restaurant"
+          : place.types?.[0] || "Non spécifié",
         location: {
           lat: place.geometry.location.lat,
           lng: place.geometry.location.lng,
