@@ -9,7 +9,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { getEnvironment, isProduction, isPreview } from "../app/lib/env";
+import { getEnvironment } from "../app/lib/env";
 
 // Initialiser le client Prisma
 const prisma = new PrismaClient();
@@ -29,33 +29,9 @@ const restaurantImages = [
 ];
 
 async function updateRestaurantImages() {
-  // Vérifier l'environnement pour éviter de modifier accidentellement les données de production
+  // Afficher l'environnement actuel
   const env = getEnvironment();
-
-  if (isProduction() && !isPreview()) {
-    console.error(
-      "⛔ ATTENTION: Ce script ne peut pas être exécuté en environnement de production."
-    );
-    console.error(
-      "Utilisez l'option --force si vous êtes absolument sûr de vouloir modifier toutes les données de production."
-    );
-
-    // Vérifier si l'option --force est présente
-    if (!process.argv.includes("--force")) {
-      console.error("Opération annulée.");
-      process.exit(1);
-    }
-
-    console.warn(
-      "⚠️ Option --force détectée. Modification des données de production..."
-    );
-  } else if (isPreview()) {
-    console.log("🔍 Environnement de preview détecté. Exécution du script...");
-  } else {
-    console.log(
-      "🔧 Environnement de développement détecté. Exécution du script..."
-    );
-  }
+  console.log(`🌍 Environnement détecté: ${env}`);
 
   try {
     console.log("🖼️ Récupération de tous les restaurants...");
