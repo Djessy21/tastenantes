@@ -329,6 +329,42 @@ export default function Home() {
     }
   };
 
+  const clearAllRestaurants = async () => {
+    if (
+      confirm(
+        "⚠️ ATTENTION: Vous êtes sur le point de supprimer TOUS les restaurants et leurs plats associés. Cette action est irréversible. Êtes-vous sûr de vouloir continuer ?"
+      )
+    ) {
+      try {
+        const response = await fetch("/api/restaurants/clear", {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error || errorData.message || "Échec de la suppression"
+          );
+        }
+
+        const data = await response.json();
+        alert(`✅ ${data.count} restaurants ont été supprimés avec succès.`);
+
+        // Rafraîchir les données
+        resetCertifiedScroll();
+        resetRegularScroll();
+        fetchInitialData();
+      } catch (error) {
+        console.error("Erreur lors de la suppression des restaurants:", error);
+        alert(
+          `❌ Erreur: ${
+            error instanceof Error ? error.message : "Erreur inconnue"
+          }`
+        );
+      }
+    }
+  };
+
   // Listes des types de cuisine et d'établissement
   const cuisineTypes = [
     "Française",
@@ -429,6 +465,15 @@ export default function Home() {
                     title="Réinitialiser la base de données de preview"
                   >
                     Réinitialiser DB
+                  </button>
+                )}
+                {isAdmin && (
+                  <button
+                    onClick={clearAllRestaurants}
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-800 hover:bg-red-900"
+                    title="Supprimer tous les restaurants et leurs plats associés"
+                  >
+                    Supprimer tout
                   </button>
                 )}
               </div>
