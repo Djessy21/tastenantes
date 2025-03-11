@@ -342,6 +342,9 @@ export default function Home() {
             <div className="flex-1"></div> {/* Espace à gauche */}
             <h1 className="dior-heading text-center text-3xl font-bold flex-1">
               Taste Nantes
+              <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full uppercase">
+                Preview
+              </span>
             </h1>
             <div className="flex-1 flex justify-end">
               <AuthButton />
