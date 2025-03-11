@@ -12,6 +12,8 @@ import AuthButton from "./components/AuthButton";
 import { useSession } from "next-auth/react";
 import { useInfiniteScroll } from "./hooks/useInfiniteScroll";
 import { isPreview, currentEnvironment } from "./lib/env";
+import LoadingIndicator from "./components/LoadingIndicator";
+import ScrollStatus from "./components/ScrollStatus";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -407,7 +409,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-16">
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]">
         <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-black/10">
           <div className="flex justify-between items-center w-full">
@@ -485,12 +487,15 @@ export default function Home() {
       {/* Espace réservé pour le header */}
       <div className="h-48 sm:h-40 md:h-36"></div>
 
-      <main className="pt-4">
+      <main className="pt-4 pb-12">
         <div className="dior-container">
           <div className="space-y-6">
             {initialLoading ? (
-              <div className="text-center py-8 dior-text">
-                DÉCOUVERTE DE L&apos;EXCELLENCE CULINAIRE...
+              <div className="text-center py-8">
+                <LoadingIndicator
+                  size="large"
+                  text="DÉCOUVERTE DE L'EXCELLENCE CULINAIRE"
+                />
               </div>
             ) : (
               <>
@@ -549,9 +554,14 @@ export default function Home() {
                     )}
                     {certifiedLoading && (
                       <div className="text-center py-4">
-                        <div className="dior-text">CHARGEMENT...</div>
+                        <LoadingIndicator size="small" />
                       </div>
                     )}
+                    <ScrollStatus
+                      currentCount={nonFeaturedCertifiedRestaurants.length}
+                      hasMore={certifiedHasMore}
+                      loading={certifiedLoading}
+                    />
                   </div>
                 )}
 
@@ -578,9 +588,14 @@ export default function Home() {
                     ))}
                     {regularLoading && (
                       <div className="text-center py-4">
-                        <div className="dior-text">CHARGEMENT...</div>
+                        <LoadingIndicator size="small" />
                       </div>
                     )}
+                    <ScrollStatus
+                      currentCount={filteredRestaurants.length}
+                      hasMore={regularHasMore}
+                      loading={regularLoading}
+                    />
                   </div>
                 )}
 

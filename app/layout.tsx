@@ -4,6 +4,7 @@ import "./globals.css";
 import { initDB } from "./lib/db-edge";
 import Providers from "./providers";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
       >
         <Providers>
           <main className="flex-grow">{children}</main>
+          <ScrollToTop />
           <Footer />
         </Providers>
       </body>
