@@ -38,12 +38,24 @@ export async function getRestaurants(
   limit = 10
 ): Promise<Restaurant[]> {
   const offset = (page - 1) * limit;
-  const { rows } = await sql<Restaurant>`
-    SELECT * FROM restaurants 
-    ORDER BY created_at DESC
-    LIMIT ${limit} OFFSET ${offset}
-  `;
-  return rows;
+  console.log(
+    `Fetching restaurants: page=${page}, limit=${limit}, offset=${offset}`
+  );
+
+  try {
+    const { rows } = await sql<Restaurant>`
+      SELECT * FROM restaurants 
+      WHERE is_certified = true OR is_certified IS NULL
+      ORDER BY created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+
+    console.log(`Retrieved ${rows.length} restaurants`);
+    return rows;
+  } catch (error) {
+    console.error("Error fetching restaurants:", error);
+    throw error;
+  }
 }
 
 export async function createRestaurant(

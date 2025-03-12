@@ -27,6 +27,7 @@ const testRestaurants = [
       "Lun-Ven: 12h-14h30, 19h-22h30 | Sam: 12h-15h, 19h-23h | Dim: Fermé",
     priceRange: "€€",
     phoneNumber: "02 40 12 34 56",
+    is_certified: true,
   },
   {
     name: "Saveurs d'Asie",
@@ -342,6 +343,7 @@ function generateRandomRestaurant() {
       ],
     priceRange: priceRanges[Math.floor(Math.random() * priceRanges.length)],
     phoneNumber: phoneNumber,
+    is_certified: true,
   };
 }
 
