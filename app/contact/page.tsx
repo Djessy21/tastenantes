@@ -204,8 +204,20 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      // Simulation d'envoi (à remplacer par un vrai appel API)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Envoyer les données du formulaire à notre API
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formState),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Une erreur est survenue");
+      }
 
       // Réinitialiser le formulaire après succès
       setFormState({
