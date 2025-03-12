@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dish } from "../lib/db-edge";
 import AddDishForm from "./AddDishForm";
 import DishesModal from "./DishesModal";
@@ -32,6 +32,41 @@ export default function CertifiedRestaurantCard({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDishesModalOpen, setIsDishesModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [hasDishes, setHasDishes] = useState<boolean | null>(null);
+  const [isCheckingDishes, setIsCheckingDishes] = useState(false);
+
+  // Vérifier si le restaurant a des plats au chargement du composant
+  useEffect(() => {
+    const checkDishes = async () => {
+      if (hasDishes !== null) return; // Ne vérifier qu'une seule fois
+
+      setIsCheckingDishes(true);
+      try {
+        const response = await fetch(
+          `/api/restaurants/${restaurant.id}/dishes`
+        );
+        if (!response.ok) throw new Error("Impossible de charger les plats");
+
+        const data = await response.json();
+        setHasDishes(data.length > 0);
+      } catch (error) {
+        console.error("Erreur lors de la vérification des plats:", error);
+        setHasDishes(false);
+      } finally {
+        setIsCheckingDishes(false);
+      }
+    };
+
+    checkDishes();
+  }, [restaurant.id, hasDishes]);
+
+  // Mettre à jour l'état hasDishes après l'ajout d'un plat
+  useEffect(() => {
+    if (showAddDishForm === false && hasDishes === false) {
+      // Vérifier à nouveau les plats quand le formulaire d'ajout est fermé
+      setHasDishes(null); // Réinitialiser pour déclencher une nouvelle vérification
+    }
+  }, [showAddDishForm, hasDishes]);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -61,7 +96,8 @@ export default function CertifiedRestaurantCard({
   const handleDishAdded = () => {
     // Fermer le formulaire après l'ajout d'un plat
     setShowAddDishForm(false);
-    // Si le modal des plats est ouvert, il se mettra à jour automatiquement
+    // Mettre à jour l'état pour indiquer que le restaurant a maintenant des plats
+    setHasDishes(true);
   };
 
   const openDishesModal = (e: React.MouseEvent) => {
@@ -92,20 +128,20 @@ export default function CertifiedRestaurantCard({
           isSelected
             ? "shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-gray-200"
             : "shadow-[0_5px_15px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)]"
-      }`}
-      onClick={onClick}
-    >
+        }`}
+        onClick={onClick}
+      >
         <div className="relative z-20">
-      <div className="absolute top-4 right-4 flex gap-2 z-10">
-        {restaurant.featured && (
-          <div
+          <div className="absolute top-4 right-4 flex gap-2 z-10">
+            {restaurant.featured && (
+              <div
                 className="h-3 w-3 text-yellow-500"
                 title="Restaurant en vedette"
-          >
+              >
                 ★
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
           <div className="flex flex-col sm:flex-row">
             {/* Photo à gauche - prend tout l'espace vertical */}
@@ -114,7 +150,7 @@ export default function CertifiedRestaurantCard({
                 <>
                   <img
                     src={restaurant.image}
-            alt={restaurant.name}
+                    alt={restaurant.name}
                     className="restaurant-image"
                     onError={(e) => {
                       console.error(
@@ -144,8 +180,8 @@ export default function CertifiedRestaurantCard({
               ) : (
                 <div className="w-full h-full flex items-center justify-center border border-gray-200 bg-gray-50 text-gray-400">
                   <span className="text-lg opacity-50">Photo</span>
-        </div>
-      )}
+                </div>
+              )}
             </div>
 
             {/* Informations à droite - avec meilleure organisation */}
@@ -154,8 +190,8 @@ export default function CertifiedRestaurantCard({
                 {/* En-tête avec nom */}
                 <div className="mb-3">
                   <h3 className="text-xl font-medium mb-2">
-        {restaurant.name}
-      </h3>
+                    {restaurant.name}
+                  </h3>
 
                   {/* Type d'établissement et cuisine avec badges */}
                   <div className="flex flex-wrap gap-2 mb-3">
@@ -175,7 +211,7 @@ export default function CertifiedRestaurantCard({
                         />
                       </svg>
                       {restaurant.specialNote || "Restaurant"}
-            </span>
+                    </span>
 
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-700">
                       <svg
@@ -193,8 +229,8 @@ export default function CertifiedRestaurantCard({
                         />
                       </svg>
                       {restaurant.cuisine}
-          </span>
-        </div>
+                    </span>
+                  </div>
 
                   {/* Adresse avec icône */}
                   <div className="flex items-start text-sm mb-2">
@@ -219,7 +255,7 @@ export default function CertifiedRestaurantCard({
                       />
                     </svg>
                     <span className="opacity-75">{restaurant.address}</span>
-      </div>
+                  </div>
 
                   {/* Site web avec icône */}
                   {restaurant.website && (
@@ -274,7 +310,7 @@ export default function CertifiedRestaurantCard({
                         <circle cx="12" cy="12" r="3.5" stroke-width="2" />
                         <circle cx="17.5" cy="6.5" r=".75" stroke-width="2" />
                       </svg>
-        <button
+                      <button
                         className="opacity-75 text-pink-600 hover:underline"
                         onClick={(e) =>
                           openExternalLink(
@@ -284,7 +320,7 @@ export default function CertifiedRestaurantCard({
                         }
                       >
                         @{restaurant.instagram}
-        </button>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -294,28 +330,82 @@ export default function CertifiedRestaurantCard({
               <div className="mt-auto">
                 {/* Boutons d'action */}
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <motion.button
-                    onClick={openDishesModal}
-                    className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  {isCheckingDishes ? (
+                    // Afficher un bouton de chargement pendant la vérification
+                    <motion.button
+                      disabled
+                      className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-gray-300 text-gray-600 rounded-lg cursor-wait"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                      />
-                    </svg>
-                    Voir les plats
-                  </motion.button>
+                      <svg
+                        className="animate-spin h-4 w-4 text-gray-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Vérification...
+                    </motion.button>
+                  ) : hasDishes ? (
+                    // Afficher le bouton normal si le restaurant a des plats
+                    <motion.button
+                      onClick={openDishesModal}
+                      className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md"
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        />
+                      </svg>
+                      Voir les plats
+                    </motion.button>
+                  ) : (
+                    // Afficher un bouton grisé si le restaurant n'a pas de plats
+                    <motion.button
+                      disabled
+                      className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed opacity-70"
+                      title="Aucun plat disponible pour ce restaurant"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        />
+                      </svg>
+                      Aucun plat disponible
+                    </motion.button>
+                  )}
 
                   {isAdmin && (
                     <>
@@ -371,8 +461,8 @@ export default function CertifiedRestaurantCard({
                       </motion.button>
 
                       <motion.button
-            onClick={(e) => {
-              e.stopPropagation();
+                        onClick={(e) => {
+                          e.stopPropagation();
                           onToggleFeatured?.();
                         }}
                         className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
@@ -424,8 +514,8 @@ export default function CertifiedRestaurantCard({
                         {isDeleting ? "Suppression..." : "Supprimer"}
                       </motion.button>
                     </>
-        )}
-      </div>
+                  )}
+                </div>
 
                 {/* Certification */}
                 <div className="text-xs opacity-50 flex items-center">
