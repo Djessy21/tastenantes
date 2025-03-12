@@ -105,6 +105,24 @@ export default function AuthButton() {
                 Gérer les utilisateurs
               </Link>
             )}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setShowDropdown(false)}
+              >
+                Tableau de bord admin
+              </Link>
+            )}
+            {isAdmin && (
+              <Link
+                href="/admin/messages"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setShowDropdown(false)}
+              >
+                Messages de contact
+              </Link>
+            )}
             <button
               onClick={() => {
                 setShowDropdown(false);

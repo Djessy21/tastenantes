@@ -151,10 +151,34 @@ export default function About() {
                 utilisateur limitée.
               </p>
               <p>
-                C'est ainsi qu'est née l'idée de Taste Nantes en 2023 : une
+                C'est ainsi qu'est née l'idée de Taste Nantes en 2025 : une
                 plateforme moderne et intuitive qui centralise les meilleures
                 adresses de la ville, permettant à tous - locaux comme visiteurs
                 - de découvrir facilement la richesse gastronomique nantaise.
+              </p>
+              <p>
+                Mais Taste Nantes est aussi une expérience en soi. Lancée cette
+                année, la plateforme est conçue comme un laboratoire
+                d'innovation où nous expérimentons une nouvelle façon de
+                développer des produits numériques. Notre approche ? Ajouter
+                rapidement de nouvelles fonctionnalités en fonction des retours
+                des utilisateurs sur les réseaux sociaux, observer comment ils
+                interagissent avec le site, et pivoter au besoin. Cette méthode
+                agile et centrée sur l'utilisateur nous permet d'évoluer
+                constamment pour mieux répondre aux besoins réels des amateurs
+                de gastronomie nantaise.
+              </p>
+              <p>
+                Un aspect particulièrement novateur de notre démarche est
+                l'intégration de l'intelligence artificielle dans notre
+                processus de développement. En utilisant des outils d'IA
+                avancés, nous sommes capables de supercharger notre vitesse de
+                développement, d'automatiser certaines tâches répétitives, et
+                d'implémenter des améliorations beaucoup plus rapidement qu'avec
+                des méthodes traditionnelles. Cette approche nous permet non
+                seulement de gagner un temps précieux, mais aussi d'explorer des
+                solutions créatives que nous n'aurions peut-être pas envisagées
+                autrement.
               </p>
               <p>
                 Ce qui nous distingue ? Chaque restaurant présenté sur Taste
