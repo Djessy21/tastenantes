@@ -542,10 +542,17 @@ async function addDishesToRestaurant(restaurantId: number, cuisine: string) {
 }
 
 export async function GET() {
-  // Vérifier l'authentification et les droits d'admin
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "admin") {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  // Vérifier si on est en mode développement ou preview
+  const isDevelopmentOrPreview =
+    process.env.NODE_ENV === "development" ||
+    process.env.VERCEL_ENV === "preview";
+
+  // Vérifier l'authentification et les droits d'admin seulement en production
+  if (!isDevelopmentOrPreview) {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
   }
 
   try {
@@ -598,7 +605,10 @@ export async function GET() {
   } catch (error) {
     console.error("Erreur lors de l'ajout des restaurants:", error);
     return NextResponse.json(
-      { error: "Erreur lors de l'ajout des restaurants" },
+      {
+        error: "Erreur lors de l'ajout des restaurants",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
