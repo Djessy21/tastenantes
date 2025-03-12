@@ -91,6 +91,20 @@ const restaurantImages = [
   "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?q=80&w=1000",
 ];
 
+// Liste d'images de plats de haute qualité
+const dishImages = [
+  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000",
+  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000",
+  "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1000",
+  "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=1000",
+  "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=1000",
+  "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1000",
+  "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=1000",
+  "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?q=80&w=1000",
+  "https://images.unsplash.com/photo-1484723091739-30a097e8f929?q=80&w=1000",
+  "https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=1000",
+];
+
 // Fonction pour générer un nom de restaurant aléatoire
 function generateRandomRestaurantName() {
   const prefixes = [
@@ -240,6 +254,202 @@ function generateRandomRestaurant() {
   };
 }
 
+// Fonction pour générer un plat aléatoire
+function generateRandomDish(cuisineType: string) {
+  // Noms de plats par type de cuisine
+  const dishNamesByCuisine: Record<string, string[]> = {
+    Française: [
+      "Bœuf Bourguignon",
+      "Coq au Vin",
+      "Ratatouille",
+      "Quiche Lorraine",
+      "Croque Monsieur",
+      "Soupe à l'Oignon",
+      "Cassoulet",
+      "Blanquette de Veau",
+      "Tarte Tatin",
+      "Crème Brûlée",
+    ],
+    Italienne: [
+      "Pizza Margherita",
+      "Spaghetti Carbonara",
+      "Lasagne",
+      "Risotto aux Champignons",
+      "Tiramisu",
+      "Carpaccio de Bœuf",
+      "Gnocchi",
+      "Osso Buco",
+      "Panna Cotta",
+      "Bruschetta",
+    ],
+    Asiatique: [
+      "Sushi Assortiment",
+      "Pad Thaï",
+      "Poulet au Curry",
+      "Ramen",
+      "Dim Sum",
+      "Canard Laqué",
+      "Bœuf Sauté",
+      "Nems",
+      "Riz Cantonais",
+      "Mochi",
+    ],
+    Japonaise: [
+      "Sushi Saumon",
+      "Sashimi",
+      "Tempura de Crevettes",
+      "Yakitori",
+      "Gyoza",
+      "Ramen Tonkotsu",
+      "Udon",
+      "Okonomiyaki",
+      "Takoyaki",
+      "Dorayaki",
+    ],
+    Chinoise: [
+      "Canard Laqué",
+      "Porc au Caramel",
+      "Nouilles Sautées",
+      "Dim Sum Variés",
+      "Poulet Kung Pao",
+      "Bœuf à l'Orange",
+      "Riz Cantonais",
+      "Wonton",
+      "Tofu Mapo",
+      "Rouleaux de Printemps",
+    ],
+    Indienne: [
+      "Poulet Tikka Masala",
+      "Curry d'Agneau",
+      "Naan au Fromage",
+      "Biryani",
+      "Samosas",
+      "Dal Makhani",
+      "Butter Chicken",
+      "Pakoras",
+      "Tandoori",
+      "Lassi à la Mangue",
+    ],
+    Mexicaine: [
+      "Tacos al Pastor",
+      "Guacamole",
+      "Enchiladas",
+      "Quesadillas",
+      "Chili con Carne",
+      "Fajitas",
+      "Nachos",
+      "Burritos",
+      "Mole Poblano",
+      "Churros",
+    ],
+    Américaine: [
+      "Burger Classic",
+      "Ribs BBQ",
+      "Mac and Cheese",
+      "Buffalo Wings",
+      "Hot Dog New-Yorkais",
+      "Cheesecake",
+      "Pancakes",
+      "Pulled Pork",
+      "Brownie",
+      "Milkshake",
+    ],
+    Végétarienne: [
+      "Buddha Bowl",
+      "Curry de Légumes",
+      "Risotto aux Champignons",
+      "Falafels",
+      "Salade Composée",
+      "Lasagnes aux Légumes",
+      "Tofu Grillé",
+      "Quiche aux Épinards",
+      "Burger Végétal",
+      "Tarte aux Légumes",
+    ],
+    Végane: [
+      "Bowl Protéiné",
+      "Curry de Pois Chiches",
+      "Pad Thaï Végétal",
+      "Falafels",
+      "Salade de Quinoa",
+      "Burger Végétal",
+      "Tofu Mariné",
+      "Légumes Rôtis",
+      "Houmous",
+      "Dessert Cru",
+    ],
+    default: [
+      "Plat du Jour",
+      "Spécialité du Chef",
+      "Assiette Gourmande",
+      "Délice Maison",
+      "Création Culinaire",
+      "Saveur Signature",
+      "Plat Traditionnel",
+      "Suggestion du Chef",
+      "Assiette Découverte",
+      "Menu Dégustation",
+    ],
+  };
+
+  // Descriptions de plats génériques
+  const descriptions = [
+    "Un délice préparé avec des ingrédients frais et locaux.",
+    "Une recette traditionnelle revisitée par notre chef.",
+    "Un plat signature qui ravira vos papilles.",
+    "Une explosion de saveurs à ne pas manquer.",
+    "Préparé avec amour selon une recette ancestrale.",
+    "Un classique de notre cuisine, apprécié par tous nos clients.",
+    "Une création originale inspirée des saveurs du monde.",
+    "Un plat équilibré alliant goût et légèreté.",
+    "Une spécialité maison qui fait notre renommée.",
+    "Une composition harmonieuse de saveurs et de textures.",
+  ];
+
+  // Sélectionner le type de cuisine approprié ou utiliser default si non trouvé
+  const dishNames =
+    dishNamesByCuisine[cuisineType] || dishNamesByCuisine.default;
+
+  // Sélectionner un nom de plat aléatoire
+  const name = dishNames[Math.floor(Math.random() * dishNames.length)];
+
+  // Sélectionner une description aléatoire
+  const description =
+    descriptions[Math.floor(Math.random() * descriptions.length)];
+
+  // Générer un prix aléatoire entre 8 et 30 euros
+  const price = Math.floor(Math.random() * 2200) / 100 + 8;
+
+  // Sélectionner une image aléatoire
+  const imageUrl = dishImages[Math.floor(Math.random() * dishImages.length)];
+
+  return {
+    name,
+    description,
+    price,
+    imageUrl,
+  };
+}
+
+// Fonction pour ajouter des plats à un restaurant
+async function addDishesToRestaurant(restaurantId: number, cuisine: string) {
+  // Déterminer aléatoirement le nombre de plats à ajouter (entre 3 et 8)
+  const numberOfDishes = Math.floor(Math.random() * 6) + 3;
+
+  // Générer et ajouter les plats
+  for (let i = 0; i < numberOfDishes; i++) {
+    const dish = generateRandomDish(cuisine);
+    await prisma.dish.create({
+      data: {
+        ...dish,
+        restaurantId,
+      },
+    });
+  }
+
+  return numberOfDishes;
+}
+
 export async function GET() {
   // Vérifier l'authentification et les droits d'admin
   const session = await getServerSession(authOptions);
@@ -250,27 +460,49 @@ export async function GET() {
   try {
     // Nombre de restaurants à générer (en plus des restaurants de test)
     const additionalRestaurants = 25;
+    let totalDishes = 0;
+    let restaurantsWithDishes = 0;
 
     // Ajouter les restaurants de test
     for (const restaurant of testRestaurants) {
-      await prisma.restaurant.create({
+      const createdRestaurant = await prisma.restaurant.create({
         data: restaurant,
       });
+
+      // 70% de chance d'ajouter des plats à ce restaurant
+      if (Math.random() < 0.7) {
+        const dishesAdded = await addDishesToRestaurant(
+          createdRestaurant.id,
+          restaurant.cuisine
+        );
+        totalDishes += dishesAdded;
+        restaurantsWithDishes++;
+      }
     }
 
     // Ajouter des restaurants générés aléatoirement
     for (let i = 0; i < additionalRestaurants; i++) {
       const randomRestaurant = generateRandomRestaurant();
-      await prisma.restaurant.create({
+      const createdRestaurant = await prisma.restaurant.create({
         data: randomRestaurant,
       });
+
+      // 50% de chance d'ajouter des plats à ce restaurant
+      if (Math.random() < 0.5) {
+        const dishesAdded = await addDishesToRestaurant(
+          createdRestaurant.id,
+          randomRestaurant.cuisine
+        );
+        totalDishes += dishesAdded;
+        restaurantsWithDishes++;
+      }
     }
 
     return NextResponse.json({
       success: true,
       message: `${
         testRestaurants.length + additionalRestaurants
-      } restaurants ont été ajoutés avec succès`,
+      } restaurants ont été ajoutés avec succès. ${totalDishes} plats ont été ajoutés à ${restaurantsWithDishes} restaurants.`,
     });
   } catch (error) {
     console.error("Erreur lors de l'ajout des restaurants:", error);
