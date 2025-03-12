@@ -329,14 +329,14 @@ function generateRandomRestaurant() {
     longitude: coordinates.longitude,
     rating: Math.floor(Math.random() * 15 + 35) / 10, // Note entre 3.5 et 5.0
     cuisine: cuisine,
-    special_note: establishmentType,
-    certified_by: `Chef ${chefs[Math.floor(Math.random() * chefs.length)]}`,
-    certification_date: new Date(
+    specialNote: establishmentType,
+    certifiedBy: `Chef ${chefs[Math.floor(Math.random() * chefs.length)]}`,
+    certificationDate: new Date(
       Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000
     ).toISOString(),
     featured: Math.random() < 0.2, // 20% de chance d'être mis en avant
     image: randomImage,
-    photo_credit: randomPhotoCredit,
+    photoCredit: randomPhotoCredit,
     website: website,
     instagram: instagram,
     description: description,
@@ -569,14 +569,14 @@ export async function POST(request: Request) {
         longitude: -1.55385,
         rating: 4.8,
         cuisine: "Française",
-        special_note: "Bistro",
-        certified_by: "Chef Martin",
-        certification_date: new Date().toISOString(),
+        specialNote: "Bistro",
+        certifiedBy: "Chef Martin",
+        certificationDate: new Date().toISOString(),
         featured: true,
         image: "https://source.unsplash.com/random/900×700/?restaurant",
         website: "https://www.lepetitgourmet.fr",
         instagram: "lepetitgourmet",
-        photo_credit: "Unsplash",
+        photoCredit: "Unsplash",
         is_certified: true,
       },
       // ... autres restaurants de test ...
