@@ -478,9 +478,9 @@ export default function Home() {
       </header>
 
       {/* Espace réservé pour le header */}
-      <div className="h-48 sm:h-40 md:h-36"></div>
+      <div className="h-48 sm:h-36 md:h-28 lg:h-24"></div>
 
-      <main className="pt-4 pb-12">
+      <main className="pt-4 sm:pt-8 md:pt-12 lg:pt-24 pb-12">
         <div className="dior-container">
           <div className="space-y-6">
             {initialLoading ? (
@@ -494,7 +494,6 @@ export default function Home() {
               <>
                 {filteredCertifiedRestaurants.length > 0 && (
                   <div className="space-y-6">
-                    <h2 className="text-xl font-semibold">Restaurants</h2>
                     {filteredCertifiedRestaurants.map((restaurant, index) => (
                       <div
                         key={restaurant.id}
