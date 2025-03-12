@@ -18,6 +18,15 @@ const testRestaurants = [
     featured: Math.random() > 0.8, // 20% de chance d'être en vedette
     image:
       "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000",
+    photoCredit: "Jay Wennington sur Unsplash",
+    website: "https://lepetitgourmet-nantes.fr",
+    instagram: "@lepetitgourmet",
+    description:
+      "Un bistro chaleureux au cœur de Nantes proposant une cuisine française traditionnelle revisitée avec des produits locaux et de saison.",
+    openingHours:
+      "Lun-Ven: 12h-14h30, 19h-22h30 | Sam: 12h-15h, 19h-23h | Dim: Fermé",
+    priceRange: "€€",
+    phoneNumber: "02 40 12 34 56",
   },
   {
     name: "Saveurs d'Asie",
@@ -32,6 +41,14 @@ const testRestaurants = [
     featured: Math.random() > 0.8,
     image:
       "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1000",
+    photoCredit: "Sharon Chen sur Unsplash",
+    website: "https://saveursdasia-nantes.com",
+    instagram: "@saveurs_asie",
+    description:
+      "Un voyage culinaire à travers l'Asie, proposant des plats authentiques de Chine, du Japon, de Thaïlande et du Vietnam.",
+    openingHours: "Lun: Fermé | Mar-Dim: 12h-14h30, 19h-22h30",
+    priceRange: "€€",
+    phoneNumber: "02 40 23 45 67",
   },
   {
     name: "Pasta Bella",
@@ -46,6 +63,14 @@ const testRestaurants = [
     featured: Math.random() > 0.8,
     image:
       "https://images.unsplash.com/photo-1579684947550-22e945225d9a?q=80&w=1000",
+    photoCredit: "Brooke Lark sur Unsplash",
+    website: "https://pastabella-nantes.fr",
+    instagram: "@pasta_bella_nantes",
+    description:
+      "Une authentique trattoria italienne où les pâtes sont faites maison chaque jour. Venez déguster nos spécialités dans une ambiance conviviale.",
+    openingHours: "Tous les jours: 12h-14h30, 19h-23h",
+    priceRange: "€€",
+    phoneNumber: "02 40 34 56 78",
   },
   {
     name: "Le Jardin Vert",
@@ -232,25 +257,91 @@ function generateRandomRestaurant() {
     "Camille Dubois",
   ];
 
+  // Crédits photo pour Unsplash
+  const photoCredits = [
+    "Louis Hansel sur Unsplash",
+    "Jay Wennington sur Unsplash",
+    "Brooke Lark sur Unsplash",
+    "Lily Banse sur Unsplash",
+    "Jakub Kapusnak sur Unsplash",
+    "Eiliv-Sonas Aceron sur Unsplash",
+    "Davide Cantelli sur Unsplash",
+    "Cel Lisboa sur Unsplash",
+    "Toa Heftiba sur Unsplash",
+    "Mahmoud Fawzy sur Unsplash",
+  ];
+
+  // Gammes de prix
+  const priceRanges = ["€", "€€", "€€€", "€€€€"];
+
+  // Modèles d'horaires d'ouverture
+  const openingHoursTemplates = [
+    "Lun-Ven: 12h-14h30, 19h-22h30 | Sam-Dim: 12h-15h, 19h-23h",
+    "Tous les jours: 12h-14h30, 19h-23h",
+    "Mar-Sam: 12h-14h, 19h-22h | Dim-Lun: Fermé",
+    "Lun: Fermé | Mar-Dim: 12h-14h30, 19h-22h30",
+    "Lun-Jeu: 12h-14h, 19h-22h | Ven-Dim: 12h-15h, 19h-23h",
+  ];
+
   const coordinates = generateRandomCoordinates();
+  const cuisine = cuisines[Math.floor(Math.random() * cuisines.length)];
+  const establishmentType =
+    establishmentTypes[Math.floor(Math.random() * establishmentTypes.length)];
 
   // Sélectionner une image aléatoire dans notre liste
-  const randomImage =
-    restaurantImages[Math.floor(Math.random() * restaurantImages.length)];
+  const randomImageIndex = Math.floor(Math.random() * restaurantImages.length);
+  const randomImage = restaurantImages[randomImageIndex];
+  const randomPhotoCredit =
+    photoCredits[Math.floor(Math.random() * photoCredits.length)];
+
+  // Générer un nom de restaurant
+  const restaurantName = generateRandomRestaurantName();
+
+  // Créer un nom de domaine et un compte Instagram basés sur le nom du restaurant
+  const domainName = restaurantName.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const website = `https://www.${domainName}.fr`;
+  const instagram = `@${domainName.substring(0, 15)}`;
+
+  // Générer une description basée sur le type de cuisine et d'établissement
+  const descriptions = [
+    `Un ${establishmentType.toLowerCase()} chaleureux proposant une délicieuse cuisine ${cuisine.toLowerCase()} dans le centre de Nantes.`,
+    `Découvrez les saveurs authentiques de la cuisine ${cuisine.toLowerCase()} dans notre ${establishmentType.toLowerCase()} convivial.`,
+    `Notre ${establishmentType.toLowerCase()} vous invite à un voyage culinaire à travers les spécialités ${cuisine.toLowerCase()}.`,
+    `Une adresse incontournable pour les amateurs de cuisine ${cuisine.toLowerCase()}, dans un cadre élégant et décontracté.`,
+    `Savourez une cuisine ${cuisine.toLowerCase()} créative et raffinée dans notre ${establishmentType.toLowerCase()} au cœur de Nantes.`,
+  ];
+  const description =
+    descriptions[Math.floor(Math.random() * descriptions.length)];
+
+  // Générer un numéro de téléphone aléatoire au format français
+  const phoneNumber = `02 40 ${Math.floor(
+    10 + Math.random() * 90
+  )} ${Math.floor(10 + Math.random() * 90)} ${Math.floor(
+    10 + Math.random() * 90
+  )}`;
 
   return {
-    name: generateRandomRestaurantName(),
+    name: restaurantName,
     address: generateRandomAddress(),
     latitude: coordinates.latitude,
     longitude: coordinates.longitude,
     rating: Math.floor(Math.random() * 15 + 35) / 10, // Note entre 3.5 et 5.0
-    cuisine: cuisines[Math.floor(Math.random() * cuisines.length)],
-    specialNote:
-      establishmentTypes[Math.floor(Math.random() * establishmentTypes.length)],
+    cuisine: cuisine,
+    specialNote: establishmentType,
     certifiedBy: `Chef ${chefs[Math.floor(Math.random() * chefs.length)]}`,
     certificationDate: new Date(),
     featured: Math.random() > 0.8, // 20% de chance d'être en vedette
-    image: randomImage, // Utiliser une image constante de notre liste
+    image: randomImage,
+    photoCredit: randomPhotoCredit,
+    website: website,
+    instagram: instagram,
+    description: description,
+    openingHours:
+      openingHoursTemplates[
+        Math.floor(Math.random() * openingHoursTemplates.length)
+      ],
+    priceRange: priceRanges[Math.floor(Math.random() * priceRanges.length)],
+    phoneNumber: phoneNumber,
   };
 }
 

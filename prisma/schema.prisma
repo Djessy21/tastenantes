@@ -80,6 +80,13 @@ model Restaurant {
   updatedAt         DateTime?           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   is_certified      Boolean?            @default(false)
   image             String?
+  photoCredit       String?             @map("photo_credit")
+  website           String?
+  instagram         String?
+  description       String?             @db.Text
+  openingHours      String?             @map("opening_hours")
+  priceRange        String?             @map("price_range") @db.VarChar(10)
+  phoneNumber       String?             @map("phone_number") @db.VarChar(20)
   dishes            Dish[]
   restaurant_images restaurant_images[]
 
