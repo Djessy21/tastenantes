@@ -5,6 +5,7 @@ import { initDB } from "./lib/db-edge";
 import Providers from "./providers";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
           <main className="flex-grow">{children}</main>
           <ScrollToTop />
           <Footer />
+          <Toaster position="bottom-right" />
         </Providers>
       </body>
     </html>
