@@ -43,6 +43,51 @@ export async function getRestaurants(
   );
 
   try {
+    // Vérifier d'abord la structure de la table restaurants
+    console.log("[DEBUG] Vérification de la structure de la table restaurants");
+    try {
+      const tableInfo = await sql`
+        SELECT column_name, data_type 
+        FROM information_schema.columns 
+        WHERE table_name = 'restaurants'
+      `;
+      console.log(
+        "[DEBUG] Structure de la table restaurants:",
+        JSON.stringify(tableInfo.rows)
+      );
+    } catch (schemaError) {
+      console.error(
+        "[DEBUG] Erreur lors de la vérification de la structure:",
+        schemaError
+      );
+    }
+
+    // Compter le nombre total de restaurants
+    console.log("[DEBUG] Comptage du nombre total de restaurants");
+    try {
+      const countResult = await sql`SELECT COUNT(*) FROM restaurants`;
+      console.log(
+        "[DEBUG] Nombre total de restaurants:",
+        countResult.rows[0].count
+      );
+
+      // Compter les restaurants certifiés
+      const certifiedCountResult =
+        await sql`SELECT COUNT(*) FROM restaurants WHERE is_certified = true`;
+      console.log(
+        "[DEBUG] Nombre de restaurants certifiés:",
+        certifiedCountResult.rows[0].count
+      );
+    } catch (countError) {
+      console.error(
+        "[DEBUG] Erreur lors du comptage des restaurants:",
+        countError
+      );
+    }
+
+    console.log(
+      "[DEBUG] Exécution de la requête principale pour récupérer les restaurants"
+    );
     const { rows } = await sql<Restaurant>`
       SELECT * FROM restaurants 
       WHERE is_certified = true OR is_certified IS NULL
@@ -51,9 +96,24 @@ export async function getRestaurants(
     `;
 
     console.log(`Retrieved ${rows.length} restaurants`);
+
+    // Afficher les détails du premier restaurant pour débogage
+    if (rows.length > 0) {
+      console.log(
+        "[DEBUG] Premier restaurant récupéré:",
+        JSON.stringify(rows[0])
+      );
+    } else {
+      console.log("[DEBUG] Aucun restaurant récupéré");
+    }
+
     return rows;
   } catch (error) {
     console.error("Error fetching restaurants:", error);
+    if (error instanceof Error) {
+      console.error("[DEBUG] Error message:", error.message);
+      console.error("[DEBUG] Error stack:", error.stack);
+    }
     throw error;
   }
 }
