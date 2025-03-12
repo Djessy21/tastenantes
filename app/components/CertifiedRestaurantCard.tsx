@@ -32,15 +32,12 @@ export default function CertifiedRestaurantCard({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDishesModalOpen, setIsDishesModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [hasDishes, setHasDishes] = useState<boolean | null>(null);
-  const [isCheckingDishes, setIsCheckingDishes] = useState(false);
+  const [dishesCount, setDishesCount] = useState<number>(0);
+  const [dishesLoaded, setDishesLoaded] = useState<boolean>(false);
 
-  // Vérifier si le restaurant a des plats au chargement du composant
+  // Précharger les informations sur les plats en arrière-plan
   useEffect(() => {
-    const checkDishes = async () => {
-      if (hasDishes !== null) return; // Ne vérifier qu'une seule fois
-
-      setIsCheckingDishes(true);
+    const loadDishesInfo = async () => {
       try {
         const response = await fetch(
           `/api/restaurants/${restaurant.id}/dishes`
@@ -48,25 +45,39 @@ export default function CertifiedRestaurantCard({
         if (!response.ok) throw new Error("Impossible de charger les plats");
 
         const data = await response.json();
-        setHasDishes(data.length > 0);
+        setDishesCount(data.length);
+        setDishesLoaded(true);
       } catch (error) {
-        console.error("Erreur lors de la vérification des plats:", error);
-        setHasDishes(false);
-      } finally {
-        setIsCheckingDishes(false);
+        console.error("Erreur lors du chargement des plats:", error);
+        setDishesCount(0);
+        setDishesLoaded(true);
       }
     };
 
-    checkDishes();
-  }, [restaurant.id, hasDishes]);
+    loadDishesInfo();
+  }, [restaurant.id]);
 
-  // Mettre à jour l'état hasDishes après l'ajout d'un plat
+  // Mettre à jour le nombre de plats après l'ajout d'un plat
   useEffect(() => {
-    if (showAddDishForm === false && hasDishes === false) {
-      // Vérifier à nouveau les plats quand le formulaire d'ajout est fermé
-      setHasDishes(null); // Réinitialiser pour déclencher une nouvelle vérification
+    if (showAddDishForm === false && dishesLoaded) {
+      // Recharger les informations sur les plats quand le formulaire d'ajout est fermé
+      const reloadDishesInfo = async () => {
+        try {
+          const response = await fetch(
+            `/api/restaurants/${restaurant.id}/dishes`
+          );
+          if (!response.ok) throw new Error("Impossible de charger les plats");
+
+          const data = await response.json();
+          setDishesCount(data.length);
+        } catch (error) {
+          console.error("Erreur lors du rechargement des plats:", error);
+        }
+      };
+
+      reloadDishesInfo();
     }
-  }, [showAddDishForm, hasDishes]);
+  }, [showAddDishForm, dishesLoaded, restaurant.id]);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -96,8 +107,8 @@ export default function CertifiedRestaurantCard({
   const handleDishAdded = () => {
     // Fermer le formulaire après l'ajout d'un plat
     setShowAddDishForm(false);
-    // Mettre à jour l'état pour indiquer que le restaurant a maintenant des plats
-    setHasDishes(true);
+    // Incrémenter le nombre de plats
+    setDishesCount((prevCount) => prevCount + 1);
   };
 
   const openDishesModal = (e: React.MouseEvent) => {
@@ -119,6 +130,72 @@ export default function CertifiedRestaurantCard({
   const openExternalLink = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  // Rendu du bouton de plats en fonction du nombre de plats
+  const renderDishesButton = () => {
+    if (dishesCount > 0) {
+      return (
+        <motion.button
+          onClick={openDishesModal}
+          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md relative"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            />
+          </svg>
+          <span>Voir les plats</span>
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {dishesCount}
+          </span>
+        </motion.button>
+      );
+    } else if (isAdmin) {
+      // Pour les admins, afficher un bouton pour ajouter des plats si aucun plat n'existe
+      return (
+        <motion.button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowAddDishForm(!showAddDishForm);
+          }}
+          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          style={{ borderRadius: "var(--button-border-radius)" }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+          Ajouter un plat
+        </motion.button>
+      );
+    } else {
+      // Pour les utilisateurs normaux, ne pas afficher de bouton si aucun plat n'existe
+      return null;
+    }
   };
 
   return (
@@ -330,82 +407,8 @@ export default function CertifiedRestaurantCard({
               <div className="mt-auto">
                 {/* Boutons d'action */}
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {isCheckingDishes ? (
-                    // Afficher un bouton de chargement pendant la vérification
-                    <motion.button
-                      disabled
-                      className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-gray-300 text-gray-600 rounded-lg cursor-wait"
-                    >
-                      <svg
-                        className="animate-spin h-4 w-4 text-gray-600"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Vérification...
-                    </motion.button>
-                  ) : hasDishes ? (
-                    // Afficher le bouton normal si le restaurant a des plats
-                    <motion.button
-                      onClick={openDishesModal}
-                      className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md"
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                        />
-                      </svg>
-                      Voir les plats
-                    </motion.button>
-                  ) : (
-                    // Afficher un bouton grisé si le restaurant n'a pas de plats
-                    <motion.button
-                      disabled
-                      className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed opacity-70"
-                      title="Aucun plat disponible pour ce restaurant"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                        />
-                      </svg>
-                      Aucun plat disponible
-                    </motion.button>
-                  )}
+                  {/* Bouton pour voir/ajouter des plats */}
+                  {renderDishesButton()}
 
                   {isAdmin && (
                     <>
@@ -433,32 +436,36 @@ export default function CertifiedRestaurantCard({
                         Modifier
                       </motion.button>
 
-                      <motion.button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowAddDishForm(!showAddDishForm);
-                        }}
-                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        style={{ borderRadius: "var(--button-border-radius)" }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                      {dishesCount === 0 ? null : (
+                        <motion.button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowAddDishForm(!showAddDishForm);
+                          }}
+                          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          style={{
+                            borderRadius: "var(--button-border-radius)",
+                          }}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                          />
-                        </svg>
-                        {showAddDishForm ? "Annuler" : "Ajouter un plat"}
-                      </motion.button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                          </svg>
+                          {showAddDishForm ? "Annuler" : "Ajouter un plat"}
+                        </motion.button>
+                      )}
 
                       <motion.button
                         onClick={(e) => {
