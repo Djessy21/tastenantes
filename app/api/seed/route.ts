@@ -20,7 +20,7 @@ const testRestaurants = [
       "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000",
     photoCredit: "Jay Wennington sur Unsplash",
     website: "https://lepetitgourmet-nantes.fr",
-    instagram: "@lepetitgourmet",
+    instagram: "lepetitgourmet",
     description:
       "Un bistro chaleureux au cœur de Nantes proposant une cuisine française traditionnelle revisitée avec des produits locaux et de saison.",
     openingHours:
@@ -43,7 +43,7 @@ const testRestaurants = [
       "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1000",
     photoCredit: "Sharon Chen sur Unsplash",
     website: "https://saveursdasia-nantes.com",
-    instagram: "@saveurs_asie",
+    instagram: "saveurs_asie",
     description:
       "Un voyage culinaire à travers l'Asie, proposant des plats authentiques de Chine, du Japon, de Thaïlande et du Vietnam.",
     openingHours: "Lun: Fermé | Mar-Dim: 12h-14h30, 19h-22h30",
@@ -65,7 +65,7 @@ const testRestaurants = [
       "https://images.unsplash.com/photo-1579684947550-22e945225d9a?q=80&w=1000",
     photoCredit: "Brooke Lark sur Unsplash",
     website: "https://pastabella-nantes.fr",
-    instagram: "@pasta_bella_nantes",
+    instagram: "pasta_bella_nantes",
     description:
       "Une authentique trattoria italienne où les pâtes sont faites maison chaque jour. Venez déguster nos spécialités dans une ambiance conviviale.",
     openingHours: "Tous les jours: 12h-14h30, 19h-23h",
@@ -300,7 +300,7 @@ function generateRandomRestaurant() {
   // Créer un nom de domaine et un compte Instagram basés sur le nom du restaurant
   const domainName = restaurantName.toLowerCase().replace(/[^a-z0-9]/g, "");
   const website = `https://www.${domainName}.fr`;
-  const instagram = `@${domainName.substring(0, 15)}`;
+  const instagram = domainName.substring(0, 15);
 
   // Générer une description basée sur le type de cuisine et d'établissement
   const descriptions = [
