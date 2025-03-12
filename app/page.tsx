@@ -272,7 +272,12 @@ export default function Home() {
 
   const seedTestRestaurants = async () => {
     try {
-      const response = await fetch("/api/seed");
+      const response = await fetch("/api/seed", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (!response.ok) {
         throw new Error("Erreur lors de l'ajout des restaurants de test");
       }
