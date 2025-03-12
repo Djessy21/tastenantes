@@ -384,7 +384,7 @@ export default function Privacy() {
               <ul className="list-disc pl-5 space-y-2">
                 <li>
                   Par email :{" "}
-                  <span className="text-pink-600">privacy@tastenantes.fr</span>
+                  <span className="text-pink-600">tastenantes@gmail.com</span>
                 </li>
                 <li>
                   Via notre{" "}
