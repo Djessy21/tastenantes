@@ -54,15 +54,7 @@ const ValueCard = ({
 };
 
 // Composant pour les membres de l'équipe
-const TeamMember = ({
-  name,
-  role,
-  image,
-}: {
-  name: string;
-  role: string;
-  image: string;
-}) => {
+const TeamMember = ({ name, image }: { name: string; image: string }) => {
   return (
     <div className="text-center">
       <div className="relative w-32 h-32 mx-auto mb-4 overflow-hidden rounded-full">
@@ -75,7 +67,6 @@ const TeamMember = ({
         />
       </div>
       <h3 className="text-lg font-semibold">{name}</h3>
-      <p className="text-gray-600">{role}</p>
     </div>
   );
 };
@@ -145,20 +136,29 @@ export default function About() {
 
             <div className="space-y-4 text-gray-600">
               <p>
-                Taste Nantes est né en 2023 d'une passion commune pour la
-                gastronomie nantaise et d'un constat simple : il était difficile
-                de trouver une ressource fiable et moderne pour découvrir les
-                meilleurs restaurants de Nantes.
+                Taste Nantes est né d'une situation que beaucoup de Nantais
+                connaissent : être constamment sollicité pour des
+                recommandations de restaurants. En tant que local passionné de
+                gastronomie, on me demande souvent où manger sur Nantes,
+                notamment par mes amis sportifs de différentes équipes de France
+                qui viennent régulièrement dans la ville pour des compétitions.
               </p>
               <p>
-                Fondé par un groupe d'amis passionnés de cuisine et de
-                technologie, notre plateforme a pour mission de mettre en valeur
-                la richesse culinaire de Nantes tout en offrant une expérience
-                utilisateur exceptionnelle.
+                Face à ces demandes récurrentes, j'ai d'abord créé un compte
+                Instagram pour partager mes découvertes culinaires nantaises.
+                Mais cette solution s'est vite révélée insuffisante : les
+                publications étaient difficiles à retrouver et l'expérience
+                utilisateur limitée.
+              </p>
+              <p>
+                C'est ainsi qu'est née l'idée de Taste Nantes en 2023 : une
+                plateforme moderne et intuitive qui centralise les meilleures
+                adresses de la ville, permettant à tous - locaux comme visiteurs
+                - de découvrir facilement la richesse gastronomique nantaise.
               </p>
               <p>
                 Ce qui nous distingue ? Chaque restaurant présenté sur Taste
-                Nantes est certifié par un expert local, garantissant ainsi
+                Nantes est soigneusement sélectionné, garantissant ainsi
                 l'authenticité et la qualité des établissements recommandés.
               </p>
             </div>
@@ -233,39 +233,6 @@ export default function About() {
               }
               title="Innovation"
               description="Nous repoussons constamment les limites pour offrir une expérience utilisateur moderne et intuitive."
-            />
-          </div>
-        </AnimatedSection>
-
-        {/* Notre équipe */}
-        <AnimatedSection delay={0.4} className="mt-16">
-          <h2 className="text-2xl font-semibold mb-8 text-center">
-            Notre équipe
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-            <TeamMember
-              name="Sophie Martin"
-              role="Fondatrice & CEO"
-              image="/default-restaurant.svg"
-            />
-
-            <TeamMember
-              name="Thomas Dupont"
-              role="Chef Culinaire"
-              image="/default-restaurant.svg"
-            />
-
-            <TeamMember
-              name="Emma Leclerc"
-              role="Responsable Partenariats"
-              image="/default-restaurant.svg"
-            />
-
-            <TeamMember
-              name="Lucas Moreau"
-              role="Développeur"
-              image="/default-restaurant.svg"
             />
           </div>
         </AnimatedSection>

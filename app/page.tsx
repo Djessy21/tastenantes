@@ -205,13 +205,6 @@ export default function Home() {
     }
   );
 
-  const featuredRestaurants = filteredCertifiedRestaurants.filter(
-    (r) => r.featured
-  );
-  const nonFeaturedCertifiedRestaurants = filteredCertifiedRestaurants.filter(
-    (r) => !r.featured
-  );
-
   const handleRestaurantClick = (
     restaurant: Restaurant | CertifiedRestaurant
   ) => {
@@ -499,66 +492,38 @@ export default function Home() {
               </div>
             ) : (
               <>
-                {featuredRestaurants.length > 0 && (
+                {filteredCertifiedRestaurants.length > 0 && (
                   <div className="space-y-6">
-                    <h2 className="text-xl font-semibold">
-                      Restaurants en vedette
-                    </h2>
-                    {featuredRestaurants.map((restaurant) => (
-                      <CertifiedRestaurantCard
+                    <h2 className="text-xl font-semibold">Restaurants</h2>
+                    {filteredCertifiedRestaurants.map((restaurant, index) => (
+                      <div
                         key={restaurant.id}
-                        restaurant={restaurant}
-                        onClick={() => handleRestaurantClick(restaurant)}
-                        isSelected={selectedRestaurant?.id === restaurant.id}
-                        onToggleFeatured={() =>
-                          handleToggleFeatured(restaurant)
+                        ref={
+                          index === filteredCertifiedRestaurants.length - 1
+                            ? certifiedLastElementRef
+                            : null
                         }
-                        onDelete={handleRestaurantDelete}
-                        onUpdate={handleRestaurantUpdate}
-                        isAdmin={isAdmin}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {nonFeaturedCertifiedRestaurants.length > 0 && (
-                  <div className="space-y-6">
-                    <h2 className="text-xl font-semibold">
-                      Restaurants certifiés
-                    </h2>
-                    {nonFeaturedCertifiedRestaurants.map(
-                      (restaurant, index) => (
-                        <div
-                          key={restaurant.id}
-                          ref={
-                            index === nonFeaturedCertifiedRestaurants.length - 1
-                              ? certifiedLastElementRef
-                              : null
+                      >
+                        <CertifiedRestaurantCard
+                          restaurant={restaurant}
+                          onClick={() => handleRestaurantClick(restaurant)}
+                          isSelected={selectedRestaurant?.id === restaurant.id}
+                          onToggleFeatured={() =>
+                            handleToggleFeatured(restaurant)
                           }
-                        >
-                          <CertifiedRestaurantCard
-                            restaurant={restaurant}
-                            onClick={() => handleRestaurantClick(restaurant)}
-                            isSelected={
-                              selectedRestaurant?.id === restaurant.id
-                            }
-                            onToggleFeatured={() =>
-                              handleToggleFeatured(restaurant)
-                            }
-                            onDelete={handleRestaurantDelete}
-                            onUpdate={handleRestaurantUpdate}
-                            isAdmin={isAdmin}
-                          />
-                        </div>
-                      )
-                    )}
+                          onDelete={handleRestaurantDelete}
+                          onUpdate={handleRestaurantUpdate}
+                          isAdmin={isAdmin}
+                        />
+                      </div>
+                    ))}
                     {certifiedLoading && (
                       <div className="text-center py-4">
                         <LoadingIndicator size="small" />
                       </div>
                     )}
                     <ScrollStatus
-                      currentCount={nonFeaturedCertifiedRestaurants.length}
+                      currentCount={filteredCertifiedRestaurants.length}
                       hasMore={certifiedHasMore}
                       loading={certifiedLoading}
                     />

@@ -210,14 +210,7 @@ export default function CertifiedRestaurantCard({
       >
         <div className="relative z-20">
           <div className="absolute top-4 right-4 flex gap-2 z-10">
-            {restaurant.featured && (
-              <div
-                className="h-3 w-3 text-yellow-500"
-                title="Restaurant en vedette"
-              >
-                ★
-              </div>
-            )}
+            {/* Suppression de l'indicateur d'étoile pour les restaurants en vedette */}
           </div>
 
           <div className="flex flex-col sm:flex-row">
@@ -466,35 +459,6 @@ export default function CertifiedRestaurantCard({
                           {showAddDishForm ? "Annuler" : "Ajouter un plat"}
                         </motion.button>
                       )}
-
-                      <motion.button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggleFeatured?.();
-                        }}
-                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-black hover:bg-black hover:text-white transition-all duration-300"
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        style={{ borderRadius: "var(--button-border-radius)" }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                          />
-                        </svg>
-                        {restaurant.featured
-                          ? "Retirer vedette"
-                          : "Mettre en vedette"}
-                      </motion.button>
 
                       <motion.button
                         onClick={handleDelete}
