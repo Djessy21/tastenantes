@@ -555,24 +555,24 @@ async function addDishesToRestaurant(restaurantId: number, cuisine: string) {
   for (let i = 0; i < numberOfDishes; i++) {
     const dish = generateRandomDish(cuisine);
 
-    // Créer un objet avec les propriétés correctes selon le schéma Prisma
-    await prisma.dish.create({
-      data: {
-        name: dish.name,
-        description: dish.description,
-        price: dish.price,
-        imageUrl: dish.imageUrl,
-        // Utiliser le nom de champ tel qu'il est défini dans le schéma Prisma
-        // Le champ est défini comme photoCredit dans le modèle TypeScript
-        // mais mappé à photo_credit dans la base de données
-        photoCredit: dish.photoCredit,
-        restaurant: {
-          connect: {
-            id: restaurantId,
-          },
-        },
-      },
-    });
+    // Utiliser une requête SQL brute pour contourner les problèmes de typage
+    await prisma.$executeRaw`
+      INSERT INTO dishes (
+        restaurant_id, 
+        name, 
+        description, 
+        price, 
+        image_url, 
+        photo_credit
+      ) VALUES (
+        ${restaurantId}, 
+        ${dish.name}, 
+        ${dish.description}, 
+        ${dish.price}, 
+        ${dish.imageUrl}, 
+        ${dish.photoCredit}
+      )
+    `;
   }
 
   return numberOfDishes;
