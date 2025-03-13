@@ -231,14 +231,12 @@ export default function DishesModal({
                           className="w-full h-full object-cover"
                         />
                         {dishes[currentIndex].photo_credit && (
-                          <div className="absolute bottom-2 right-2">
-                            <PhotoCredit
-                              credit={dishes[currentIndex].photo_credit || ""}
-                              position="bottom-right"
-                              theme="dark"
-                              size="small"
-                            />
-                          </div>
+                          <PhotoCredit
+                            credit={dishes[currentIndex].photo_credit || ""}
+                            position="bottom-right"
+                            theme="dark"
+                            size="small"
+                          />
                         )}
                       </div>
                     ) : (

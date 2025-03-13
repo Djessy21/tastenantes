@@ -519,11 +519,30 @@ function generateRandomDish(cuisineType: string) {
   // Sélectionner une image aléatoire
   const imageUrl = dishImages[Math.floor(Math.random() * dishImages.length)];
 
+  // Ajouter des crédits photo pour les images
+  const photoCredits = [
+    "@foodphotographer",
+    "@culinary_shots",
+    "@gourmet_pics",
+    "@food_artistry",
+    "@plate_perfection",
+    "@cuisine_captures",
+    "@dish_delights",
+    "@gastronomy_lens",
+    "@flavor_frames",
+    "@taste_visuals",
+  ];
+
+  // Sélectionner un crédit photo aléatoire
+  const photoCredit =
+    photoCredits[Math.floor(Math.random() * photoCredits.length)];
+
   return {
     name,
     description,
     price,
     imageUrl,
+    photoCredit,
   };
 }
 
@@ -537,7 +556,11 @@ async function addDishesToRestaurant(restaurantId: number, cuisine: string) {
     const dish = generateRandomDish(cuisine);
     await prisma.dish.create({
       data: {
-        ...dish,
+        name: dish.name,
+        description: dish.description,
+        price: dish.price,
+        imageUrl: dish.imageUrl,
+        photoCredit: dish.photoCredit,
         restaurantId,
       },
     });
