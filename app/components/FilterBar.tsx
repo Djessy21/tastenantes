@@ -28,9 +28,27 @@ export default function FilterBar({
   >("cuisine");
   const [searchTerm, setSearchTerm] = useState("");
   const [restaurantSearchTerm, setRestaurantSearchTerm] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Détecter si l'appareil est mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    // Vérifier au chargement
+    checkIfMobile();
+
+    // Vérifier au redimensionnement
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []);
 
   // Fermer les suggestions lorsqu'on clique en dehors
   useEffect(() => {
@@ -69,6 +87,33 @@ export default function FilterBar({
       }
     };
   }, [restaurantSearchTerm, onSearchChange]);
+
+  // Ajouter une meta tag pour désactiver le zoom sur mobile
+  useEffect(() => {
+    // Vérifier si la meta tag existe déjà
+    let metaViewport = document.querySelector('meta[name="viewport"]');
+
+    // Si elle n'existe pas, la créer
+    if (!metaViewport) {
+      metaViewport = document.createElement("meta");
+      metaViewport.setAttribute("name", "viewport");
+      document.head.appendChild(metaViewport);
+    }
+
+    // Mettre à jour le contenu pour désactiver le zoom
+    metaViewport.setAttribute(
+      "content",
+      "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+    );
+
+    // Nettoyer lors du démontage du composant
+    return () => {
+      metaViewport.setAttribute(
+        "content",
+        "width=device-width, initial-scale=1"
+      );
+    };
+  }, []);
 
   // Gérer la sélection d'un type de cuisine
   const toggleCuisine = (cuisine: string) => {
@@ -178,7 +223,12 @@ export default function FilterBar({
                 placeholder="Rechercher un restaurant..."
                 value={restaurantSearchTerm}
                 onChange={(e) => setRestaurantSearchTerm(e.target.value)}
-                className="w-full py-3 px-3 bg-transparent border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none"
+                className="w-full py-3 px-3 bg-transparent border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none text-[16px]"
+                style={{ fontSize: "16px" }}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
               />
               {restaurantSearchTerm && (
                 <button
@@ -240,63 +290,112 @@ export default function FilterBar({
         {/* Affichage des filtres sélectionnés */}
         {totalFilters > 0 && (
           <div className="px-4 py-2 flex flex-wrap gap-1.5 items-center border-t border-[#E8E1D9]">
-            {selectedCuisines.map((cuisine) => (
-              <div
-                key={cuisine}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40] max-w-[150px] truncate"
-              >
-                <span className="truncate">{cuisine}</span>
-                <button
-                  onClick={() => removeFilter("cuisine", cuisine)}
-                  className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
-                  aria-label={`Supprimer le filtre ${cuisine}`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+            {isMobile ? (
+              // Affichage compact pour mobile
+              <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40]">
+                {totalFilters} filtre{totalFilters > 1 ? "s" : ""} actif
+                {totalFilters > 1 ? "s" : ""}
               </div>
-            ))}
+            ) : (
+              // Affichage normal pour desktop
+              <>
+                {/* Affichage des filtres de cuisine */}
+                {selectedCuisines.map((cuisine) => (
+                  <div
+                    key={cuisine}
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40] max-w-[150px] truncate"
+                  >
+                    <span className="truncate">{cuisine}</span>
+                    <button
+                      onClick={() => removeFilter("cuisine", cuisine)}
+                      className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
+                      aria-label={`Supprimer le filtre ${cuisine}`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
 
-            {selectedEstablishments.map((establishment) => (
-              <div
-                key={establishment}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F] max-w-[150px] truncate"
-              >
-                <span className="truncate">{establishment}</span>
-                <button
-                  onClick={() => removeFilter("establishment", establishment)}
-                  className="ml-1 flex-shrink-0 text-[#6B5D4F]/80 hover:text-[#6B5D4F]"
-                  aria-label={`Supprimer le filtre ${establishment}`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                {/* Affichage des filtres d'établissement */}
+                {selectedEstablishments.map((establishment) => (
+                  <div
+                    key={establishment}
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F] max-w-[150px] truncate"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ))}
+                    <span className="truncate">{establishment}</span>
+                    <button
+                      onClick={() =>
+                        removeFilter("establishment", establishment)
+                      }
+                      className="ml-1 flex-shrink-0 text-[#6B5D4F]/80 hover:text-[#6B5D4F]"
+                      aria-label={`Supprimer le filtre ${establishment}`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+
+                {/* Affichage du filtre de recherche si présent */}
+                {restaurantSearchTerm && (
+                  <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F5F2EE] text-[#5D4D40] max-w-[150px] truncate">
+                    <span className="truncate">
+                      {`"${restaurantSearchTerm}"`}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setRestaurantSearchTerm("");
+                        if (onSearchChange) {
+                          onSearchChange("");
+                        }
+                      }}
+                      className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
+                      aria-label={`Supprimer la recherche ${restaurantSearchTerm}`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
 
             {totalFilters > 0 && (
               <button
@@ -342,7 +441,12 @@ export default function FilterBar({
                     placeholder="Rechercher un filtre..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full py-2 px-3 bg-transparent border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none"
+                    className="w-full py-2 px-3 bg-transparent border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none text-[16px]"
+                    style={{ fontSize: "16px" }}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck="false"
                   />
                   {searchTerm && (
                     <button

@@ -68,7 +68,7 @@ export default function AuthButton() {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="h-full w-full bg-[#b08e7d] text-white flex items-center justify-center text-sm font-medium">
+            <div className="h-full w-full bg-black text-white flex items-center justify-center text-sm font-medium">
               {getInitials()}
             </div>
           )}
@@ -141,7 +141,7 @@ export default function AuthButton() {
   return (
     <button
       onClick={openLoginModal}
-      className="h-10 w-10 rounded-full bg-[#b08e7d] text-white flex items-center justify-center hover:bg-[#96735f] transition-colors"
+      className="h-10 w-10 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
