@@ -22,6 +22,11 @@ export default function DishesModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Seuil minimum pour considérer un swipe (en pixels)
+  const minSwipeDistance = 50;
 
   // Charger les plats quand le modal s'ouvre
   useEffect(() => {
@@ -71,6 +76,30 @@ export default function DishesModal({
       document.removeEventListener("keydown", handleArrowKeys);
     };
   }, [isOpen, dishes, currentIndex]);
+
+  // Gestionnaires d'événements tactiles pour le swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null); // Réinitialiser touchEnd
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && dishes.length > 0) {
+      goToNext();
+    } else if (isRightSwipe && dishes.length > 0) {
+      goToPrevious();
+    }
+  };
 
   // Fonction pour charger les plats
   const loadDishes = async () => {
@@ -222,13 +251,19 @@ export default function DishesModal({
                   className="flex flex-col"
                 >
                   {/* Image du plat avec compteur et boutons de navigation */}
-                  <div className="relative w-full aspect-square bg-black/20 rounded-xl overflow-hidden mb-4 shadow-lg">
+                  <div
+                    className="relative w-full aspect-square bg-black/20 rounded-xl overflow-hidden mb-4 shadow-lg"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  >
                     {dishes[currentIndex].image_url ? (
                       <div className="relative w-full h-full">
                         <img
                           src={dishes[currentIndex].image_url}
                           alt={dishes[currentIndex].name}
                           className="w-full h-full object-cover"
+                          draggable="false" // Empêcher le glissement de l'image
                         />
                         {dishes[currentIndex].photo_credit && (
                           <PhotoCredit
@@ -252,51 +287,60 @@ export default function DishesModal({
                       {currentIndex + 1} / {dishes.length}
                     </div>
 
-                    {/* Boutons de navigation - Écartés davantage sur les côtés */}
-                    <div className="absolute inset-y-0 -left-4 -right-4 flex items-center justify-between pointer-events-none">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          goToPrevious();
-                        }}
-                        className="pointer-events-auto bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white/80 hover:text-white rounded-full p-3 shadow-lg transition-all duration-300 transform hover:scale-110 hover:-translate-x-1 focus:outline-none focus:ring-2 focus:ring-white/30"
-                        aria-label="Plat précédent"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                    {/* Boutons de navigation - Repositionnés pour une meilleure ergonomie */}
+                    <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
+                      {/* Flèche gauche - Positionnée sur le côté gauche avec un espacement */}
+                      <div className="h-full flex items-center pl-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            goToPrevious();
+                          }}
+                          className="pointer-events-auto bg-black/30 hover:bg-black/50 backdrop-blur-sm text-white/90 hover:text-white rounded-full p-2 shadow-lg transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/30"
+                          aria-label="Plat précédent"
                         >
-                          <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
-                      </button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                          </svg>
+                        </button>
+                      </div>
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          goToNext();
-                        }}
-                        className="pointer-events-auto bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white/80 hover:text-white rounded-full p-3 shadow-lg transition-all duration-300 transform hover:scale-110 hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-white/30"
-                        aria-label="Plat suivant"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                      {/* Zone centrale transparente pour permettre l'interaction avec l'image */}
+                      <div className="flex-grow h-full"></div>
+
+                      {/* Flèche droite - Positionnée sur le côté droit avec un espacement */}
+                      <div className="h-full flex items-center pr-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            goToNext();
+                          }}
+                          className="pointer-events-auto bg-black/30 hover:bg-black/50 backdrop-blur-sm text-white/90 hover:text-white rounded-full p-2 shadow-lg transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/30"
+                          aria-label="Plat suivant"
                         >
-                          <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                      </button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
