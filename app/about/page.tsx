@@ -136,54 +136,24 @@ export default function About() {
 
             <div className="space-y-4 text-gray-600">
               <p>
-                Taste Nantes est né d'une situation que beaucoup de Nantais
-                connaissent : être constamment sollicité pour des
-                recommandations de restaurants. En tant que local passionné de
-                gastronomie, on me demande souvent où manger sur Nantes,
-                notamment par mes amis sportifs de différentes équipes de France
-                qui viennent régulièrement dans la ville pour des compétitions.
+                Taste Nantes est né d'un constat simple : le besoin de
+                recommandations fiables pour les restaurants nantais. En tant
+                que passionné de gastronomie locale, je partageais souvent mes
+                adresses préférées avec des amis et visiteurs de passage à
+                Nantes.
               </p>
               <p>
-                Face à ces demandes récurrentes, j'ai d'abord créé un compte
-                Instagram pour partager mes découvertes culinaires nantaises.
-                Mais cette solution s'est vite révélée insuffisante : les
-                publications étaient difficiles à retrouver et l'expérience
-                utilisateur limitée.
+                Après avoir d'abord utilisé Instagram pour partager mes
+                découvertes, j'ai créé Taste Nantes en 2025 : une plateforme
+                intuitive qui centralise les meilleures adresses de la ville
+                pour tous les gourmets.
               </p>
               <p>
-                C'est ainsi qu'est née l'idée de Taste Nantes en 2025 : une
-                plateforme moderne et intuitive qui centralise les meilleures
-                adresses de la ville, permettant à tous - locaux comme visiteurs
-                - de découvrir facilement la richesse gastronomique nantaise.
-              </p>
-              <p>
-                Mais Taste Nantes est aussi une expérience en soi. Lancée cette
-                année, la plateforme est conçue comme un laboratoire
-                d'innovation où nous expérimentons une nouvelle façon de
-                développer des produits numériques. Notre approche ? Ajouter
-                rapidement de nouvelles fonctionnalités en fonction des retours
-                des utilisateurs sur les réseaux sociaux, observer comment ils
-                interagissent avec le site, et pivoter au besoin. Cette méthode
-                agile et centrée sur l'utilisateur nous permet d'évoluer
-                constamment pour mieux répondre aux besoins réels des amateurs
-                de gastronomie nantaise.
-              </p>
-              <p>
-                Un aspect particulièrement novateur de notre démarche est
-                l'intégration de l'intelligence artificielle dans notre
-                processus de développement. En utilisant des outils d'IA
-                avancés, nous sommes capables de supercharger notre vitesse de
-                développement, d'automatiser certaines tâches répétitives, et
-                d'implémenter des améliorations beaucoup plus rapidement qu'avec
-                des méthodes traditionnelles. Cette approche nous permet non
-                seulement de gagner un temps précieux, mais aussi d'explorer des
-                solutions créatives que nous n'aurions peut-être pas envisagées
-                autrement.
-              </p>
-              <p>
-                Ce qui nous distingue ? Chaque restaurant présenté sur Taste
-                Nantes est soigneusement sélectionné, garantissant ainsi
-                l'authenticité et la qualité des établissements recommandés.
+                Notre approche est simple : nous évoluons rapidement en fonction
+                des retours utilisateurs et utilisons les technologies modernes,
+                dont l'IA, pour améliorer constamment l'expérience. Chaque
+                restaurant présenté est soigneusement sélectionné pour garantir
+                qualité et authenticité.
               </p>
             </div>
           </div>
