@@ -35,6 +35,9 @@ export default function FilterBar({
 
   // Détecter si l'appareil est mobile
   useEffect(() => {
+    // S'assurer que le code s'exécute uniquement côté client
+    if (typeof window === "undefined") return;
+
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 640);
     };
@@ -90,6 +93,9 @@ export default function FilterBar({
 
   // Ajouter une meta tag pour désactiver le zoom sur mobile
   useEffect(() => {
+    // S'assurer que le code s'exécute uniquement côté client
+    if (typeof window === "undefined") return;
+
     // Vérifier si la meta tag existe déjà
     let metaViewport = document.querySelector('meta[name="viewport"]');
 
@@ -108,10 +114,13 @@ export default function FilterBar({
 
     // Nettoyer lors du démontage du composant
     return () => {
-      metaViewport.setAttribute(
-        "content",
-        "width=device-width, initial-scale=1"
-      );
+      // Vérifier que metaViewport existe toujours
+      if (metaViewport) {
+        metaViewport.setAttribute(
+          "content",
+          "width=device-width, initial-scale=1"
+        );
+      }
     };
   }, []);
 
