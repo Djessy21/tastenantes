@@ -9,24 +9,28 @@ interface FilterProps {
     cuisines: string[];
     establishments: string[];
   }) => void;
+  onSearchChange?: (searchTerm: string) => void;
 }
 
 export default function FilterBar({
   cuisineTypes,
   establishmentTypes,
   onFilterChange,
+  onSearchChange,
 }: FilterProps) {
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [selectedEstablishments, setSelectedEstablishments] = useState<
     string[]
   >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [activeTab, setActiveTab] = useState<"cuisine" | "establishment">(
-    "cuisine"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "cuisine" | "establishment" | "search"
+  >("cuisine");
   const [searchTerm, setSearchTerm] = useState("");
+  const [restaurantSearchTerm, setRestaurantSearchTerm] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fermer les suggestions lorsqu'on clique en dehors
   useEffect(() => {
@@ -46,6 +50,25 @@ export default function FilterBar({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Appliquer la recherche en temps réel avec un délai
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      if (onSearchChange) {
+        onSearchChange(restaurantSearchTerm);
+      }
+    }, 300); // Délai de 300ms pour éviter trop d'appels pendant la frappe
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [restaurantSearchTerm, onSearchChange]);
 
   // Gérer la sélection d'un type de cuisine
   const toggleCuisine = (cuisine: string) => {
@@ -96,11 +119,18 @@ export default function FilterBar({
   const clearAllFilters = () => {
     setSelectedCuisines([]);
     setSelectedEstablishments([]);
+    setRestaurantSearchTerm("");
+    if (onSearchChange) {
+      onSearchChange("");
+    }
     onFilterChange({ cuisines: [], establishments: [] });
   };
 
   // Nombre total de filtres sélectionnés
-  const totalFilters = selectedCuisines.length + selectedEstablishments.length;
+  const totalFilters =
+    selectedCuisines.length +
+    selectedEstablishments.length +
+    (restaurantSearchTerm ? 1 : 0);
 
   // Filtrer les options en fonction du terme de recherche
   const filteredCuisines = searchTerm
@@ -121,26 +151,74 @@ export default function FilterBar({
       <div
         className={`relative bg-white transition-all duration-300 ${
           showSuggestions
-            ? "border-b-2 border-red-400"
-            : "border-b border-stone-200 hover:border-stone-300"
+            ? "border-b-2 border-[#6B5D4F]"
+            : "border-b border-[#D2C8BC] hover:border-[#A89B8C]"
         }`}
       >
         {/* Champ de recherche */}
-        <div
-          className="px-5 py-3.5 flex items-center cursor-pointer"
-          onClick={() => {
-            setShowSuggestions(!showSuggestions);
-          }}
-        >
+        <div className="flex items-center p-2">
+          <div className="relative flex-grow">
+            <div className="relative flex items-center bg-transparent">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-[#8C7B6B] ml-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Rechercher un restaurant..."
+                value={restaurantSearchTerm}
+                onChange={(e) => setRestaurantSearchTerm(e.target.value)}
+                className="w-full py-3 px-3 bg-transparent border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none"
+              />
+              {restaurantSearchTerm && (
+                <button
+                  onClick={() => {
+                    setRestaurantSearchTerm("");
+                    if (onSearchChange) {
+                      onSearchChange("");
+                    }
+                  }}
+                  className="flex items-center justify-center h-8 w-8 mr-1 rounded-full text-[#A89B8C] hover:text-[#6B5D4F] hover:bg-[#F5F2EE] transition-colors"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
           <button
             ref={buttonRef}
-            className={`flex items-center justify-center p-2 rounded-full transition-all ${
+            className={`ml-2 flex items-center justify-center h-10 w-10 rounded-lg transition-all ${
               showSuggestions || totalFilters > 0
-                ? "bg-stone-500 text-white"
-                : "bg-stone-100 text-stone-500 hover:bg-stone-200"
+                ? "bg-[#6B5D4F] text-white"
+                : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
             }`}
             aria-expanded={showSuggestions}
             aria-controls="filter-panel"
+            onClick={() => setShowSuggestions(!showSuggestions)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -157,123 +235,80 @@ export default function FilterBar({
               />
             </svg>
           </button>
+        </div>
 
-          <div className="ml-3 flex-grow truncate">
-            {totalFilters === 0 ? (
-              <span className="text-stone-500">
-                Filtrer par cuisine ou type d'établissement
-              </span>
-            ) : (
-              <div className="flex flex-wrap gap-1.5 items-center">
-                {selectedCuisines.map((cuisine) => (
-                  <div
-                    key={cuisine}
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${"bg-stone-400 text-white"} max-w-[150px] truncate`}
+        {/* Affichage des filtres sélectionnés */}
+        {totalFilters > 0 && (
+          <div className="px-4 py-2 flex flex-wrap gap-1.5 items-center border-t border-[#E8E1D9]">
+            {selectedCuisines.map((cuisine) => (
+              <div
+                key={cuisine}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40] max-w-[150px] truncate"
+              >
+                <span className="truncate">{cuisine}</span>
+                <button
+                  onClick={() => removeFilter("cuisine", cuisine)}
+                  className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
+                  aria-label={`Supprimer le filtre ${cuisine}`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <span className="truncate">{cuisine}</span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeFilter("cuisine", cuisine);
-                      }}
-                      className="ml-1 flex-shrink-0 text-white/80 hover:text-white"
-                      aria-label={`Supprimer le filtre ${cuisine}`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-
-                {selectedEstablishments.map((establishment) => (
-                  <div
-                    key={establishment}
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${"bg-stone-600 text-white"} max-w-[150px] truncate`}
-                  >
-                    <span className="truncate">{establishment}</span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeFilter("establishment", establishment);
-                      }}
-                      className="ml-1 flex-shrink-0 text-white/80 hover:text-white"
-                      aria-label={`Supprimer le filtre ${establishment}`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-
-                {totalFilters > 0 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      clearAllFilters();
-                    }}
-                    className="ml-1 text-xs text-stone-500 hover:text-stone-800 transition-colors"
-                    aria-label="Effacer tous les filtres"
-                  >
-                    Effacer
-                  </button>
-                )}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
               </div>
+            ))}
+
+            {selectedEstablishments.map((establishment) => (
+              <div
+                key={establishment}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F] max-w-[150px] truncate"
+              >
+                <span className="truncate">{establishment}</span>
+                <button
+                  onClick={() => removeFilter("establishment", establishment)}
+                  className="ml-1 flex-shrink-0 text-[#6B5D4F]/80 hover:text-[#6B5D4F]"
+                  aria-label={`Supprimer le filtre ${establishment}`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))}
+
+            {totalFilters > 0 && (
+              <button
+                onClick={clearAllFilters}
+                className="ml-1 text-xs text-[#8C7B6B] hover:text-[#5D4D40] transition-colors"
+                aria-label="Effacer tous les filtres"
+              >
+                Effacer tout
+              </button>
             )}
           </div>
-
-          <div className="ml-2 flex-shrink-0">
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                showSuggestions ? "bg-stone-100" : "bg-transparent"
-              }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowSuggestions(!showSuggestions);
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`h-4 w-4 text-stone-500 transition-transform duration-300 ${
-                  showSuggestions ? "rotate-180" : ""
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Suggestions de filtres */}
         <AnimatePresence>
@@ -283,21 +318,14 @@ export default function FilterBar({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-stone-100 overflow-hidden z-50 transform origin-top"
+              className="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-[#E8E1D9] overflow-hidden z-50 transform origin-top"
             >
-              {/* Barre de recherche */}
-              <div className="p-3 border-b border-stone-100">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Rechercher un filtre..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  />
+              {/* Barre de recherche pour les filtres */}
+              <div className="p-3 border-b border-[#E8E1D9]">
+                <div className="relative flex items-center bg-[#F5F2EE] rounded-lg overflow-hidden">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-stone-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                    className="h-5 w-5 text-[#8C7B6B] ml-3"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -309,10 +337,17 @@ export default function FilterBar({
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   </svg>
+                  <input
+                    type="text"
+                    placeholder="Rechercher un filtre..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full py-2 px-3 bg-transparent border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none"
+                  />
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm("")}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                      className="flex items-center justify-center h-8 w-8 mr-1 rounded-full text-[#A89B8C] hover:text-[#6B5D4F] hover:bg-[#EFE9E3] transition-colors"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -334,12 +369,12 @@ export default function FilterBar({
               </div>
 
               {/* Onglets */}
-              <div className="flex border-b border-stone-100">
+              <div className="flex border-b border-[#E8E1D9]">
                 <button
                   className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
                     activeTab === "cuisine"
-                      ? "text-stone-500 border-b-2 border-stone-500"
-                      : "text-stone-500 hover:text-stone-800"
+                      ? "text-[#5D4D40] border-b-2 border-[#6B5D4F]"
+                      : "text-[#8C7B6B] hover:text-[#5D4D40]"
                   }`}
                   onClick={() => setActiveTab("cuisine")}
                 >
@@ -348,8 +383,8 @@ export default function FilterBar({
                 <button
                   className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
                     activeTab === "establishment"
-                      ? "text-stone-700 border-b-2 border-stone-700"
-                      : "text-stone-500 hover:text-stone-800"
+                      ? "text-[#5D4D40] border-b-2 border-[#8C7B6B]"
+                      : "text-[#8C7B6B] hover:text-[#5D4D40]"
                   }`}
                   onClick={() => setActiveTab("establishment")}
                 >
@@ -367,8 +402,8 @@ export default function FilterBar({
                           key={cuisine}
                           className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                             selectedCuisines.includes(cuisine)
-                              ? "bg-stone-400 text-white font-medium"
-                              : "bg-stone-50 text-stone-700 hover:bg-stone-100 border border-stone-200"
+                              ? "bg-[#D2C8BC] text-[#5D4D40] font-medium"
+                              : "bg-[#F5F2EE] text-[#6B5D4F] hover:bg-[#E8E1D9] border border-[#E8E1D9]"
                           }`}
                           onClick={() => toggleCuisine(cuisine)}
                         >
@@ -376,7 +411,7 @@ export default function FilterBar({
                         </button>
                       ))
                     ) : (
-                      <p className="text-sm text-stone-500 py-2">
+                      <p className="text-sm text-[#8C7B6B] py-2">
                         Aucun type de cuisine trouvé
                       </p>
                     )}
@@ -389,8 +424,8 @@ export default function FilterBar({
                           key={establishment}
                           className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                             selectedEstablishments.includes(establishment)
-                              ? "bg-stone-600 text-white font-medium"
-                              : "bg-stone-50 text-stone-700 hover:bg-stone-100 border border-stone-200"
+                              ? "bg-[#E8E1D9] text-[#6B5D4F] font-medium"
+                              : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9] border border-[#E8E1D9]"
                           }`}
                           onClick={() => toggleEstablishment(establishment)}
                         >
@@ -398,7 +433,7 @@ export default function FilterBar({
                         </button>
                       ))
                     ) : (
-                      <p className="text-sm text-stone-500 py-2">
+                      <p className="text-sm text-[#8C7B6B] py-2">
                         Aucun type d'établissement trouvé
                       </p>
                     )}
@@ -407,18 +442,23 @@ export default function FilterBar({
               </div>
 
               {/* Pied du panneau avec boutons d'action */}
-              <div className="p-3 border-t border-stone-100 flex justify-between">
-                <button
-                  onClick={clearAllFilters}
-                  className="text-sm text-stone-500 hover:text-stone-800 transition-colors"
-                >
-                  Effacer tous les filtres
-                </button>
+              <div className="p-3 border-t border-[#E8E1D9] flex justify-between items-center">
+                <div className="flex items-center">
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-sm text-[#8C7B6B] hover:text-[#5D4D40] transition-colors"
+                  >
+                    Effacer tous les filtres
+                  </button>
+                  <span className="ml-3 text-xs text-[#A89B8C] italic">
+                    Les filtres sont appliqués automatiquement
+                  </span>
+                </div>
                 <button
                   onClick={() => setShowSuggestions(false)}
-                  className="px-4 py-1.5 bg-stone-500 text-white text-sm font-medium rounded-full hover:bg-stone-600 transition-colors"
+                  className="px-4 py-1.5 bg-[#D2C8BC] text-[#5D4D40] text-sm font-medium rounded-full hover:bg-[#C4B8A8] hover:text-[#4A3C31] transition-colors"
                 >
-                  Appliquer
+                  Fermer
                 </button>
               </div>
             </motion.div>
