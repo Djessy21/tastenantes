@@ -549,7 +549,7 @@ export default function AdminPanel({
                       </div>
                     ))}
 
-                    <label className="w-24 h-24 flex items-center justify-center border-2 border-dashed rounded-lg cursor-pointer hover:border-gray-400">
+                    <label className="w-24 h-24 flex items-center justify-center border-2 border-dashed rounded-lg cursor-pointer border-[#D2C8BC] hover:border-[#8C7B6B]">
                       <input
                         type="file"
                         accept="image/*"
@@ -558,7 +558,7 @@ export default function AdminPanel({
                       />
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 text-gray-400"
+                        className="h-6 w-6 text-[#8C7B6B]"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -572,13 +572,13 @@ export default function AdminPanel({
                       </svg>
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#8C7B6B] mt-1">
                     Cliquez sur une image pour la définir comme principale
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wider mb-1">
+                  <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                     Crédit photo
                   </label>
                   <input
@@ -590,7 +590,7 @@ export default function AdminPanel({
                       setFormData({ ...formData, photo_credit: e.target.value })
                     }
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#8C7B6B] mt-1">
                     Compte Instagram (avec @) ou nom du photographe
                   </p>
                 </div>
@@ -606,7 +606,7 @@ export default function AdminPanel({
                 <button
                   type="button"
                   onClick={addDish}
-                  className="text-xs uppercase tracking-wider px-3 py-1 border border-black hover:bg-black hover:text-white transition-colors"
+                  className="text-xs uppercase tracking-wider px-3 py-1 border border-[#6B5D4F] text-[#6B5D4F] hover:bg-[#6B5D4F] hover:text-white transition-colors"
                 >
                   + Ajouter un Plat
                 </button>
@@ -615,21 +615,23 @@ export default function AdminPanel({
               {dishes.map((dish, index) => (
                 <div
                   key={index}
-                  className="border border-black/10 p-4 space-y-4"
+                  className="border border-[#E8E1D9] p-4 space-y-4"
                 >
                   <div className="flex justify-between items-center">
-                    <h4 className="text-sm font-medium">Plat #{index + 1}</h4>
+                    <h4 className="text-sm font-medium text-[#5D4D40]">
+                      Plat #{index + 1}
+                    </h4>
                     <button
                       type="button"
                       onClick={() => removeDish(index)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-[#E05D5D] hover:text-[#c54545]"
                     >
                       Supprimer
                     </button>
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider mb-1">
+                    <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                       Nom du Plat
                     </label>
                     <input
@@ -644,7 +646,7 @@ export default function AdminPanel({
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider mb-1">
+                    <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                       Description
                     </label>
                     <textarea
@@ -657,7 +659,7 @@ export default function AdminPanel({
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider mb-1">
+                    <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                       Prix
                     </label>
                     <input
@@ -677,7 +679,7 @@ export default function AdminPanel({
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider mb-1">
+                    <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                       Image du Plat
                     </label>
                     <div className="relative">
@@ -690,7 +692,7 @@ export default function AdminPanel({
                       />
                       <button
                         type="button"
-                        className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-black/80 transition-colors"
+                        className="w-full py-2 px-4 bg-[#6B5D4F] text-white rounded-md hover:bg-[#5D4D40] transition-colors"
                         onClick={() => {}} // Ce bouton ne fait rien, l'input au-dessus capte le clic
                       >
                         Sélectionner une image

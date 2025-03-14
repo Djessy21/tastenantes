@@ -92,7 +92,7 @@ export default function ImageUpload({
         <button
           type="button"
           onClick={handleButtonClick}
-          className="w-full p-4 text-center border-2 border-dashed rounded-lg cursor-pointer hover:border-gray-400 transition-colors"
+          className="w-full p-4 text-center border-2 border-dashed rounded-lg cursor-pointer border-[#D2C8BC] hover:border-[#8C7B6B] transition-colors text-[#8C7B6B]"
         >
           {isLoading ? (
             <span>Chargement...</span>
@@ -114,17 +114,17 @@ export default function ImageUpload({
 
       {showCreditField && (
         <div className="mt-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-[#5D4D40] mb-1">
             Crédit photo
           </label>
           <input
             type="text"
             value={photoCredit}
             onChange={handleCreditChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+            className="w-full px-3 py-2 border border-[#E8E1D9] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]"
             placeholder="@photographe ou Nom du photographe"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-[#8C7B6B] mt-1">
             Compte Instagram (avec @) ou nom du photographe
           </p>
         </div>
