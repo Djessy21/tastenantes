@@ -661,7 +661,15 @@ export default function Home() {
                             ? certifiedLastElementRef
                             : null
                         }
-                        className="bg-white rounded-lg shadow-md overflow-hidden"
+                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+                        style={{
+                          borderRadius: isMobile
+                            ? "0 0 0.5rem 0"
+                            : "0 0.5rem 0.5rem 0",
+                          borderTopRightRadius: isMobile ? "0" : "0.5rem",
+                          boxShadow:
+                            "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                        }}
                       >
                         <CertifiedRestaurantCard
                           restaurant={restaurant}
@@ -702,7 +710,15 @@ export default function Home() {
                             ? regularLastElementRef
                             : null
                         }
-                        className="bg-white rounded-lg shadow-md overflow-hidden"
+                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+                        style={{
+                          borderRadius: isMobile
+                            ? "0 0 0.5rem 0"
+                            : "0 0.5rem 0.5rem 0",
+                          borderTopRightRadius: isMobile ? "0" : "0.5rem",
+                          boxShadow:
+                            "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                        }}
                       >
                         <RestaurantCard
                           restaurant={restaurant}
