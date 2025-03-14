@@ -25,6 +25,10 @@ export default function DishesModal({
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [direction, setDirection] = useState(0);
+
+  // Référence pour le conteneur du carousel
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   // Seuil minimum pour considérer un swipe (en pixels)
   const minSwipeDistance = 50;
@@ -142,12 +146,14 @@ export default function DishesModal({
   // Fonction pour aller au plat suivant
   const goToNext = () => {
     if (dishes.length === 0) return;
+    setDirection(1);
     setCurrentIndex((prevIndex) => (prevIndex + 1) % dishes.length);
   };
 
   // Fonction pour aller au plat précédent
   const goToPrevious = () => {
     if (dishes.length === 0) return;
+    setDirection(-1);
     setCurrentIndex(
       (prevIndex) => (prevIndex - 1 + dishes.length) % dishes.length
     );
@@ -164,6 +170,43 @@ export default function DishesModal({
     return "0.00";
   };
 
+  // Variants pour les animations
+  const cardVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+      scale: 0.9,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        x: {
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+        },
+        opacity: { duration: 0.2 },
+        scale: {
+          type: "spring",
+          stiffness: 400,
+          damping: 20,
+        },
+      },
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 300 : -300,
+      opacity: 0,
+      scale: 0.9,
+      transition: {
+        x: { duration: 0.2 },
+        opacity: { duration: 0.2 },
+        scale: { duration: 0.2 },
+      },
+    }),
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -173,7 +216,7 @@ export default function DishesModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.2 }}
           className="fixed inset-0 z-50 flex items-center justify-center"
           onClick={onClose}
         >
@@ -182,21 +225,19 @@ export default function DishesModal({
             initial={{ backdropFilter: "blur(0px)" }}
             animate={{ backdropFilter: "blur(5px)" }}
             exit={{ backdropFilter: "blur(0px)" }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.3 }}
             className="absolute inset-0 bg-black/40"
             onClick={onClose}
           />
 
           {/* Contenu du carousel - Design moderne et responsive */}
           <motion.div
-            initial={{ y: 50, opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
+            exit={{ y: 20, opacity: 0 }}
             transition={{
-              type: "spring",
-              damping: 25,
-              stiffness: 300,
-              delay: 0.1,
+              duration: 0.25,
+              ease: "easeOut",
             }}
             className="relative z-10 w-full max-w-md mx-auto"
             style={{
@@ -206,9 +247,9 @@ export default function DishesModal({
           >
             {/* Bannière du restaurant - Nouveau design plus visible */}
             <motion.div
-              initial={{ y: -20, opacity: 0 }}
+              initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
+              transition={{ duration: 0.2 }}
               className="bg-[#6B5D4F] text-white px-6 py-4 rounded-t-2xl shadow-lg flex justify-between items-center"
             >
               <div>
@@ -225,7 +266,7 @@ export default function DishesModal({
               {/* Bouton de fermeture - Design amélioré */}
               <button
                 onClick={onClose}
-                className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-300 backdrop-blur-sm transform hover:rotate-90 focus:outline-none focus:ring-2 focus:ring-white/30"
+                className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-200 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/30 transform hover:rotate-90"
                 aria-label="Fermer"
               >
                 <svg
@@ -246,9 +287,9 @@ export default function DishesModal({
 
             {isLoading ? (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
                 className="flex flex-col justify-center items-center h-64 bg-white rounded-b-2xl shadow-2xl"
               >
                 <div className="relative w-16 h-16">
@@ -261,9 +302,9 @@ export default function DishesModal({
               </motion.div>
             ) : error ? (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
                 className="text-center py-10 px-6 bg-white rounded-b-2xl shadow-2xl text-[#5D4D40] flex flex-col items-center"
               >
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
@@ -292,9 +333,9 @@ export default function DishesModal({
               </motion.div>
             ) : dishes.length === 0 ? (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
                 className="text-center py-10 px-6 bg-white rounded-b-2xl shadow-2xl text-[#5D4D40] flex flex-col items-center"
               >
                 <div className="w-16 h-16 rounded-full bg-[#F5F2EE] flex items-center justify-center mb-4">
@@ -318,20 +359,24 @@ export default function DishesModal({
                 </p>
               </motion.div>
             ) : (
-              <div className="relative bg-white rounded-b-2xl overflow-hidden shadow-2xl">
-                {/* Carousel - Design moderne */}
+              <div
+                ref={carouselRef}
+                className="relative bg-white rounded-b-2xl overflow-hidden shadow-2xl"
+              >
+                {/* Carousel - Design avec effet de rebond */}
                 <div className="relative w-full mx-auto">
-                  <AnimatePresence mode="wait">
+                  <AnimatePresence
+                    mode="wait"
+                    initial={false}
+                    custom={direction}
+                  >
                     <motion.div
                       key={currentIndex}
-                      initial={{ opacity: 0, x: 100 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      transition={{
-                        type: "spring",
-                        damping: 30,
-                        stiffness: 300,
-                      }}
+                      custom={direction}
+                      variants={cardVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
                       className="flex flex-col"
                     >
                       {/* Image du plat avec compteur et boutons de navigation */}
@@ -342,27 +387,12 @@ export default function DishesModal({
                         onTouchEnd={handleTouchEnd}
                       >
                         {dishes[currentIndex].image_url ? (
-                          <motion.div
-                            initial={{ scale: 1.1 }}
-                            animate={{ scale: 1 }}
-                            transition={{ duration: 0.5 }}
-                            className="relative w-full h-full"
-                          >
-                            <img
-                              src={dishes[currentIndex].image_url}
-                              alt={dishes[currentIndex].name}
-                              className="w-full h-full object-cover"
-                              draggable="false" // Empêcher le glissement de l'image
-                            />
-                            {dishes[currentIndex].photo_credit && (
-                              <PhotoCredit
-                                credit={dishes[currentIndex].photo_credit || ""}
-                                position="bottom-right"
-                                theme="dark"
-                                size="small"
-                              />
-                            )}
-                          </motion.div>
+                          <img
+                            src={dishes[currentIndex].image_url}
+                            alt={dishes[currentIndex].name}
+                            className="w-full h-full object-cover"
+                            draggable="false" // Empêcher le glissement de l'image
+                          />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-[#8C7B6B]">
                             <span className="text-sm font-medium">
@@ -379,18 +409,13 @@ export default function DishesModal({
                         {/* Boutons de navigation - Repositionnés pour une meilleure ergonomie */}
                         <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
                           {/* Flèche gauche - Positionnée sur le côté gauche avec un espacement */}
-                          <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className="h-full flex items-center pl-2"
-                          >
+                          <div className="h-full flex items-center pl-2">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 goToPrevious();
                               }}
-                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]/30"
+                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]/30 transform hover:scale-110 hover:-translate-x-1"
                               aria-label="Plat précédent"
                             >
                               <svg
@@ -406,24 +431,19 @@ export default function DishesModal({
                                 <polyline points="15 18 9 12 15 6"></polyline>
                               </svg>
                             </button>
-                          </motion.div>
+                          </div>
 
                           {/* Zone centrale transparente pour permettre l'interaction avec l'image */}
                           <div className="flex-grow h-full"></div>
 
                           {/* Flèche droite - Positionnée sur le côté droit avec un espacement */}
-                          <motion.div
-                            initial={{ x: 10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className="h-full flex items-center pr-2"
-                          >
+                          <div className="h-full flex items-center pr-2">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 goToNext();
                               }}
-                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]/30"
+                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]/30 transform hover:scale-110 hover:translate-x-1"
                               aria-label="Plat suivant"
                             >
                               <svg
@@ -439,17 +459,12 @@ export default function DishesModal({
                                 <polyline points="9 18 15 12 9 6"></polyline>
                               </svg>
                             </button>
-                          </motion.div>
+                          </div>
                         </div>
                       </div>
 
                       {/* Informations du plat - Carte avec fond blanc */}
-                      <motion.div
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="bg-white p-5"
-                      >
+                      <div className="bg-white p-5">
                         <div className="flex justify-between items-start mb-3">
                           <h3 className="text-xl font-bold tracking-tight text-[#5D4D40] pr-2">
                             {dishes[currentIndex].name}
@@ -468,25 +483,28 @@ export default function DishesModal({
                             {dishes[currentIndex].description}
                           </p>
                         )}
-                      </motion.div>
+                      </div>
                     </motion.div>
                   </AnimatePresence>
+                </div>
 
-                  {/* Indicateurs de position - Style moderne */}
-                  <div className="flex justify-center py-4 gap-1.5">
-                    {dishes.map((_, index) => (
-                      <button
-                        key={index}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          index === currentIndex
-                            ? "bg-[#6B5D4F] w-6"
-                            : "bg-[#6B5D4F]/30 w-2 hover:bg-[#6B5D4F]/50"
-                        }`}
-                        onClick={() => setCurrentIndex(index)}
-                        aria-label={`Voir le plat ${index + 1}`}
-                      />
-                    ))}
-                  </div>
+                {/* Indicateurs de position - Style moderne */}
+                <div className="flex justify-center py-4 gap-1.5">
+                  {dishes.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`h-2 rounded-full transition-all duration-200 ${
+                        index === currentIndex
+                          ? "bg-[#6B5D4F] w-6"
+                          : "bg-[#6B5D4F]/30 w-2 hover:bg-[#6B5D4F]/50"
+                      }`}
+                      onClick={() => {
+                        setDirection(index > currentIndex ? 1 : -1);
+                        setCurrentIndex(index);
+                      }}
+                      aria-label={`Voir le plat ${index + 1}`}
+                    />
+                  ))}
                 </div>
               </div>
             )}
