@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Dish } from "../lib/db-edge";
 import AddDishForm from "./AddDishForm";
-import DishesModal from "./DishesModal";
 import { CertifiedRestaurant } from "../types/restaurant";
 import { motion } from "framer-motion";
 import EditRestaurantModal from "./EditRestaurantModal";
@@ -30,7 +29,6 @@ export default function CertifiedRestaurantCard({
 }: CertifiedRestaurantCardProps) {
   const [showAddDishForm, setShowAddDishForm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isDishesModalOpen, setIsDishesModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [dishesCount, setDishesCount] = useState<number>(0);
   const [dishesLoaded, setDishesLoaded] = useState<boolean>(false);
@@ -111,11 +109,6 @@ export default function CertifiedRestaurantCard({
     setDishesCount((prevCount) => prevCount + 1);
   };
 
-  const openDishesModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDishesModalOpen(true);
-  };
-
   const openEditModal = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditModalOpen(true);
@@ -137,7 +130,10 @@ export default function CertifiedRestaurantCard({
     if (dishesCount > 0) {
       return (
         <motion.button
-          onClick={openDishesModal}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onClick) onClick();
+          }}
           className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md relative"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -538,14 +534,6 @@ export default function CertifiedRestaurantCard({
           )}
         </div>
       </div>
-
-      {/* Modal pour afficher les plats */}
-      <DishesModal
-        isOpen={isDishesModalOpen}
-        onClose={() => setIsDishesModalOpen(false)}
-        restaurantId={restaurant.id}
-        restaurantName={restaurant.name}
-      />
 
       {/* Modal pour éditer le restaurant */}
       <EditRestaurantModal

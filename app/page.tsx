@@ -14,6 +14,7 @@ import { useInfiniteScroll } from "./hooks/useInfiniteScroll";
 import { isPreview, currentEnvironment } from "./lib/env";
 import LoadingIndicator from "./components/LoadingIndicator";
 import ScrollStatus from "./components/ScrollStatus";
+import DishesModal from "./components/DishesModal";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -39,6 +40,7 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLDivElement>(null);
+  const [isDishesModalOpen, setIsDishesModalOpen] = useState(false);
 
   // Détecter si on est sur mobile
   useEffect(() => {
@@ -305,6 +307,7 @@ export default function Home() {
     restaurant: Restaurant | CertifiedRestaurant
   ) => {
     setSelectedRestaurant(restaurant);
+    setIsDishesModalOpen(true);
   };
 
   const handleToggleFeatured = async (restaurant: CertifiedRestaurant) => {
@@ -764,6 +767,16 @@ export default function Home() {
           fetchCertifiedRestaurants(1);
         }}
       />
+
+      {/* Modal pour afficher les plats */}
+      {selectedRestaurant && (
+        <DishesModal
+          isOpen={isDishesModalOpen}
+          onClose={() => setIsDishesModalOpen(false)}
+          restaurantId={selectedRestaurant.id}
+          restaurantName={selectedRestaurant.name}
+        />
+      )}
     </div>
   );
 }
