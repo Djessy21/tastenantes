@@ -461,7 +461,7 @@ export default function CertifiedRestaurantCard({
                       <motion.button
                         onClick={handleDelete}
                         disabled={isDeleting}
-                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-[#E05D5D] text-[#E05D5D] hover:bg-[#E05D5D] hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         whileHover={{ scale: isDeleting ? 1 : 1.03 }}
                         whileTap={{ scale: isDeleting ? 1 : 0.97 }}
                         style={{ borderRadius: "var(--button-border-radius)" }}
@@ -490,7 +490,7 @@ export default function CertifiedRestaurantCard({
                 <div className="text-xs opacity-50 flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 mr-1"
+                    className="h-3 w-3 mr-1 text-[#8C7B6B]"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -502,9 +502,9 @@ export default function CertifiedRestaurantCard({
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  Validée par{" "}
+                  <span className="text-[#8C7B6B]">Validée par</span>{" "}
                   <button
-                    className="ml-1 text-pink-600 hover:underline"
+                    className="ml-1 text-[#6B5D4F] hover:text-[#5D4D40] hover:underline"
                     onClick={(e) =>
                       restaurant.certifiedBy &&
                       openExternalLink(
@@ -522,10 +522,10 @@ export default function CertifiedRestaurantCard({
 
           {showAddDishForm && isAdmin && (
             <div
-              className="mt-6 border-t border-gray-200 pt-6 px-4 sm:px-6 pb-4"
+              className="mt-6 border-t border-[#E8E1D9] pt-6 px-4 sm:px-6 pb-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <h4 className="text-sm uppercase tracking-wider font-medium mb-4">
+              <h4 className="text-sm uppercase tracking-wider font-medium mb-4 text-[#5D4D40]">
                 Ajouter un nouveau plat
               </h4>
               <AddDishForm

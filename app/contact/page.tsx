@@ -254,7 +254,7 @@ export default function Contact() {
       <div className="dior-container max-w-5xl mx-auto px-4">
         <AnimatedSection>
           <motion.h1
-            className="text-4xl md:text-5xl font-bold text-center mb-3"
+            className="text-4xl md:text-5xl font-bold text-center mb-3 text-[#5D4D40]"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -263,14 +263,14 @@ export default function Contact() {
           </motion.h1>
 
           <motion.div
-            className="w-20 h-1 bg-pink-600 mx-auto mb-8"
+            className="w-20 h-1 bg-[#6B5D4F] mx-auto mb-8"
             initial={{ width: 0 }}
             animate={{ width: 80 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           />
 
           <motion.p
-            className="text-center text-gray-600 max-w-2xl mx-auto mb-12"
+            className="text-center text-[#8C7B6B] max-w-2xl mx-auto mb-12"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -407,10 +407,10 @@ export default function Contact() {
 
               <div className="space-y-6">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-[#F5F2EE] flex items-center justify-center mr-4">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-pink-600"
+                      className="h-5 w-5 text-[#6B5D4F]"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -424,19 +424,21 @@ export default function Contact() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">Email</h3>
-                    <p className="mt-1 text-gray-600">tastenantes@gmail.com</p>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <h3 className="text-lg font-medium text-[#5D4D40]">
+                      Email
+                    </h3>
+                    <p className="mt-1 text-[#8C7B6B]">tastenantes@gmail.com</p>
+                    <p className="mt-1 text-sm text-[#A89B8C]">
                       Nous répondons généralement sous 24-48h
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-[#F5F2EE] flex items-center justify-center mr-4">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-pink-600"
+                      className="h-5 w-5 text-[#6B5D4F]"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -450,13 +452,13 @@ export default function Contact() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">
+                    <h3 className="text-lg font-medium text-[#5D4D40]">
                       Téléphone
                     </h3>
-                    <p className="mt-1 text-gray-600">
+                    <p className="mt-1 text-[#8C7B6B]">
                       Contactez-nous via le formulaire
                     </p>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-[#A89B8C]">
                       Nous recevrons votre message par email
                     </p>
                   </div>

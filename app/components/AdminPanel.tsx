@@ -298,12 +298,12 @@ export default function AdminPanel({
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white p-6 rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="dior-text text-xl uppercase tracking-wider">
+            <h2 className="dior-text text-xl uppercase tracking-wider text-[#5D4D40]">
               Ajouter un Restaurant Certifié
             </h2>
             <button
               onClick={onClose}
-              className="text-black/50 hover:text-black transition-colors"
+              className="text-[#8C7B6B] hover:text-[#5D4D40] transition-colors"
               type="button"
             >
               <svg
@@ -325,12 +325,12 @@ export default function AdminPanel({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Informations de base du restaurant */}
             <div className="space-y-4">
-              <h3 className="text-sm uppercase tracking-wider font-medium">
+              <h3 className="text-sm uppercase tracking-wider font-medium text-[#5D4D40]">
                 Informations Générales
               </h3>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider mb-1">
+                <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                   Nom du Restaurant
                 </label>
                 <input
@@ -345,7 +345,7 @@ export default function AdminPanel({
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider mb-1">
+                <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                   Adresse
                 </label>
                 <input
@@ -360,7 +360,7 @@ export default function AdminPanel({
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider mb-1">
+                <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                   Type de Cuisine
                 </label>
                 <select
@@ -380,7 +380,7 @@ export default function AdminPanel({
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider mb-1">
+                <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
                   Type d'Établissement
                 </label>
                 <select
@@ -606,7 +606,7 @@ export default function AdminPanel({
                 <button
                   type="button"
                   onClick={addDish}
-                  className="text-xs uppercase tracking-wider px-3 py-1 border border-[#6B5D4F] text-[#6B5D4F] hover:bg-[#6B5D4F] hover:text-white transition-colors"
+                  className="text-xs uppercase tracking-wider px-3 py-1 border border-black hover:bg-black hover:text-white transition-colors"
                 >
                   + Ajouter un Plat
                 </button>
@@ -615,23 +615,21 @@ export default function AdminPanel({
               {dishes.map((dish, index) => (
                 <div
                   key={index}
-                  className="border border-[#E8E1D9] p-4 space-y-4"
+                  className="border border-black/10 p-4 space-y-4"
                 >
                   <div className="flex justify-between items-center">
-                    <h4 className="text-sm font-medium text-[#5D4D40]">
-                      Plat #{index + 1}
-                    </h4>
+                    <h4 className="text-sm font-medium">Plat #{index + 1}</h4>
                     <button
                       type="button"
                       onClick={() => removeDish(index)}
-                      className="text-[#E05D5D] hover:text-[#c54545]"
+                      className="text-red-500 hover:text-red-700"
                     >
                       Supprimer
                     </button>
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
+                    <label className="block text-xs uppercase tracking-wider mb-1">
                       Nom du Plat
                     </label>
                     <input
@@ -646,7 +644,7 @@ export default function AdminPanel({
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
+                    <label className="block text-xs uppercase tracking-wider mb-1">
                       Description
                     </label>
                     <textarea
@@ -659,7 +657,7 @@ export default function AdminPanel({
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider mb-1 text-[#8C7B6B]">
+                    <label className="block text-xs uppercase tracking-wider mb-1">
                       Prix
                     </label>
                     <input
@@ -714,14 +712,14 @@ export default function AdminPanel({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-black text-black hover:bg-black hover:text-white transition-colors"
+                className="px-4 py-2 border border-[#6B5D4F] text-[#6B5D4F] hover:bg-[#6B5D4F] hover:text-white transition-colors"
                 style={{ borderRadius: "var(--button-border-radius)" }}
               >
                 Annuler
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-black text-white hover:bg-black/90 transition-colors"
+                className="px-4 py-2 bg-[#6B5D4F] text-white hover:bg-[#5D4D40] transition-colors"
                 style={{ borderRadius: "var(--button-border-radius)" }}
               >
                 Ajouter
