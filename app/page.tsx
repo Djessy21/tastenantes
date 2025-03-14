@@ -158,10 +158,19 @@ export default function Home() {
 
   // Filtrer les restaurants en fonction des filtres sélectionnés
   const filteredRestaurants = restaurants.filter((restaurant) => {
-    // Si aucun filtre n'est sélectionné, afficher tous les restaurants
-    if (filters.cuisines.length === 0 && filters.establishments.length === 0) {
+    // Si aucun filtre n'est sélectionné et pas de recherche, afficher tous les restaurants
+    if (
+      filters.cuisines.length === 0 &&
+      filters.establishments.length === 0 &&
+      !searchQuery
+    ) {
       return true;
     }
+
+    // Vérifier si le restaurant correspond à la recherche par nom
+    const matchesSearch =
+      !searchQuery ||
+      restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
 
     // Vérifier si le restaurant correspond aux filtres de cuisine
     const matchesCuisine =
@@ -172,18 +181,24 @@ export default function Home() {
 
     // Pour les restaurants normaux, nous n'avons pas d'information sur le type d'établissement
     // Donc on considère qu'ils correspondent toujours au filtre d'établissement
-    return matchesCuisine;
+    return matchesCuisine && matchesSearch;
   });
 
   const filteredCertifiedRestaurants = certifiedRestaurants.filter(
     (restaurant) => {
-      // Si aucun filtre n'est sélectionné, afficher tous les restaurants
+      // Si aucun filtre n'est sélectionné et pas de recherche, afficher tous les restaurants
       if (
         filters.cuisines.length === 0 &&
-        filters.establishments.length === 0
+        filters.establishments.length === 0 &&
+        !searchQuery
       ) {
         return true;
       }
+
+      // Vérifier si le restaurant correspond à la recherche par nom
+      const matchesSearch =
+        !searchQuery ||
+        restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Vérifier si le restaurant correspond aux filtres de cuisine
       const matchesCuisine =
@@ -201,7 +216,7 @@ export default function Home() {
             .includes(establishment.toLowerCase())
         );
 
-      return matchesCuisine && matchesEstablishment;
+      return matchesCuisine && matchesEstablishment && matchesSearch;
     }
   );
 
@@ -227,6 +242,10 @@ export default function Home() {
     establishments: string[];
   }) => {
     setFilters(newFilters);
+  };
+
+  const handleSearchChange = (searchTerm: string) => {
+    setSearchQuery(searchTerm);
   };
 
   const handleRestaurantDelete = () => {
@@ -435,6 +454,7 @@ export default function Home() {
               cuisineTypes={cuisineTypes}
               establishmentTypes={establishmentTypes}
               onFilterChange={handleFilterChange}
+              onSearchChange={handleSearchChange}
             />
             {isAdmin && (
               <div className="flex gap-2 w-full sm:w-auto">
