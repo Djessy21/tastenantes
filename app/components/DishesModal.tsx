@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dish } from "../lib/db-edge";
 import PhotoCredit from "./PhotoCredit";
+import "./dish-animations.css";
 
 interface DishesModalProps {
   isOpen: boolean;
@@ -474,25 +475,30 @@ export default function DishesModal({
                       </div>
 
                       {/* Informations du plat - Carte avec fond blanc */}
-                      <div className="bg-white p-5">
-                        <div className="flex justify-between items-start mb-3">
-                          <h3 className="text-xl font-bold tracking-tight text-[#5D4D40] pr-2">
-                            {dishes[currentIndex].name}
-                          </h3>
+                      <div className="bg-white p-5 overflow-hidden">
+                        <div
+                          key={`dish-content-${currentIndex}`}
+                          className="dish-content"
+                        >
+                          <div className="flex justify-between items-start mb-3">
+                            <h3 className="text-xl font-bold tracking-tight text-[#5D4D40] pr-2 dish-title">
+                              {dishes[currentIndex].name}
+                            </h3>
 
-                          {/* Prix mis en évidence */}
-                          <div className="bg-[#F5F2EE] rounded-lg px-3 py-1 flex-shrink-0">
-                            <p className="text-lg font-semibold text-[#6B5D4F]">
-                              {formatPrice(dishes[currentIndex].price)} €
-                            </p>
+                            {/* Prix mis en évidence */}
+                            <div className="bg-[#F5F2EE] rounded-lg px-3 py-1 flex-shrink-0 dish-price">
+                              <p className="text-lg font-semibold text-[#6B5D4F]">
+                                {formatPrice(dishes[currentIndex].price)} €
+                              </p>
+                            </div>
                           </div>
-                        </div>
 
-                        {dishes[currentIndex].description && (
-                          <p className="text-sm text-[#5D4D40]/90 leading-relaxed">
-                            {dishes[currentIndex].description}
-                          </p>
-                        )}
+                          {dishes[currentIndex].description && (
+                            <p className="text-sm text-[#5D4D40]/90 leading-relaxed dish-description">
+                              {dishes[currentIndex].description}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                   </AnimatePresence>

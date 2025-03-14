@@ -1,0 +1,62 @@
+/* Animations élégantes et subtiles pour les éléments descriptifs des plats */
+
+@keyframes subtleFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes subtleSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation pour l'ensemble du contenu */
+.dish-content {
+  animation: subtleFadeIn 0.4s ease-out forwards;
+}
+
+/* Animation pour le titre */
+.dish-title {
+  opacity: 0;
+  animation: subtleSlideIn 0.5s ease-out forwards;
+  animation-delay: 0.05s;
+}
+
+/* Animation pour le prix */
+.dish-price {
+  opacity: 0;
+  animation: subtleSlideIn 0.5s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+/* Animation pour la description */
+.dish-description {
+  opacity: 0;
+  animation: subtleSlideIn 0.5s ease-out forwards;
+  animation-delay: 0.15s;
+}
+
+/* Assurer que les animations se jouent à chaque changement de plat */
+.dish-content,
+.dish-title,
+.dish-price,
+.dish-description {
+  animation-fill-mode: both;
+}
+
+/* Réinitialisation des animations pour les nouveaux plats */
+@keyframes reset {
+  to {
+    visibility: visible;
+  }
+}
