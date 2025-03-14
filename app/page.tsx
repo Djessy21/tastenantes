@@ -568,18 +568,18 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Espace réservé pour le header */}
+      {/* Espace réservé pour le header - Augmenté pour garantir une marge suffisante */}
       <div
         className={`transition-all duration-300 ease-in-out ${
           isMobile && !showFiltersOnMobile
-            ? "h-20"
-            : "h-48 sm:h-36 md:h-28 lg:h-24"
+            ? "h-28" // Augmenté de h-20 à h-28
+            : "h-56 sm:h-44 md:h-36 lg:h-32" // Augmenté pour toutes les tailles d'écran
         }`}
       ></div>
 
-      <main className="pt-4 sm:pt-8 md:pt-12 lg:pt-24 pb-12">
+      <main className="pb-12">
         <div className="dior-container">
-          <div className="space-y-6">
+          <div className="space-y-8">
             {initialLoading ? (
               <div className="text-center py-8">
                 <LoadingIndicator
@@ -590,7 +590,7 @@ export default function Home() {
             ) : (
               <>
                 {filteredCertifiedRestaurants.length > 0 && (
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     {filteredCertifiedRestaurants.map((restaurant, index) => (
                       <div
                         key={restaurant.id}
@@ -599,6 +599,7 @@ export default function Home() {
                             ? certifiedLastElementRef
                             : null
                         }
+                        className="bg-white rounded-lg shadow-md overflow-hidden"
                       >
                         <CertifiedRestaurantCard
                           restaurant={restaurant}
@@ -627,7 +628,7 @@ export default function Home() {
                 )}
 
                 {filteredRestaurants.length > 0 && (
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     <h2 className="text-xl font-semibold">
                       Autres restaurants à proximité
                     </h2>
@@ -639,6 +640,7 @@ export default function Home() {
                             ? regularLastElementRef
                             : null
                         }
+                        className="bg-white rounded-lg shadow-md overflow-hidden"
                       >
                         <RestaurantCard
                           restaurant={restaurant}
