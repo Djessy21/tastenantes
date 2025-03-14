@@ -24,9 +24,27 @@ export default function DishesModal({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Seuil minimum pour considérer un swipe (en pixels)
   const minSwipeDistance = 50;
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    // Vérifier au chargement
+    checkIfMobile();
+
+    // Vérifier au redimensionnement
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []);
 
   // Charger les plats quand le modal s'ouvre
   useEffect(() => {
