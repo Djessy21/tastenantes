@@ -167,242 +167,332 @@ export default function DishesModal({
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={onClose}
-    >
-      {/* Overlay avec effet de flou */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-md"
-        onClick={onClose}
-      />
-
-      {/* Contenu du carousel - Design moderne et responsive */}
-      <div
-        className="relative z-10 w-full max-w-md px-4 mx-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* En-tête avec titre du restaurant et bouton de fermeture */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white tracking-tight">
-            {restaurantName}
-          </h2>
-
-          {/* Bouton de fermeture - Design amélioré */}
-          <button
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          onClick={onClose}
+        >
+          {/* Overlay avec effet de flou */}
+          <motion.div
+            initial={{ backdropFilter: "blur(0px)" }}
+            animate={{ backdropFilter: "blur(5px)" }}
+            exit={{ backdropFilter: "blur(0px)" }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0 bg-black/40"
             onClick={onClose}
-            className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-all duration-300 backdrop-blur-sm shadow-lg transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/30"
-            aria-label="Fermer"
+          />
+
+          {/* Contenu du carousel - Design moderne et responsive */}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{
+              type: "spring",
+              damping: 25,
+              stiffness: 300,
+              delay: 0.1,
+            }}
+            className="relative z-10 w-full max-w-md mx-auto"
+            style={{
+              margin: isMobile ? "0 16px" : "0 auto",
+            }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            {/* Bannière du restaurant - Nouveau design plus visible */}
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="bg-[#6B5D4F] text-white px-6 py-4 rounded-t-2xl shadow-lg flex justify-between items-center"
             >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-
-        {isLoading ? (
-          <div className="flex flex-col justify-center items-center h-64 bg-black/20 backdrop-blur-sm rounded-xl">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-white border-t-transparent mb-3"></div>
-            <p className="text-white/90 text-sm font-medium">
-              Chargement des plats...
-            </p>
-          </div>
-        ) : error ? (
-          <div className="text-center py-10 px-4 bg-black/20 backdrop-blur-sm rounded-xl text-white flex flex-col items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 mb-3 text-red-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <p className="font-medium">{error}</p>
-          </div>
-        ) : dishes.length === 0 ? (
-          <div className="text-center py-10 px-4 bg-black/20 backdrop-blur-sm rounded-xl text-white flex flex-col items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 mb-3 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-            <p className="font-medium">
-              Aucun plat disponible pour ce restaurant
-            </p>
-          </div>
-        ) : (
-          <div className="relative">
-            {/* Carousel - Design moderne */}
-            <div className="relative w-full mx-auto">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentIndex}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="flex flex-col"
-                >
-                  {/* Image du plat avec compteur et boutons de navigation */}
-                  <div
-                    className="relative w-full aspect-square bg-black/20 rounded-xl overflow-hidden mb-4 shadow-lg"
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                  >
-                    {dishes[currentIndex].image_url ? (
-                      <div className="relative w-full h-full">
-                        <img
-                          src={dishes[currentIndex].image_url}
-                          alt={dishes[currentIndex].name}
-                          className="w-full h-full object-cover"
-                          draggable="false" // Empêcher le glissement de l'image
-                        />
-                        {dishes[currentIndex].photo_credit && (
-                          <PhotoCredit
-                            credit={dishes[currentIndex].photo_credit || ""}
-                            position="bottom-right"
-                            theme="dark"
-                            size="small"
-                          />
-                        )}
-                      </div>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white bg-gradient-to-br from-gray-800 to-gray-900">
-                        <span className="text-sm font-medium">
-                          Pas d'image disponible
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Compteur de plats - En bas de l'image */}
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm text-white font-medium">
-                      {currentIndex + 1} / {dishes.length}
-                    </div>
-
-                    {/* Boutons de navigation - Repositionnés pour une meilleure ergonomie */}
-                    <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
-                      {/* Flèche gauche - Positionnée sur le côté gauche avec un espacement */}
-                      <div className="h-full flex items-center pl-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            goToPrevious();
-                          }}
-                          className="pointer-events-auto bg-black/30 hover:bg-black/50 backdrop-blur-sm text-white/90 hover:text-white rounded-full p-2 shadow-lg transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/30"
-                          aria-label="Plat précédent"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                          </svg>
-                        </button>
-                      </div>
-
-                      {/* Zone centrale transparente pour permettre l'interaction avec l'image */}
-                      <div className="flex-grow h-full"></div>
-
-                      {/* Flèche droite - Positionnée sur le côté droit avec un espacement */}
-                      <div className="h-full flex items-center pr-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            goToNext();
-                          }}
-                          className="pointer-events-auto bg-black/30 hover:bg-black/50 backdrop-blur-sm text-white/90 hover:text-white rounded-full p-2 shadow-lg transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/30"
-                          aria-label="Plat suivant"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Informations du plat - Carte avec fond semi-transparent */}
-                  <div className="bg-black/30 backdrop-blur-md rounded-xl p-4 text-white shadow-lg">
-                    <h3 className="text-xl font-bold mb-2 tracking-tight">
-                      {dishes[currentIndex].name}
-                    </h3>
-
-                    {/* Prix mis en évidence */}
-                    <div className="inline-block bg-white/20 rounded-lg px-3 py-1 mb-3">
-                      <p className="text-lg font-semibold">
-                        {formatPrice(dishes[currentIndex].price)} €
-                      </p>
-                    </div>
-
-                    {dishes[currentIndex].description && (
-                      <p className="text-sm text-white/90 leading-relaxed">
-                        {dishes[currentIndex].description}
-                      </p>
-                    )}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Indicateurs de position - Style moderne */}
-              <div className="flex justify-center mt-4 gap-1.5">
-                {dishes.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentIndex
-                        ? "bg-white w-4"
-                        : "bg-white/40 hover:bg-white/60"
-                    }`}
-                    onClick={() => setCurrentIndex(index)}
-                    aria-label={`Voir le plat ${index + 1}`}
-                  />
-                ))}
+              <div>
+                <h2 className="text-xl font-bold tracking-tight">
+                  {restaurantName}
+                </h2>
+                <p className="text-xs text-white/80 mt-0.5">
+                  {dishes.length > 0
+                    ? `${dishes.length} plats disponibles`
+                    : ""}
+                </p>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+
+              {/* Bouton de fermeture - Design amélioré */}
+              <button
+                onClick={onClose}
+                className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-300 backdrop-blur-sm transform hover:rotate-90 focus:outline-none focus:ring-2 focus:ring-white/30"
+                aria-label="Fermer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </motion.div>
+
+            {isLoading ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col justify-center items-center h-64 bg-white rounded-b-2xl shadow-2xl"
+              >
+                <div className="relative w-16 h-16">
+                  <div className="absolute inset-0 rounded-full border-4 border-[#E8E1D9] opacity-25"></div>
+                  <div className="absolute inset-0 rounded-full border-4 border-t-[#6B5D4F] animate-spin"></div>
+                </div>
+                <p className="text-[#5D4D40] text-sm font-medium mt-4">
+                  Chargement des plats...
+                </p>
+              </motion.div>
+            ) : error ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="text-center py-10 px-6 bg-white rounded-b-2xl shadow-2xl text-[#5D4D40] flex flex-col items-center"
+              >
+                <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-red-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                </div>
+                <p className="font-medium text-lg">{error}</p>
+                <button
+                  onClick={loadDishes}
+                  className="mt-4 px-4 py-2 bg-[#6B5D4F] text-white rounded-lg hover:bg-[#5D4D40] transition-colors"
+                >
+                  Réessayer
+                </button>
+              </motion.div>
+            ) : dishes.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="text-center py-10 px-6 bg-white rounded-b-2xl shadow-2xl text-[#5D4D40] flex flex-col items-center"
+              >
+                <div className="w-16 h-16 rounded-full bg-[#F5F2EE] flex items-center justify-center mb-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-[#8C7B6B]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <p className="font-medium text-lg">
+                  Aucun plat disponible pour ce restaurant
+                </p>
+              </motion.div>
+            ) : (
+              <div className="relative bg-white rounded-b-2xl overflow-hidden shadow-2xl">
+                {/* Carousel - Design moderne */}
+                <div className="relative w-full mx-auto">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentIndex}
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{
+                        type: "spring",
+                        damping: 30,
+                        stiffness: 300,
+                      }}
+                      className="flex flex-col"
+                    >
+                      {/* Image du plat avec compteur et boutons de navigation */}
+                      <div
+                        className="relative w-full aspect-square bg-[#F5F2EE] overflow-hidden"
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                      >
+                        {dishes[currentIndex].image_url ? (
+                          <motion.div
+                            initial={{ scale: 1.1 }}
+                            animate={{ scale: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className="relative w-full h-full"
+                          >
+                            <img
+                              src={dishes[currentIndex].image_url}
+                              alt={dishes[currentIndex].name}
+                              className="w-full h-full object-cover"
+                              draggable="false" // Empêcher le glissement de l'image
+                            />
+                            {dishes[currentIndex].photo_credit && (
+                              <PhotoCredit
+                                credit={dishes[currentIndex].photo_credit || ""}
+                                position="bottom-right"
+                                theme="dark"
+                                size="small"
+                              />
+                            )}
+                          </motion.div>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[#8C7B6B]">
+                            <span className="text-sm font-medium">
+                              Pas d'image disponible
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Compteur de plats - En bas de l'image */}
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-[#6B5D4F]/80 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm text-white font-medium">
+                          {currentIndex + 1} / {dishes.length}
+                        </div>
+
+                        {/* Boutons de navigation - Repositionnés pour une meilleure ergonomie */}
+                        <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
+                          {/* Flèche gauche - Positionnée sur le côté gauche avec un espacement */}
+                          <motion.div
+                            initial={{ x: -10, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="h-full flex items-center pl-2"
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                goToPrevious();
+                              }}
+                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]/30"
+                              aria-label="Plat précédent"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                              </svg>
+                            </button>
+                          </motion.div>
+
+                          {/* Zone centrale transparente pour permettre l'interaction avec l'image */}
+                          <div className="flex-grow h-full"></div>
+
+                          {/* Flèche droite - Positionnée sur le côté droit avec un espacement */}
+                          <motion.div
+                            initial={{ x: 10, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="h-full flex items-center pr-2"
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                goToNext();
+                              }}
+                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]/30"
+                              aria-label="Plat suivant"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                              </svg>
+                            </button>
+                          </motion.div>
+                        </div>
+                      </div>
+
+                      {/* Informations du plat - Carte avec fond blanc */}
+                      <motion.div
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="bg-white p-5"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className="text-xl font-bold tracking-tight text-[#5D4D40] pr-2">
+                            {dishes[currentIndex].name}
+                          </h3>
+
+                          {/* Prix mis en évidence */}
+                          <div className="bg-[#F5F2EE] rounded-lg px-3 py-1 flex-shrink-0">
+                            <p className="text-lg font-semibold text-[#6B5D4F]">
+                              {formatPrice(dishes[currentIndex].price)} €
+                            </p>
+                          </div>
+                        </div>
+
+                        {dishes[currentIndex].description && (
+                          <p className="text-sm text-[#5D4D40]/90 leading-relaxed">
+                            {dishes[currentIndex].description}
+                          </p>
+                        )}
+                      </motion.div>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Indicateurs de position - Style moderne */}
+                  <div className="flex justify-center py-4 gap-1.5">
+                    {dishes.map((_, index) => (
+                      <button
+                        key={index}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          index === currentIndex
+                            ? "bg-[#6B5D4F] w-6"
+                            : "bg-[#6B5D4F]/30 w-2 hover:bg-[#6B5D4F]/50"
+                        }`}
+                        onClick={() => setCurrentIndex(index)}
+                        aria-label={`Voir le plat ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
