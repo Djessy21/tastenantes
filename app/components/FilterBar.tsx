@@ -488,7 +488,7 @@ export default function FilterBar({
         )}
       </div>
 
-      {/* Panneau de filtres avec animation */}
+      {/* Panneau de filtres avec animations */}
       <AnimatePresence>
         {showSuggestions && (
           <>
@@ -504,12 +504,16 @@ export default function FilterBar({
 
             {/* Panneau de filtres avec animation */}
             <motion.div
-              className="fixed left-0 right-0 top-[4rem] mx-auto max-w-[600px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-[#E8E1D9]/60 z-[1000] overflow-hidden"
+              className="fixed left-0 right-0 top-[4rem] sm:mx-auto max-w-[600px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-[#E8E1D9]/60 z-[1000] overflow-hidden"
               style={{
                 boxShadow:
                   "0 10px 25px -5px rgba(107, 93, 79, 0.15), 0 8px 10px -6px rgba(107, 93, 79, 0.1)",
                 backgroundImage:
                   "linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(253, 251, 249, 0.95))",
+                maxHeight: isMobile ? "80vh" : "auto",
+                margin: isMobile ? "0 8px" : "0 auto",
+                width: isMobile ? "calc(100% - 16px)" : "auto",
+                top: isMobile ? "calc(4rem + 8px)" : "4rem", // Ajustement de la position pour mobile
               }}
               variants={panelVariants}
               initial="hidden"
@@ -577,6 +581,12 @@ export default function FilterBar({
                 <motion.div
                   key={activeTab}
                   className="p-5 max-h-[60vh] overflow-y-auto"
+                  style={{
+                    paddingLeft: isMobile ? "12px" : "20px",
+                    paddingRight: isMobile ? "12px" : "20px",
+                    paddingTop: isMobile ? "16px" : "20px",
+                    paddingBottom: isMobile ? "16px" : "20px",
+                  }}
                   variants={tabContentVariants}
                   initial="hidden"
                   animate="visible"
@@ -625,7 +635,15 @@ export default function FilterBar({
               </AnimatePresence>
 
               {/* Bouton de fermeture avec style amélioré et plus arrondi - sans délimitation */}
-              <div className="p-4 flex justify-between items-center bg-[#FDFBF9]/80">
+              <div
+                className="p-4 flex justify-between items-center bg-[#FDFBF9]/80"
+                style={{
+                  paddingLeft: isMobile ? "12px" : "16px",
+                  paddingRight: isMobile ? "12px" : "16px",
+                  paddingTop: isMobile ? "12px" : "16px",
+                  paddingBottom: isMobile ? "12px" : "16px",
+                }}
+              >
                 <div className="text-sm text-[#8C7B6B]">
                   {totalFilters > 0 ? (
                     <span>
