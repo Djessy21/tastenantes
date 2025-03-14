@@ -53,6 +53,9 @@ export default function FilterBar({
     };
   }, []);
 
+  // Nombre maximum de filtres à afficher en fonction de la taille de l'écran
+  const maxVisibleFilters = isMobile ? 2 : 5;
+
   // Fermer les suggestions lorsqu'on clique en dehors
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -312,9 +315,9 @@ export default function FilterBar({
         {/* Affichage des filtres sélectionnés */}
         {totalFilters > 0 && (
           <div className="px-4 py-2 flex flex-wrap gap-1.5 items-center border-t border-[#E8E1D9]">
-            {/* Affichage des filtres de cuisine (limité à 3 au total avec les établissements) */}
+            {/* Affichage des filtres de cuisine (limité en fonction de la taille de l'écran) */}
             {selectedCuisines
-              .slice(0, Math.min(3, selectedCuisines.length))
+              .slice(0, Math.min(maxVisibleFilters, selectedCuisines.length))
               .map((cuisine) => (
                 <div
                   key={cuisine}
@@ -343,9 +346,16 @@ export default function FilterBar({
                 </div>
               ))}
 
-            {/* Affichage des filtres d'établissement (limité à ce qui reste des 3 premiers) */}
+            {/* Affichage des filtres d'établissement (limité à ce qui reste des filtres visibles) */}
             {selectedEstablishments
-              .slice(0, Math.max(0, 3 - selectedCuisines.slice(0, 3).length))
+              .slice(
+                0,
+                Math.max(
+                  0,
+                  maxVisibleFilters -
+                    selectedCuisines.slice(0, maxVisibleFilters).length
+                )
+              )
               .map((establishment) => (
                 <div
                   key={establishment}
@@ -374,9 +384,10 @@ export default function FilterBar({
                 </div>
               ))}
 
-            {/* Affichage du filtre de recherche (seulement s'il reste de la place dans les 3) */}
+            {/* Affichage du filtre de recherche (seulement s'il reste de la place dans les filtres visibles) */}
             {restaurantSearchTerm &&
-              selectedCuisines.length + selectedEstablishments.length < 3 && (
+              selectedCuisines.length + selectedEstablishments.length <
+                maxVisibleFilters && (
                 <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F5F2EE] text-[#5D4D40] max-w-[150px] truncate">
                   <span className="truncate">"{restaurantSearchTerm}"</span>
                   <button
@@ -407,17 +418,17 @@ export default function FilterBar({
               )}
 
             {/* Indicateur pour les filtres supplémentaires */}
-            {totalFilters > 3 && (
+            {totalFilters > maxVisibleFilters && (
               <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#6B5D4F] text-white">
                 +
                 {totalFilters -
                   Math.min(
-                    3,
+                    maxVisibleFilters,
                     selectedCuisines.length +
                       selectedEstablishments.length +
                       (restaurantSearchTerm &&
                       selectedCuisines.length + selectedEstablishments.length <
-                        3
+                        maxVisibleFilters
                         ? 1
                         : 0)
                   )}
