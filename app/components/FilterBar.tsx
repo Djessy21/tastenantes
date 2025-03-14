@@ -299,82 +299,102 @@ export default function FilterBar({
         {/* Affichage des filtres sélectionnés */}
         {totalFilters > 0 && (
           <div className="px-4 py-2 flex flex-wrap gap-1.5 items-center border-t border-[#E8E1D9]">
-            {isMobile ? (
-              // Affichage compact pour mobile
+            {isMobile && totalFilters > 2 ? (
+              // Affichage compact pour mobile avec beaucoup de filtres
               <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40]">
                 {totalFilters} filtre{totalFilters > 1 ? "s" : ""} actif
                 {totalFilters > 1 ? "s" : ""}
               </div>
             ) : (
-              // Affichage normal pour desktop
+              // Affichage normal pour desktop ou peu de filtres sur mobile
               <>
-                {/* Affichage des filtres de cuisine */}
-                {selectedCuisines.map((cuisine) => (
-                  <div
-                    key={cuisine}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40] max-w-[150px] truncate"
-                  >
-                    <span className="truncate">{cuisine}</span>
-                    <button
-                      onClick={() => removeFilter("cuisine", cuisine)}
-                      className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
-                      aria-label={`Supprimer le filtre ${cuisine}`}
+                {/* Affichage limité des filtres de cuisine sur mobile */}
+                {selectedCuisines
+                  .slice(0, isMobile ? 1 : selectedCuisines.length)
+                  .map((cuisine) => (
+                    <div
+                      key={cuisine}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40] max-w-[150px] truncate"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                      <span className="truncate">{cuisine}</span>
+                      <button
+                        onClick={() => removeFilter("cuisine", cuisine)}
+                        className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
+                        aria-label={`Supprimer le filtre ${cuisine}`}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-3 w-3"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
 
-                {/* Affichage des filtres d'établissement */}
-                {selectedEstablishments.map((establishment) => (
-                  <div
-                    key={establishment}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F] max-w-[150px] truncate"
-                  >
-                    <span className="truncate">{establishment}</span>
-                    <button
-                      onClick={() =>
-                        removeFilter("establishment", establishment)
-                      }
-                      className="ml-1 flex-shrink-0 text-[#6B5D4F]/80 hover:text-[#6B5D4F]"
-                      aria-label={`Supprimer le filtre ${establishment}`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
+                {/* Compteur pour les filtres de cuisine supplémentaires sur mobile */}
+                {isMobile && selectedCuisines.length > 1 && (
+                  <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40]">
+                    +{selectedCuisines.length - 1}
                   </div>
-                ))}
+                )}
+
+                {/* Affichage limité des filtres d'établissement sur mobile */}
+                {selectedEstablishments
+                  .slice(0, isMobile ? 1 : selectedEstablishments.length)
+                  .map((establishment) => (
+                    <div
+                      key={establishment}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F] max-w-[150px] truncate"
+                    >
+                      <span className="truncate">{establishment}</span>
+                      <button
+                        onClick={() =>
+                          removeFilter("establishment", establishment)
+                        }
+                        className="ml-1 flex-shrink-0 text-[#6B5D4F]/80 hover:text-[#6B5D4F]"
+                        aria-label={`Supprimer le filtre ${establishment}`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-3 w-3"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+
+                {/* Compteur pour les filtres d'établissement supplémentaires sur mobile */}
+                {isMobile && selectedEstablishments.length > 1 && (
+                  <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F]">
+                    +{selectedEstablishments.length - 1}
+                  </div>
+                )}
 
                 {/* Affichage du filtre de recherche si présent */}
                 {restaurantSearchTerm && (
                   <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F5F2EE] text-[#5D4D40] max-w-[150px] truncate">
                     <span className="truncate">
-                      {`"${restaurantSearchTerm}"`}
+                      {isMobile && restaurantSearchTerm.length > 10
+                        ? `"${restaurantSearchTerm.substring(0, 10)}..."`
+                        : `"${restaurantSearchTerm}"`}
                     </span>
                     <button
                       onClick={() => {
@@ -419,164 +439,205 @@ export default function FilterBar({
         )}
 
         {/* Suggestions de filtres */}
-        <AnimatePresence>
-          {showSuggestions && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-[#E8E1D9] overflow-hidden z-50 transform origin-top"
-            >
-              {/* Barre de recherche pour les filtres */}
-              <div className="p-3 border-b border-[#E8E1D9]">
-                <div className="relative flex items-center bg-[#F5F2EE] rounded-lg overflow-hidden">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-[#8C7B6B] ml-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+        {showSuggestions && (
+          <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-[#E8E1D9] overflow-hidden z-50 transform origin-top transition-all duration-200 ease-out">
+            {/* Onglets de navigation */}
+            <div className="flex border-b border-[#E8E1D9]">
+              <button
+                className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+                  activeTab === "cuisine"
+                    ? "text-[#5D4D40] border-b-2 border-[#5D4D40]"
+                    : "text-[#8C7B6B] hover:text-[#5D4D40]"
+                }`}
+                onClick={() => setActiveTab("cuisine")}
+              >
+                Cuisines
+              </button>
+              <button
+                className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+                  activeTab === "establishment"
+                    ? "text-[#5D4D40] border-b-2 border-[#5D4D40]"
+                    : "text-[#8C7B6B] hover:text-[#5D4D40]"
+                }`}
+                onClick={() => setActiveTab("establishment")}
+              >
+                Établissements
+              </button>
+              <button
+                className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+                  activeTab === "search"
+                    ? "text-[#5D4D40] border-b-2 border-[#5D4D40]"
+                    : "text-[#8C7B6B] hover:text-[#5D4D40]"
+                }`}
+                onClick={() => setActiveTab("search")}
+              >
+                Recherche
+              </button>
+            </div>
+
+            {/* Contenu des onglets */}
+            <div className="max-h-[60vh] overflow-y-auto">
+              <AnimatePresence mode="wait">
+                {activeTab === "cuisine" && (
+                  <motion.div
+                    key="cuisine"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-4"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="Rechercher un filtre..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full py-2 px-3 bg-transparent border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none text-[16px]"
-                    style={{ fontSize: "16px" }}
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck="false"
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={() => setSearchTerm("")}
-                      className="flex items-center justify-center h-8 w-8 mr-1 rounded-full text-[#A89B8C] hover:text-[#6B5D4F] hover:bg-[#EFE9E3] transition-colors"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Onglets */}
-              <div className="flex border-b border-[#E8E1D9]">
-                <button
-                  className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "cuisine"
-                      ? "text-[#5D4D40] border-b-2 border-[#6B5D4F]"
-                      : "text-[#8C7B6B] hover:text-[#5D4D40]"
-                  }`}
-                  onClick={() => setActiveTab("cuisine")}
-                >
-                  Types de cuisine
-                </button>
-                <button
-                  className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "establishment"
-                      ? "text-[#5D4D40] border-b-2 border-[#8C7B6B]"
-                      : "text-[#8C7B6B] hover:text-[#5D4D40]"
-                  }`}
-                  onClick={() => setActiveTab("establishment")}
-                >
-                  Types d'établissement
-                </button>
-              </div>
-
-              {/* Contenu des onglets */}
-              <div className="overflow-y-auto max-h-[50vh] p-4">
-                {activeTab === "cuisine" ? (
-                  <div className="flex flex-wrap gap-2">
-                    {filteredCuisines.length > 0 ? (
-                      filteredCuisines.map((cuisine) => (
+                    <div className="flex flex-wrap gap-2">
+                      {filteredCuisines.map((cuisine) => (
                         <button
                           key={cuisine}
                           className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                             selectedCuisines.includes(cuisine)
                               ? "bg-[#D2C8BC] text-[#5D4D40] font-medium"
-                              : "bg-[#F5F2EE] text-[#6B5D4F] hover:bg-[#E8E1D9] border border-[#E8E1D9]"
+                              : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
                           }`}
                           onClick={() => toggleCuisine(cuisine)}
                         >
                           {cuisine}
                         </button>
-                      ))
-                    ) : (
-                      <p className="text-sm text-[#8C7B6B] py-2">
-                        Aucun type de cuisine trouvé
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {filteredEstablishments.length > 0 ? (
-                      filteredEstablishments.map((establishment) => (
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "establishment" && (
+                  <motion.div
+                    key="establishment"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-4"
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      {filteredEstablishments.map((establishment) => (
                         <button
                           key={establishment}
                           className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                             selectedEstablishments.includes(establishment)
                               ? "bg-[#E8E1D9] text-[#6B5D4F] font-medium"
-                              : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9] border border-[#E8E1D9]"
+                              : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
                           }`}
                           onClick={() => toggleEstablishment(establishment)}
                         >
                           {establishment}
                         </button>
-                      ))
-                    ) : (
-                      <p className="text-sm text-[#8C7B6B] py-2">
-                        Aucun type d'établissement trouvé
-                      </p>
-                    )}
-                  </div>
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
-              </div>
 
-              {/* Pied du panneau avec boutons d'action */}
-              <div className="p-3 border-t border-[#E8E1D9] flex justify-between items-center">
-                <div className="flex items-center">
-                  <button
-                    onClick={clearAllFilters}
-                    className="text-sm text-[#8C7B6B] hover:text-[#5D4D40] transition-colors"
+                {activeTab === "search" && (
+                  <motion.div
+                    key="search"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-4"
                   >
-                    Effacer tous les filtres
-                  </button>
-                  <span className="ml-3 text-xs text-[#A89B8C] italic">
-                    Les filtres sont appliqués automatiquement
-                  </span>
-                </div>
-                <button
-                  onClick={() => setShowSuggestions(false)}
-                  className="px-4 py-1.5 bg-[#D2C8BC] text-[#5D4D40] text-sm font-medium rounded-full hover:bg-[#C4B8A8] hover:text-[#4A3C31] transition-colors"
-                >
-                  Fermer
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Rechercher une cuisine ou un type d'établissement..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full p-3 bg-[#F5F2EE] rounded-lg border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none focus:ring-2 focus:ring-[#D2C8BC]"
+                      />
+                      {searchTerm && (
+                        <button
+                          onClick={() => setSearchTerm("")}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A89B8C] hover:text-[#6B5D4F]"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+
+                    {searchTerm && (
+                      <div className="mt-4">
+                        {filteredCuisines.length > 0 && (
+                          <div className="mb-4">
+                            <h3 className="text-xs font-medium uppercase tracking-wider text-[#8C7B6B] mb-2">
+                              Cuisines
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {filteredCuisines.map((cuisine) => (
+                                <button
+                                  key={cuisine}
+                                  className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                                    selectedCuisines.includes(cuisine)
+                                      ? "bg-[#D2C8BC] text-[#5D4D40] font-medium"
+                                      : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
+                                  }`}
+                                  onClick={() => toggleCuisine(cuisine)}
+                                >
+                                  {cuisine}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {filteredEstablishments.length > 0 && (
+                          <div>
+                            <h3 className="text-xs font-medium uppercase tracking-wider text-[#8C7B6B] mb-2">
+                              Établissements
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {filteredEstablishments.map((establishment) => (
+                                <button
+                                  key={establishment}
+                                  className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                                    selectedEstablishments.includes(
+                                      establishment
+                                    )
+                                      ? "bg-[#E8E1D9] text-[#6B5D4F] font-medium"
+                                      : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
+                                  }`}
+                                  onClick={() =>
+                                    toggleEstablishment(establishment)
+                                  }
+                                >
+                                  {establishment}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {filteredCuisines.length === 0 &&
+                          filteredEstablishments.length === 0 && (
+                            <p className="text-center text-[#8C7B6B] py-2">
+                              Aucun résultat trouvé pour "{searchTerm}"
+                            </p>
+                          )}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -35,6 +35,25 @@ export default function Home() {
     establishments: [],
   });
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showFiltersOnMobile, setShowFiltersOnMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    // Vérifier au chargement
+    checkIfMobile();
+
+    // Vérifier au redimensionnement
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []);
 
   // Hooks pour l'infinite scroll
   const {
@@ -430,7 +449,46 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]">
         <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-black/10">
           <div className="flex justify-between items-center w-full">
-            <div className="flex-1"></div> {/* Espace à gauche */}
+            <div className="flex-1">
+              {isMobile && (
+                <button
+                  onClick={() => setShowFiltersOnMobile(!showFiltersOnMobile)}
+                  className={`p-2 rounded-lg transition-colors relative ${
+                    filters.cuisines.length > 0 ||
+                    filters.establishments.length > 0 ||
+                    searchQuery
+                      ? "bg-[#6B5D4F] text-white"
+                      : "bg-[#F5F2EE] hover:bg-[#E8E1D9] text-[#6B5D4F]"
+                  }`}
+                  aria-label={
+                    showFiltersOnMobile
+                      ? "Masquer les filtres"
+                      : "Afficher les filtres"
+                  }
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  {(filters.cuisines.length > 0 ||
+                    filters.establishments.length > 0 ||
+                    searchQuery) &&
+                    !showFiltersOnMobile && (
+                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                    )}
+                </button>
+              )}
+            </div>
             <h1 className="dior-heading text-center text-3xl font-bold flex-1">
               Taste Nantes
               {currentEnvironment !== "production" && (
@@ -449,61 +507,75 @@ export default function Home() {
               <AuthButton />
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
-            <FilterBar
-              cuisineTypes={cuisineTypes}
-              establishmentTypes={establishmentTypes}
-              onFilterChange={handleFilterChange}
-              onSearchChange={handleSearchChange}
-            />
-            {isAdmin && (
-              <div className="flex gap-2 w-full sm:w-auto">
-                <button
-                  onClick={() => setShowAdminPanel(true)}
-                  className="dior-button whitespace-nowrap w-full sm:w-auto"
-                >
-                  + Ajouter
-                </button>
-                <button
-                  onClick={runMigration}
-                  className="dior-button whitespace-nowrap w-full sm:w-auto bg-gray-700 hover:bg-gray-800"
-                  title="Ajouter les colonnes website et instagram à la base de données"
-                >
-                  Migrer DB
-                </button>
-                <button
-                  onClick={seedTestRestaurants}
-                  className="dior-button whitespace-nowrap w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
-                  title="Ajouter des restaurants de test pour l'infinite scroll"
-                >
-                  Ajouter 30 restaurants
-                </button>
-                {isPreview() && (
+          <div
+            className={`w-full transition-all duration-300 ease-in-out overflow-hidden ${
+              isMobile && !showFiltersOnMobile
+                ? "max-h-0 opacity-0 my-0"
+                : "max-h-96 opacity-100"
+            }`}
+          >
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+              <FilterBar
+                cuisineTypes={cuisineTypes}
+                establishmentTypes={establishmentTypes}
+                onFilterChange={handleFilterChange}
+                onSearchChange={handleSearchChange}
+              />
+              {isAdmin && (
+                <div className="flex gap-2 w-full sm:w-auto">
                   <button
-                    onClick={resetPreviewDatabase}
-                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-600 hover:bg-red-700"
-                    title="Réinitialiser la base de données de preview"
+                    onClick={() => setShowAdminPanel(true)}
+                    className="dior-button whitespace-nowrap w-full sm:w-auto"
                   >
-                    Réinitialiser DB
+                    + Ajouter
                   </button>
-                )}
-                {isAdmin && (
                   <button
-                    onClick={clearAllRestaurants}
-                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-800 hover:bg-red-900"
-                    title="Supprimer tous les restaurants et leurs plats associés"
+                    onClick={runMigration}
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-gray-700 hover:bg-gray-800"
+                    title="Ajouter les colonnes website et instagram à la base de données"
                   >
-                    Supprimer tout
+                    Migrer DB
                   </button>
-                )}
-              </div>
-            )}
+                  <button
+                    onClick={seedTestRestaurants}
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+                    title="Ajouter des restaurants de test pour l'infinite scroll"
+                  >
+                    Ajouter 30 restaurants
+                  </button>
+                  {isPreview() && (
+                    <button
+                      onClick={resetPreviewDatabase}
+                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-600 hover:bg-red-700"
+                      title="Réinitialiser la base de données de preview"
+                    >
+                      Réinitialiser DB
+                    </button>
+                  )}
+                  {isAdmin && (
+                    <button
+                      onClick={clearAllRestaurants}
+                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-800 hover:bg-red-900"
+                      title="Supprimer tous les restaurants et leurs plats associés"
+                    >
+                      Supprimer tout
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
       {/* Espace réservé pour le header */}
-      <div className="h-48 sm:h-36 md:h-28 lg:h-24"></div>
+      <div
+        className={`transition-all duration-300 ease-in-out ${
+          isMobile && !showFiltersOnMobile
+            ? "h-20"
+            : "h-48 sm:h-36 md:h-28 lg:h-24"
+        }`}
+      ></div>
 
       <main className="pt-4 sm:pt-8 md:pt-12 lg:pt-24 pb-12">
         <div className="dior-container">
