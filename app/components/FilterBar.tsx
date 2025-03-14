@@ -217,6 +217,42 @@ export default function FilterBar({
     selectedEstablishments,
   ]);
 
+  // Animations pour le panneau de filtres
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, transition: { duration: 0.2 } },
+  };
+
+  const panelVariants = {
+    hidden: { opacity: 0, y: -20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 25,
+        stiffness: 300,
+        delay: 0.05,
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -10,
+      scale: 0.98,
+      transition: {
+        duration: 0.2,
+      },
+    },
+  };
+
+  const tabContentVariants = {
+    hidden: { opacity: 0, x: 10 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+    exit: { opacity: 0, x: -10, transition: { duration: 0.2 } },
+  };
+
   return (
     <div className="w-full relative" ref={searchRef}>
       {/* Barre de recherche avec filtres */}
@@ -445,92 +481,170 @@ export default function FilterBar({
         )}
       </div>
 
-      {/* Panneau de filtres - Utilisation de fixed au lieu de absolute pour une meilleure visibilité */}
-      {showSuggestions && (
-        <>
-          {/* Overlay semi-transparent pour s'assurer que le panneau est visible */}
-          <div
-            className="fixed inset-0 bg-black bg-opacity-20 z-[999]"
-            onClick={() => setShowSuggestions(false)}
-          />
+      {/* Panneau de filtres avec animation */}
+      <AnimatePresence>
+        {showSuggestions && (
+          <>
+            {/* Overlay semi-transparent avec animation */}
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-[2px] z-[999]"
+              onClick={() => setShowSuggestions(false)}
+              variants={overlayVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            />
 
-          {/* Panneau de filtres */}
-          <div className="fixed left-0 right-0 top-[4rem] mx-auto max-w-[600px] bg-white rounded-lg shadow-xl border border-[#E8E1D9] z-[1000]">
-            {/* Onglets */}
-            <div className="flex border-b border-[#E8E1D9]">
-              <button
-                className={`flex-1 py-3 px-4 text-sm font-medium ${
-                  activeTab === "cuisine"
-                    ? "text-[#5D4D40] border-b-2 border-[#5D4D40]"
-                    : "text-[#8C7B6B]"
-                }`}
-                onClick={() => setActiveTab("cuisine")}
-              >
-                Cuisines
-              </button>
-              <button
-                className={`flex-1 py-3 px-4 text-sm font-medium ${
-                  activeTab === "establishment"
-                    ? "text-[#5D4D40] border-b-2 border-[#5D4D40]"
-                    : "text-[#8C7B6B]"
-                }`}
-                onClick={() => setActiveTab("establishment")}
-              >
-                Établissements
-              </button>
-            </div>
-
-            {/* Contenu des onglets */}
-            <div className="p-4 max-h-[60vh] overflow-y-auto">
-              {activeTab === "cuisine" && (
-                <div className="flex flex-wrap gap-2">
-                  {cuisineTypes.map((cuisine) => (
-                    <button
-                      key={cuisine}
-                      className={`px-3 py-1.5 rounded-full text-sm ${
-                        selectedCuisines.includes(cuisine)
-                          ? "bg-[#D2C8BC] text-[#5D4D40] font-medium"
-                          : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
-                      }`}
-                      onClick={() => toggleCuisine(cuisine)}
+            {/* Panneau de filtres avec animation */}
+            <motion.div
+              className="fixed left-0 right-0 top-[4rem] mx-auto max-w-[600px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-[#E8E1D9]/60 z-[1000] overflow-hidden"
+              style={{
+                boxShadow:
+                  "0 10px 25px -5px rgba(107, 93, 79, 0.15), 0 8px 10px -6px rgba(107, 93, 79, 0.1)",
+                backgroundImage:
+                  "linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(253, 251, 249, 0.95))",
+              }}
+              variants={panelVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {/* Onglets avec style amélioré */}
+              <div className="flex border-b border-[#E8E1D9]/60 bg-[#FDFBF9]/80">
+                <button
+                  className={`flex-1 py-4 px-4 text-sm font-medium transition-all duration-200 ${
+                    activeTab === "cuisine"
+                      ? "text-[#5D4D40] border-b-2 border-[#6B5D4F] bg-white/80"
+                      : "text-[#8C7B6B] hover:text-[#5D4D40] hover:bg-white/40"
+                  }`}
+                  onClick={() => setActiveTab("cuisine")}
+                >
+                  <div className="flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      {cuisine}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {activeTab === "establishment" && (
-                <div className="flex flex-wrap gap-2">
-                  {establishmentTypes.map((establishment) => (
-                    <button
-                      key={establishment}
-                      className={`px-3 py-1.5 rounded-full text-sm ${
-                        selectedEstablishments.includes(establishment)
-                          ? "bg-[#E8E1D9] text-[#6B5D4F] font-medium"
-                          : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
-                      }`}
-                      onClick={() => toggleEstablishment(establishment)}
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M13.325 14.37a1 1 0 001.214-.32l2.414-3.415a1 1 0 00-.126-1.293l-5.878-5.878a1 1 0 00-1.532.126l-3.236 4.53a1 1 0 00-.126 1.214l4.319 7.2a1 1 0 001.532.126l1.419-1.42M6 20.452l5.598-5.598"
+                      />
+                    </svg>
+                    Cuisines
+                  </div>
+                </button>
+                <button
+                  className={`flex-1 py-4 px-4 text-sm font-medium transition-all duration-200 ${
+                    activeTab === "establishment"
+                      ? "text-[#5D4D40] border-b-2 border-[#6B5D4F] bg-white/80"
+                      : "text-[#8C7B6B] hover:text-[#5D4D40] hover:bg-white/40"
+                  }`}
+                  onClick={() => setActiveTab("establishment")}
+                >
+                  <div className="flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      {establishment}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      />
+                    </svg>
+                    Établissements
+                  </div>
+                </button>
+              </div>
 
-            {/* Bouton de fermeture */}
-            <div className="p-3 border-t border-[#E8E1D9] flex justify-end">
-              <button
-                onClick={() => setShowSuggestions(false)}
-                className="px-4 py-2 bg-[#6B5D4F] text-white text-sm font-medium rounded-lg hover:bg-[#5D4D40]"
-              >
-                Fermer
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+              {/* Contenu des onglets avec animation */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  className="p-5 max-h-[60vh] overflow-y-auto"
+                  variants={tabContentVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  {activeTab === "cuisine" && (
+                    <div className="flex flex-wrap gap-2">
+                      {cuisineTypes.map((cuisine) => (
+                        <motion.button
+                          key={cuisine}
+                          className={`px-3 py-2 rounded-full text-sm transition-all duration-200 ${
+                            selectedCuisines.includes(cuisine)
+                              ? "bg-[#D2C8BC] text-[#5D4D40] font-medium shadow-sm"
+                              : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9] hover:shadow-sm"
+                          }`}
+                          onClick={() => toggleCuisine(cuisine)}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          {cuisine}
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
+
+                  {activeTab === "establishment" && (
+                    <div className="flex flex-wrap gap-2">
+                      {establishmentTypes.map((establishment) => (
+                        <motion.button
+                          key={establishment}
+                          className={`px-3 py-2 rounded-full text-sm transition-all duration-200 ${
+                            selectedEstablishments.includes(establishment)
+                              ? "bg-[#E8E1D9] text-[#6B5D4F] font-medium shadow-sm"
+                              : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9] hover:shadow-sm"
+                          }`}
+                          onClick={() => toggleEstablishment(establishment)}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          {establishment}
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Bouton de fermeture avec style amélioré et plus arrondi - sans délimitation */}
+              <div className="p-4 flex justify-between items-center bg-[#FDFBF9]/80">
+                <div className="text-sm text-[#8C7B6B]">
+                  {totalFilters > 0 ? (
+                    <span>
+                      {totalFilters} filtre{totalFilters > 1 ? "s" : ""}{" "}
+                      sélectionné{totalFilters > 1 ? "s" : ""}
+                    </span>
+                  ) : (
+                    <span>Aucun filtre sélectionné</span>
+                  )}
+                </div>
+                <motion.button
+                  onClick={() => setShowSuggestions(false)}
+                  className="px-6 py-2.5 bg-[#6B5D4F] text-white text-sm font-medium rounded-full hover:bg-[#5D4D40] transition-colors shadow-sm"
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0 4px 8px rgba(107, 93, 79, 0.2)",
+                  }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Fermer
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
