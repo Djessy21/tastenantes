@@ -312,92 +312,115 @@ export default function FilterBar({
         {/* Affichage des filtres sélectionnés */}
         {totalFilters > 0 && (
           <div className="px-4 py-2 flex flex-wrap gap-1.5 items-center border-t border-[#E8E1D9]">
-            {/* Affichage des filtres de cuisine */}
-            {selectedCuisines.map((cuisine) => (
-              <div
-                key={cuisine}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40] max-w-[150px] truncate"
-              >
-                <span className="truncate">{cuisine}</span>
-                <button
-                  onClick={() => removeFilter("cuisine", cuisine)}
-                  className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
+            {/* Affichage des filtres de cuisine (limité à 3 au total avec les établissements) */}
+            {selectedCuisines
+              .slice(0, Math.min(3, selectedCuisines.length))
+              .map((cuisine) => (
+                <div
+                  key={cuisine}
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40] max-w-[150px] truncate"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <span className="truncate">{cuisine}</span>
+                  <button
+                    onClick={() => removeFilter("cuisine", cuisine)}
+                    className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ))}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
 
-            {/* Affichage des filtres d'établissement */}
-            {selectedEstablishments.map((establishment) => (
-              <div
-                key={establishment}
-                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F] max-w-[150px] truncate"
-              >
-                <span className="truncate">{establishment}</span>
-                <button
-                  onClick={() => removeFilter("establishment", establishment)}
-                  className="ml-1 flex-shrink-0 text-[#6B5D4F]/80 hover:text-[#6B5D4F]"
+            {/* Affichage des filtres d'établissement (limité à ce qui reste des 3 premiers) */}
+            {selectedEstablishments
+              .slice(0, Math.max(0, 3 - selectedCuisines.slice(0, 3).length))
+              .map((establishment) => (
+                <div
+                  key={establishment}
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F] max-w-[150px] truncate"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <span className="truncate">{establishment}</span>
+                  <button
+                    onClick={() => removeFilter("establishment", establishment)}
+                    className="ml-1 flex-shrink-0 text-[#6B5D4F]/80 hover:text-[#6B5D4F]"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ))}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
 
-            {/* Affichage du filtre de recherche */}
-            {restaurantSearchTerm && (
-              <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F5F2EE] text-[#5D4D40] max-w-[150px] truncate">
-                <span className="truncate">"{restaurantSearchTerm}"</span>
-                <button
-                  onClick={() => {
-                    setRestaurantSearchTerm("");
-                    if (onSearchChange) {
-                      onSearchChange("");
-                    }
-                  }}
-                  className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+            {/* Affichage du filtre de recherche (seulement s'il reste de la place dans les 3) */}
+            {restaurantSearchTerm &&
+              selectedCuisines.length + selectedEstablishments.length < 3 && (
+                <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F5F2EE] text-[#5D4D40] max-w-[150px] truncate">
+                  <span className="truncate">"{restaurantSearchTerm}"</span>
+                  <button
+                    onClick={() => {
+                      setRestaurantSearchTerm("");
+                      if (onSearchChange) {
+                        onSearchChange("");
+                      }
+                    }}
+                    className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3 w-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+            {/* Indicateur pour les filtres supplémentaires */}
+            {totalFilters > 3 && (
+              <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#6B5D4F] text-white">
+                +
+                {totalFilters -
+                  Math.min(
+                    3,
+                    selectedCuisines.length +
+                      selectedEstablishments.length +
+                      (restaurantSearchTerm &&
+                      selectedCuisines.length + selectedEstablishments.length <
+                        3
+                        ? 1
+                        : 0)
+                  )}
               </div>
             )}
 
