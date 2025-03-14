@@ -46,24 +46,22 @@ export default function AuthModal() {
           </p>
         </div>
 
-        <div className="flex justify-center mb-4">
-          <div className={`relative ${isMobile ? "w-24 h-24" : "w-32 h-32"}`}>
-            <Image
-              src={
-                modalType === "login"
-                  ? "/images/login-illustration.svg"
-                  : "/images/register-illustration.svg"
-              }
-              alt={modalType === "login" ? "Connexion" : "Inscription"}
-              width={isMobile ? 96 : 128}
-              height={isMobile ? 96 : 128}
-              className="object-contain"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
+        {modalType === "login" && (
+          <div className="flex justify-center mb-4">
+            <div className={`relative ${isMobile ? "w-24 h-24" : "w-32 h-32"}`}>
+              <Image
+                src="/images/login-illustration.svg"
+                alt="Connexion"
+                width={isMobile ? 96 : 128}
+                height={isMobile ? 96 : 128}
+                className="object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="w-full">
           {modalType === "login" ? <LoginForm /> : <RegisterForm />}
