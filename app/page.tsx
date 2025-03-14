@@ -661,7 +661,7 @@ export default function Home() {
                             ? certifiedLastElementRef
                             : null
                         }
-                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover"
                         style={{
                           borderRadius: isMobile
                             ? "0 0 0.5rem 0"
@@ -669,6 +669,7 @@ export default function Home() {
                           borderTopRightRadius: isMobile ? "0" : "0.5rem",
                           boxShadow:
                             "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                          animationDelay: `${index * 0.1}s`,
                         }}
                       >
                         <CertifiedRestaurantCard
@@ -710,7 +711,7 @@ export default function Home() {
                             ? regularLastElementRef
                             : null
                         }
-                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover"
                         style={{
                           borderRadius: isMobile
                             ? "0 0 0.5rem 0"
@@ -718,6 +719,7 @@ export default function Home() {
                           borderTopRightRadius: isMobile ? "0" : "0.5rem",
                           boxShadow:
                             "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                          animationDelay: `${index * 0.1}s`,
                         }}
                       >
                         <RestaurantCard
