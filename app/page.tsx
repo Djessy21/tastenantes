@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import RestaurantCard from "./components/RestaurantCard";
 import CertifiedRestaurantCard from "./components/CertifiedRestaurantCard";
 import AdminPanel from "./components/AdminPanel";
@@ -37,6 +37,8 @@ export default function Home() {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [showFiltersOnMobile, setShowFiltersOnMobile] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   // Détecter si on est sur mobile
   useEffect(() => {
@@ -105,6 +107,66 @@ export default function Home() {
     resetCertifiedScroll();
     fetchInitialData();
   }, [filters]);
+
+  // Effet pour ajouter scroll-padding-top à l'élément html
+  useEffect(() => {
+    // S'assurer que le code s'exécute uniquement côté client
+    if (typeof document === "undefined") return;
+
+    // Calculer la hauteur du header en fonction de l'état des filtres
+    const updateScrollPadding = () => {
+      const headerHeight =
+        isMobile && !showFiltersOnMobile
+          ? 70 // Hauteur approximative du header sans filtres sur mobile
+          : 150; // Hauteur approximative du header avec filtres
+
+      // Appliquer scroll-padding-top à l'élément html
+      document.documentElement.style.scrollPaddingTop = `${headerHeight}px`;
+    };
+
+    // Appliquer immédiatement
+    updateScrollPadding();
+
+    // Mettre à jour lorsque l'état des filtres change
+    window.addEventListener("resize", updateScrollPadding);
+
+    return () => {
+      window.removeEventListener("resize", updateScrollPadding);
+    };
+  }, [isMobile, showFiltersOnMobile]);
+
+  // Mesurer la hauteur réelle du header
+  useEffect(() => {
+    // S'assurer que le code s'exécute uniquement côté client
+    if (typeof window === "undefined") return;
+
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        const height = headerRef.current.offsetHeight;
+        setHeaderHeight(height);
+      }
+    };
+
+    // Observer les changements de taille du header
+    const resizeObserver = new ResizeObserver(updateHeaderHeight);
+
+    if (headerRef.current) {
+      resizeObserver.observe(headerRef.current);
+    }
+
+    // Mettre à jour également lors du redimensionnement de la fenêtre
+    window.addEventListener("resize", updateHeaderHeight);
+
+    // Mettre à jour lorsque l'état des filtres change
+    updateHeaderHeight();
+
+    return () => {
+      if (headerRef.current) {
+        resizeObserver.unobserve(headerRef.current);
+      }
+      window.removeEventListener("resize", updateHeaderHeight);
+    };
+  }, [isMobile, showFiltersOnMobile]);
 
   const fetchInitialData = async () => {
     setInitialLoading(true);
@@ -446,7 +508,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white pb-16">
-      <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]">
+      <header
+        ref={headerRef}
+        className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]"
+      >
         <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-black/10">
           <div className="flex justify-between items-center w-full">
             <div className="flex-1">
@@ -568,13 +633,10 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Espace réservé pour le header - Augmenté pour garantir une marge suffisante */}
+      {/* Spacer dynamique qui prend exactement la hauteur du header */}
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          isMobile && !showFiltersOnMobile
-            ? "h-28" // Augmenté de h-20 à h-28
-            : "h-56 sm:h-44 md:h-36 lg:h-32" // Augmenté pour toutes les tailles d'écran
-        }`}
+        style={{ height: `${headerHeight + 24}px` }}
+        className="transition-all duration-300 ease-in-out"
       ></div>
 
       <main className="pb-12">
