@@ -318,8 +318,8 @@ export default function FilterBar({
 
           <button
             ref={buttonRef}
-            className={`ml-2 flex items-center justify-center h-10 w-10 rounded-lg transition-all ${
-              showSuggestions || totalFilters > 0
+            className={`ml-2 flex items-center justify-center h-10 w-10 rounded-lg transition-all relative ${
+              showSuggestions
                 ? "bg-[#6B5D4F] text-white"
                 : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
             }`}
@@ -345,6 +345,13 @@ export default function FilterBar({
                 d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
               />
             </svg>
+
+            {/* Badge indiquant le nombre de filtres sélectionnés */}
+            {totalFilters > 0 && (
+              <div className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-[#E05D5D] text-white text-[10px] font-medium px-1">
+                {totalFilters}
+              </div>
+            )}
           </button>
         </div>
 
