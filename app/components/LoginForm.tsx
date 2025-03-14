@@ -16,6 +16,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { openRegisterModal, closeModal } = useAuthModal();
+  const [isMobile, setIsMobile] = useState(false);
 
   // Vérifier si l'utilisateur vient de s'inscrire
   useEffect(() => {
@@ -25,6 +26,23 @@ export default function LoginForm() {
         "Inscription réussie ! Vous pouvez maintenant vous connecter."
       );
     }
+  }, [searchParams]);
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    // Vérifier au chargement
+    checkIfMobile();
+
+    // Vérifier au redimensionnement
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,14 +85,14 @@ export default function LoginForm() {
     >
       {error && (
         <motion.div
-          className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-center"
+          className="mb-3 p-2 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-center text-sm"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2 flex-shrink-0"
+            className="h-4 w-4 mr-2 flex-shrink-0"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -90,14 +108,14 @@ export default function LoginForm() {
 
       {success && (
         <motion.div
-          className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg border border-green-100 flex items-center"
+          className="mb-3 p-2 bg-green-50 text-green-700 rounded-lg border border-green-100 flex items-center text-sm"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2 flex-shrink-0"
+            className="h-4 w-4 mr-2 flex-shrink-0"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -111,19 +129,24 @@ export default function LoginForm() {
         </motion.div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form
+        onSubmit={handleSubmit}
+        className={`space-y-${isMobile ? "3" : "5"}`}
+      >
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className={`block text-${
+              isMobile ? "xs" : "sm"
+            } font-medium text-[#5D4D40] mb-1`}
           >
             Email
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8C7B6B]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -136,7 +159,11 @@ export default function LoginForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+              className={`w-full pl-10 pr-3 py-${
+                isMobile ? "2" : "2.5"
+              } border border-[#E8E1D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B5D4F] focus:border-transparent transition-all duration-200 text-${
+                isMobile ? "sm" : "base"
+              }`}
               placeholder="votre@email.com"
               required
             />
@@ -146,15 +173,17 @@ export default function LoginForm() {
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className={`block text-${
+              isMobile ? "xs" : "sm"
+            } font-medium text-[#5D4D40] mb-1`}
           >
             Mot de passe
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8C7B6B]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -170,14 +199,18 @@ export default function LoginForm() {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+              className={`w-full pl-10 pr-12 py-${
+                isMobile ? "2" : "2.5"
+              } border border-[#E8E1D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B5D4F] focus:border-transparent transition-all duration-200 text-${
+                isMobile ? "sm" : "base"
+              }`}
               placeholder="••••••••"
               required
             />
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#8C7B6B] hover:text-[#5D4D40] focus:outline-none transition-colors"
               aria-label={
                 showPassword
                   ? "Masquer le mot de passe"
@@ -188,7 +221,7 @@ export default function LoginForm() {
               {showPassword ? (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -202,7 +235,7 @@ export default function LoginForm() {
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -221,14 +254,20 @@ export default function LoginForm() {
         <motion.button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 px-4 bg-black text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className={`w-full py-${
+            isMobile ? "2" : "2.5"
+          } px-4 bg-[#6B5D4F] text-white rounded-lg hover:bg-[#5D4D40] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6B5D4F] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-${
+            isMobile ? "sm" : "base"
+          }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           {loading ? (
             <div className="flex items-center justify-center">
               <svg
-                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                className={`animate-spin -ml-1 mr-2 ${
+                  isMobile ? "h-3 w-3" : "h-4 w-4"
+                } text-white`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -255,15 +294,15 @@ export default function LoginForm() {
         </motion.button>
 
         {/* Lien vers l'inscription */}
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-600">
+        <div className="text-center mt-4">
+          <p className={`text-${isMobile ? "xs" : "sm"} text-[#8C7B6B]`}>
             Vous n'avez pas de compte ?{" "}
             <button
               type="button"
               onClick={openRegisterModal}
-              className="font-medium text-black hover:underline transition-all duration-200"
+              className="font-medium text-[#6B5D4F] hover:text-[#5D4D40] focus:outline-none focus:underline transition-colors"
             >
-              S'inscrire
+              Inscrivez-vous
             </button>
           </p>
         </div>

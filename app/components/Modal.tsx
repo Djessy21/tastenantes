@@ -18,10 +18,26 @@ export default function Modal({
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Montage côté client uniquement pour éviter les erreurs d'hydratation
   useEffect(() => {
     setIsMounted(true);
+
+    // Détecter si on est sur mobile
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    // Vérifier au chargement
+    checkIfMobile();
+
+    // Vérifier au redimensionnement
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
   }, []);
 
   // Fermer le modal quand on clique en dehors
@@ -76,7 +92,7 @@ export default function Modal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -92,17 +108,29 @@ export default function Modal({
               stiffness: 300,
               damping: 30,
             }}
-            className="relative z-10 w-full max-w-md mx-4 overflow-hidden bg-white rounded-xl shadow-2xl"
+            className="relative z-[1000] w-full overflow-hidden bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-[#E8E1D9]/60"
+            style={{
+              boxShadow:
+                "0 10px 25px -5px rgba(107, 93, 79, 0.15), 0 8px 10px -6px rgba(107, 93, 79, 0.1)",
+              backgroundImage:
+                "linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(253, 251, 249, 0.95))",
+              margin: isMobile ? "0 16px" : "0 auto",
+              maxWidth: isMobile ? "calc(100% - 32px)" : "28rem",
+              maxHeight: isMobile
+                ? "calc(100vh - 64px)"
+                : "calc(100vh - 120px)",
+              overflowY: "auto",
+            }}
             role="dialog"
             aria-modal="true"
             aria-labelledby={title ? "modal-title" : undefined}
           >
             {/* En-tête du modal */}
             {title && (
-              <div className="px-6 py-4 border-b border-gray-100">
+              <div className="px-6 py-4 border-b border-[#E8E1D9]/60">
                 <h3
                   id="modal-title"
-                  className="text-xl font-semibold text-gray-900"
+                  className="text-xl font-semibold text-[#5D4D40]"
                 >
                   {title}
                 </h3>
@@ -110,12 +138,12 @@ export default function Modal({
             )}
 
             {/* Corps du modal */}
-            <div className="p-6">{children}</div>
+            <div className={`p-${isMobile ? "4" : "6"}`}>{children}</div>
 
             {/* Bouton de fermeture */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-1 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200"
+              className="absolute top-4 right-4 p-1 rounded-full text-[#8C7B6B] hover:text-[#5D4D40] hover:bg-white/40 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E8E1D9]"
               aria-label="Fermer"
             >
               <svg

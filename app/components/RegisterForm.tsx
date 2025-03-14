@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuthModal } from "../contexts/AuthModalContext";
@@ -20,6 +20,24 @@ export default function RegisterForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { openLoginModal } = useAuthModal();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    // Vérifier au chargement
+    checkIfMobile();
+
+    // Vérifier au redimensionnement
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -157,14 +175,14 @@ export default function RegisterForm() {
     >
       {error && (
         <motion.div
-          className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-center"
+          className="mb-3 p-2 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-center text-sm"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2 flex-shrink-0"
+            className="h-4 w-4 mr-2 flex-shrink-0"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -178,73 +196,97 @@ export default function RegisterForm() {
         </motion.div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form
+        onSubmit={handleSubmit}
+        className={`space-y-${isMobile ? "3" : "5"}`}
+      >
         {/* Avatar upload */}
         <div className="flex flex-col items-center mb-4">
-          <motion.div
-            className="h-24 w-24 rounded-full overflow-hidden bg-gray-50 mb-2 cursor-pointer border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors duration-200"
+          <div
+            className={`relative ${
+              isMobile ? "w-20 h-20" : "w-24 h-24"
+            } rounded-full overflow-hidden bg-[#F5F2EE] border-2 border-[#E8E1D9] mb-2 cursor-pointer`}
             onClick={() => fileInputRef.current?.click()}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
             {avatarPreview ? (
               <Image
                 src={avatarPreview}
                 alt="Avatar preview"
-                width={96}
-                height={96}
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
               />
             ) : (
-              <div className="h-full w-full flex items-center justify-center text-gray-400">
+              <div className="flex items-center justify-center h-full text-[#8C7B6B]">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
+                  className={`${isMobile ? "h-8 w-8" : "h-10 w-10"}`}
                   fill="none"
                   viewBox="0 0 24 24"
-                  strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-10 h-10"
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                    strokeWidth={1.5}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
               </div>
             )}
-          </motion.div>
+            <div className="absolute bottom-0 right-0 bg-[#6B5D4F] rounded-full p-1 shadow-md">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`${isMobile ? "h-3 w-3" : "h-4 w-4"} text-white`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </div>
+          </div>
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleAvatarChange}
             className="hidden"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg, image/png, image/webp"
           />
-          <motion.button
+          <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="text-xs text-[#6B5D4F] hover:text-[#5D4D40] focus:outline-none transition-colors"
           >
-            {avatarPreview ? "Changer la photo" : "Ajouter une photo"}
-          </motion.button>
+            Choisir une photo de profil
+          </button>
         </div>
 
         {/* Nom */}
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className={`block text-${
+              isMobile ? "xs" : "sm"
+            } font-medium text-[#5D4D40] mb-1`}
           >
             Nom
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8C7B6B]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -260,7 +302,11 @@ export default function RegisterForm() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+              className={`w-full pl-10 pr-3 py-${
+                isMobile ? "2" : "2.5"
+              } border border-[#E8E1D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B5D4F] focus:border-transparent transition-all duration-200 text-${
+                isMobile ? "sm" : "base"
+              }`}
               placeholder="Votre nom"
               required
             />
@@ -271,15 +317,17 @@ export default function RegisterForm() {
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className={`block text-${
+              isMobile ? "xs" : "sm"
+            } font-medium text-[#5D4D40] mb-1`}
           >
             Email
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8C7B6B]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -292,7 +340,11 @@ export default function RegisterForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+              className={`w-full pl-10 pr-3 py-${
+                isMobile ? "2" : "2.5"
+              } border border-[#E8E1D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B5D4F] focus:border-transparent transition-all duration-200 text-${
+                isMobile ? "sm" : "base"
+              }`}
               placeholder="votre@email.com"
               required
             />
@@ -303,15 +355,17 @@ export default function RegisterForm() {
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className={`block text-${
+              isMobile ? "xs" : "sm"
+            } font-medium text-[#5D4D40] mb-1`}
           >
             Mot de passe
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8C7B6B]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -327,14 +381,18 @@ export default function RegisterForm() {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+              className={`w-full pl-10 pr-12 py-${
+                isMobile ? "2" : "2.5"
+              } border border-[#E8E1D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B5D4F] focus:border-transparent transition-all duration-200 text-${
+                isMobile ? "sm" : "base"
+              }`}
               placeholder="••••••••"
               required
             />
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#8C7B6B] hover:text-[#5D4D40] focus:outline-none transition-colors"
               aria-label={
                 showPassword
                   ? "Masquer le mot de passe"
@@ -345,7 +403,7 @@ export default function RegisterForm() {
               {showPassword ? (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -359,7 +417,7 @@ export default function RegisterForm() {
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -373,28 +431,29 @@ export default function RegisterForm() {
               )}
             </button>
           </div>
-          <p className="mt-1 text-xs text-gray-500">Au moins 8 caractères</p>
         </div>
 
         {/* Confirmer le mot de passe */}
         <div>
           <label
             htmlFor="confirmPassword"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className={`block text-${
+              isMobile ? "xs" : "sm"
+            } font-medium text-[#5D4D40] mb-1`}
           >
             Confirmer le mot de passe
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8C7B6B]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
                 <path
                   fillRule="evenodd"
-                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                   clipRule="evenodd"
                 />
               </svg>
@@ -404,14 +463,18 @@ export default function RegisterForm() {
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+              className={`w-full pl-10 pr-12 py-${
+                isMobile ? "2" : "2.5"
+              } border border-[#E8E1D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6B5D4F] focus:border-transparent transition-all duration-200 text-${
+                isMobile ? "sm" : "base"
+              }`}
               placeholder="••••••••"
               required
             />
             <button
               type="button"
               onClick={toggleConfirmPasswordVisibility}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#8C7B6B] hover:text-[#5D4D40] focus:outline-none transition-colors"
               aria-label={
                 showConfirmPassword
                   ? "Masquer le mot de passe"
@@ -422,7 +485,7 @@ export default function RegisterForm() {
               {showConfirmPassword ? (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -436,7 +499,7 @@ export default function RegisterForm() {
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className={`${isMobile ? "h-4 w-4" : "h-5 w-5"}`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -455,14 +518,20 @@ export default function RegisterForm() {
         <motion.button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 px-4 bg-black text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 mt-2"
+          className={`w-full py-${
+            isMobile ? "2" : "2.5"
+          } px-4 bg-[#6B5D4F] text-white rounded-lg hover:bg-[#5D4D40] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6B5D4F] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-${
+            isMobile ? "sm" : "base"
+          }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           {loading ? (
             <div className="flex items-center justify-center">
               <svg
-                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                className={`animate-spin -ml-1 mr-2 ${
+                  isMobile ? "h-3 w-3" : "h-4 w-4"
+                } text-white`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -487,21 +556,19 @@ export default function RegisterForm() {
             "S'inscrire"
           )}
         </motion.button>
-
-        {/* Lien vers la connexion */}
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-600">
-            Vous avez déjà un compte ?{" "}
-            <button
-              type="button"
-              onClick={openLoginModal}
-              className="font-medium text-black hover:underline transition-all duration-200"
-            >
-              Se connecter
-            </button>
-          </p>
-        </div>
       </form>
+
+      <div className="mt-4 text-center">
+        <p className={`text-${isMobile ? "xs" : "sm"} text-[#8C7B6B]`}>
+          Vous avez déjà un compte ?{" "}
+          <button
+            onClick={openLoginModal}
+            className="font-medium text-[#6B5D4F] hover:text-[#5D4D40] focus:outline-none focus:underline transition-colors"
+          >
+            Connectez-vous
+          </button>
+        </p>
+      </div>
     </motion.div>
   );
 }
