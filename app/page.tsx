@@ -515,7 +515,7 @@ export default function Home() {
         ref={headerRef}
         className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]"
       >
-        <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-black/10">
+        <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-[#E8E1D9]">
           <div className="flex justify-between items-center w-full">
             <div className="flex-1">
               {isMobile && (
@@ -552,7 +552,7 @@ export default function Home() {
                     filters.establishments.length > 0 ||
                     searchQuery) &&
                     !showFiltersOnMobile && (
-                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-[#E05D5D] rounded-full"></span>
                     )}
                 </button>
               )}
@@ -599,14 +599,14 @@ export default function Home() {
                   </button>
                   <button
                     onClick={runMigration}
-                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-gray-700 hover:bg-gray-800"
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-[#8C7B6B] hover:bg-[#5D4D40]"
                     title="Ajouter les colonnes website et instagram à la base de données"
                   >
                     Migrer DB
                   </button>
                   <button
                     onClick={seedTestRestaurants}
-                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-[#6B5D4F] hover:bg-[#5D4D40]"
                     title="Ajouter des restaurants de test pour l'infinite scroll"
                   >
                     Ajouter 30 restaurants
@@ -614,7 +614,7 @@ export default function Home() {
                   {isPreview() && (
                     <button
                       onClick={resetPreviewDatabase}
-                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-600 hover:bg-red-700"
+                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-[#E05D5D] hover:bg-[#c54545]"
                       title="Réinitialiser la base de données de preview"
                     >
                       Réinitialiser DB
@@ -623,7 +623,7 @@ export default function Home() {
                   {isAdmin && (
                     <button
                       onClick={clearAllRestaurants}
-                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-800 hover:bg-red-900"
+                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-[#E05D5D] hover:bg-[#c54545]"
                       title="Supprimer tous les restaurants et leurs plats associés"
                     >
                       Supprimer tout
@@ -664,14 +664,14 @@ export default function Home() {
                             ? certifiedLastElementRef
                             : null
                         }
-                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover"
+                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover border border-[#E8E1D9]/60"
                         style={{
                           borderRadius: isMobile
                             ? "0 0 0.5rem 0"
                             : "0 0.5rem 0.5rem 0",
                           borderTopRightRadius: isMobile ? "0" : "0.5rem",
                           boxShadow:
-                            "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                            "0 10px 25px -5px rgba(107, 93, 79, 0.1), 0 8px 10px -6px rgba(107, 93, 79, 0.1)",
                           animationDelay: `${index * 0.1}s`,
                         }}
                       >
@@ -703,7 +703,7 @@ export default function Home() {
 
                 {filteredRestaurants.length > 0 && (
                   <div className="space-y-8">
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-xl font-semibold text-[#5D4D40]">
                       Autres restaurants à proximité
                     </h2>
                     {filteredRestaurants.map((restaurant, index) => (
@@ -714,14 +714,14 @@ export default function Home() {
                             ? regularLastElementRef
                             : null
                         }
-                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover"
+                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover border border-[#E8E1D9]/60"
                         style={{
                           borderRadius: isMobile
                             ? "0 0 0.5rem 0"
                             : "0 0.5rem 0.5rem 0",
                           borderTopRightRadius: isMobile ? "0" : "0.5rem",
                           boxShadow:
-                            "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                            "0 10px 25px -5px rgba(107, 93, 79, 0.1), 0 8px 10px -6px rgba(107, 93, 79, 0.1)",
                           animationDelay: `${index * 0.1}s`,
                         }}
                       >
@@ -748,7 +748,7 @@ export default function Home() {
                 {filteredRestaurants.length === 0 &&
                   filteredCertifiedRestaurants.length === 0 && (
                     <div className="text-center py-8">
-                      <p className="text-gray-500">
+                      <p className="text-[#8C7B6B]">
                         Aucun établissement n&apos;a été trouvé
                       </p>
                     </div>

@@ -21,7 +21,7 @@ export default function RestaurantCard({
   return (
     <div
       className={`dior-card p-0 transition-all duration-300 ${
-        isSelected ? "bg-black text-white" : "bg-white"
+        isSelected ? "bg-[#6B5D4F] text-white" : "bg-white"
       }`}
       onClick={onClick}
     >
@@ -36,7 +36,11 @@ export default function RestaurantCard({
         </div>
       )}
       <div className="p-4 sm:p-6">
-        <h3 className="dior-text text-lg sm:text-xl mb-2 uppercase tracking-wider line-clamp-1">
+        <h3
+          className={`text-lg sm:text-xl mb-2 uppercase tracking-wider line-clamp-1 ${
+            isSelected ? "text-white" : "text-[#5D4D40]"
+          }`}
+        >
           {restaurant.name}
         </h3>
         <div className="mb-2 sm:mb-3">
@@ -48,10 +52,10 @@ export default function RestaurantCard({
                   i < restaurant.rating
                     ? isSelected
                       ? "text-white"
-                      : "text-black"
+                      : "text-[#8C7B6B]"
                     : isSelected
                     ? "text-gray-400"
-                    : "text-gray-300"
+                    : "text-[#E8E1D9]"
                 }`}
               >
                 ★
@@ -72,7 +76,7 @@ export default function RestaurantCard({
           className={`mt-3 sm:mt-4 text-xs uppercase tracking-widest py-2 px-3 sm:px-4 border ${
             isSelected
               ? "border-white text-white"
-              : "border-black text-black active:bg-black active:text-white sm:hover:bg-black sm:hover:text-white"
+              : "border-[#6B5D4F] text-[#6B5D4F] active:bg-[#6B5D4F] active:text-white sm:hover:bg-[#6B5D4F] sm:hover:text-white"
           } transition-colors duration-300`}
         >
           View Details

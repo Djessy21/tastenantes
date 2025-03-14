@@ -9,8 +9,8 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-  --foreground-rgb: 0, 0, 0;
+  --foreground: #5d4d40;
+  --foreground-rgb: 93, 77, 64;
   --background-rgb: 255, 255, 255;
   --dish-image-border-radius: 0.5rem; /* 8px par défaut, ajustez selon vos préférences */
   --button-border-radius: 1rem; /* Arrondi des boutons, ajustez selon vos préférences */
@@ -19,6 +19,16 @@
   --image-border-radius: 8px;
   --button-border-radius: 4px;
   --dish-image-border-radius: 8px;
+
+  /* Palette de couleurs */
+  --color-brown-dark: #6b5d4f;
+  --color-brown-darker: #5d4d40;
+  --color-brown-medium: #8c7b6b;
+  --color-brown-light: #a89b8c;
+  --color-beige-dark: #d2c8bc;
+  --color-beige-medium: #e8e1d9;
+  --color-beige-light: #f5f2ee;
+  --color-beige-lighter: #fdfbf9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -45,32 +55,32 @@ body {
   }
 
   .dior-card {
-    @apply bg-white transition-all duration-300;
+    @apply bg-white transition-all duration-300 border border-[#E8E1D9]/60 rounded-lg shadow-sm hover:shadow-md;
   }
 
   .dior-text {
-    @apply font-serif tracking-wider;
+    @apply font-serif tracking-wider text-[#5D4D40];
   }
 
   .dior-heading {
-    @apply text-2xl sm:text-4xl font-light tracking-wider uppercase;
+    @apply text-2xl sm:text-4xl font-light tracking-wider uppercase text-[#5D4D40];
   }
 
   .dior-button {
-    @apply px-4 py-2 bg-black text-white uppercase tracking-wider text-xs font-medium transition-colors hover:bg-black/90;
+    @apply px-4 py-2 bg-[#6B5D4F] text-white uppercase tracking-wider text-xs font-medium transition-colors hover:bg-[#5D4D40];
     border-radius: var(--button-border-radius);
   }
 
   .dior-input {
-    @apply w-full border-0 border-b border-black pb-2 text-sm sm:text-base bg-transparent focus:outline-none focus:border-b-2;
+    @apply w-full border-0 border-b border-[#E8E1D9] pb-2 text-sm sm:text-base bg-transparent focus:outline-none focus:border-[#6B5D4F] text-[#5D4D40] placeholder-[#A89B8C];
   }
 
   .mobile-map-toggle {
-    @apply fixed bottom-4 right-4 bg-black text-white p-3 rounded-full shadow-lg z-40 flex items-center justify-center lg:hidden;
+    @apply fixed bottom-4 right-4 bg-[#6B5D4F] text-white p-3 rounded-full shadow-lg z-40 flex items-center justify-center lg:hidden hover:bg-[#5D4D40];
   }
 
   .custom-scrollbar {
-    @apply scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent;
+    @apply scrollbar-thin scrollbar-thumb-[#D2C8BC] scrollbar-track-transparent;
   }
 }
 
@@ -91,7 +101,7 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(107, 93, 79, 0.2);
   border-radius: 2px;
 }
 
