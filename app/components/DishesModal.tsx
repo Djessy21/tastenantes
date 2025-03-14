@@ -266,7 +266,7 @@ export default function DishesModal({
               {/* Bouton de fermeture - Design amélioré */}
               <button
                 onClick={onClose}
-                className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-200 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/30 transform hover:rotate-90"
+                className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-200 backdrop-blur-sm transform hover:rotate-90 focus:outline-none"
                 aria-label="Fermer"
               >
                 <svg
@@ -409,13 +409,18 @@ export default function DishesModal({
                         {/* Boutons de navigation - Repositionnés pour une meilleure ergonomie */}
                         <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
                           {/* Flèche gauche - Positionnée sur le côté gauche avec un espacement */}
-                          <div className="h-full flex items-center pl-2">
+                          <motion.div
+                            className="h-full flex items-center pl-2"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2, duration: 0.3 }}
+                          >
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 goToPrevious();
                               }}
-                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]/30 transform hover:scale-110 hover:-translate-x-1"
+                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-200 transform hover:scale-110 hover:-translate-x-1 focus:outline-none"
                               aria-label="Plat précédent"
                             >
                               <svg
@@ -431,19 +436,24 @@ export default function DishesModal({
                                 <polyline points="15 18 9 12 15 6"></polyline>
                               </svg>
                             </button>
-                          </div>
+                          </motion.div>
 
                           {/* Zone centrale transparente pour permettre l'interaction avec l'image */}
                           <div className="flex-grow h-full"></div>
 
                           {/* Flèche droite - Positionnée sur le côté droit avec un espacement */}
-                          <div className="h-full flex items-center pr-2">
+                          <motion.div
+                            className="h-full flex items-center pr-2"
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2, duration: 0.3 }}
+                          >
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 goToNext();
                               }}
-                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B5D4F]/30 transform hover:scale-110 hover:translate-x-1"
+                              className="pointer-events-auto bg-[#6B5D4F]/70 hover:bg-[#6B5D4F] backdrop-blur-sm text-white rounded-full p-2 shadow-sm transition-all duration-200 transform hover:scale-110 hover:translate-x-1 focus:outline-none"
                               aria-label="Plat suivant"
                             >
                               <svg
@@ -459,7 +469,7 @@ export default function DishesModal({
                                 <polyline points="9 18 15 12 9 6"></polyline>
                               </svg>
                             </button>
-                          </div>
+                          </motion.div>
                         </div>
                       </div>
 
