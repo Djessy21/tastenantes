@@ -5,7 +5,7 @@ import { CertifiedRestaurant } from "../types/restaurant";
 import ImageUpload from "./ImageUpload";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
-import { getUncachedImageUrl, clearImageCache } from "@/app/lib/utils";
+import { getUncachedImageUrl, clearImageCache } from "../lib/utils";
 
 interface EditRestaurantModalProps {
   isOpen: boolean;
