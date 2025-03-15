@@ -515,7 +515,7 @@ export default function Home() {
         ref={headerRef}
         className="fixed top-0 left-0 right-0 bg-white shadow-md z-[50]"
       >
-        <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-[#E8E1D9]">
+        <div className="dior-container py-4 sm:py-6 flex flex-col items-center gap-6 border-b border-beige-medium">
           <div className="flex justify-between items-center w-full">
             <div className="flex-1">
               {isMobile && (
@@ -525,8 +525,8 @@ export default function Home() {
                     filters.cuisines.length > 0 ||
                     filters.establishments.length > 0 ||
                     searchQuery
-                      ? "bg-[#6B5D4F] text-white"
-                      : "bg-[#F5F2EE] hover:bg-[#E8E1D9] text-[#6B5D4F]"
+                      ? "bg-brown-dark text-white"
+                      : "bg-beige-light hover:bg-beige-medium text-brown-dark"
                   }`}
                   aria-label={
                     showFiltersOnMobile
@@ -552,7 +552,7 @@ export default function Home() {
                     filters.establishments.length > 0 ||
                     searchQuery) &&
                     !showFiltersOnMobile && (
-                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-[#E05D5D] rounded-full"></span>
+                      <span className="absolute -top-1 -right-1 h-3 w-3 bg-accent rounded-full"></span>
                     )}
                 </button>
               )}
@@ -593,20 +593,20 @@ export default function Home() {
                 <div className="flex gap-2 w-full sm:w-auto">
                   <button
                     onClick={() => setShowAdminPanel(true)}
-                    className="dior-button whitespace-nowrap w-full sm:w-auto"
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-accent hover:bg-accent-dark"
                   >
                     + Ajouter
                   </button>
                   <button
                     onClick={runMigration}
-                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-[#8C7B6B] hover:bg-[#5D4D40]"
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-brown-medium hover:bg-brown-darker"
                     title="Ajouter les colonnes website et instagram à la base de données"
                   >
                     Migrer DB
                   </button>
                   <button
                     onClick={seedTestRestaurants}
-                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-[#6B5D4F] hover:bg-[#5D4D40]"
+                    className="dior-button whitespace-nowrap w-full sm:w-auto bg-brown-medium hover:bg-brown-darker"
                     title="Ajouter des restaurants de test pour l'infinite scroll"
                   >
                     Ajouter 30 restaurants
@@ -614,7 +614,7 @@ export default function Home() {
                   {isPreview() && (
                     <button
                       onClick={resetPreviewDatabase}
-                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-[#E05D5D] hover:bg-[#c54545]"
+                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-accent hover:bg-accent-dark"
                       title="Réinitialiser la base de données de preview"
                     >
                       Réinitialiser DB
@@ -623,7 +623,7 @@ export default function Home() {
                   {isAdmin && (
                     <button
                       onClick={clearAllRestaurants}
-                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-[#E05D5D] hover:bg-[#c54545]"
+                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-accent hover:bg-accent-dark"
                       title="Supprimer tous les restaurants et leurs plats associés"
                     >
                       Supprimer tout
@@ -664,7 +664,7 @@ export default function Home() {
                             ? certifiedLastElementRef
                             : null
                         }
-                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover border border-[#E8E1D9]/60"
+                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover border border-beige-medium/60"
                         style={{
                           borderRadius: isMobile
                             ? "0 0 0.5rem 0"
@@ -703,7 +703,7 @@ export default function Home() {
 
                 {filteredRestaurants.length > 0 && (
                   <div className="space-y-8">
-                    <h2 className="text-xl font-semibold text-[#5D4D40]">
+                    <h2 className="text-xl font-semibold text-brown-darker">
                       Autres restaurants à proximité
                     </h2>
                     {filteredRestaurants.map((restaurant, index) => (
@@ -714,7 +714,7 @@ export default function Home() {
                             ? regularLastElementRef
                             : null
                         }
-                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover border border-[#E8E1D9]/60"
+                        className="bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden restaurant-card-animation restaurant-card-hover border border-beige-medium/60"
                         style={{
                           borderRadius: isMobile
                             ? "0 0 0.5rem 0"
@@ -748,7 +748,7 @@ export default function Home() {
                 {filteredRestaurants.length === 0 &&
                   filteredCertifiedRestaurants.length === 0 && (
                     <div className="text-center py-8">
-                      <p className="text-[#8C7B6B]">
+                      <p className="text-brown-medium">
                         Aucun établissement n&apos;a été trouvé
                       </p>
                     </div>

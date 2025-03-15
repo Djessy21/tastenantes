@@ -44,11 +44,11 @@ const ValueCard = ({
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-      <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-4 text-pink-600">
+      <div className="w-12 h-12 bg-accent-lighter rounded-full flex items-center justify-center mb-4 text-accent-dark">
         {icon}
       </div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+      <h3 className="text-lg font-semibold mb-2 text-brown-darker">{title}</h3>
+      <p className="text-brown-medium">{description}</p>
     </div>
   );
 };
@@ -85,7 +85,7 @@ export default function About() {
       <div className="dior-container max-w-5xl mx-auto px-4">
         <AnimatedSection>
           <motion.h1
-            className="text-4xl md:text-5xl font-bold text-center mb-3 text-[#5D4D40]"
+            className="text-4xl md:text-5xl font-bold text-center mb-3 text-brown-darker"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -94,14 +94,14 @@ export default function About() {
           </motion.h1>
 
           <motion.div
-            className="w-20 h-1 bg-[#6B5D4F] mx-auto mb-8"
+            className="w-20 h-1 bg-brown-dark mx-auto mb-8"
             initial={{ width: 0 }}
             animate={{ width: 80 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           />
 
           <motion.p
-            className="text-center text-[#8C7B6B] max-w-2xl mx-auto mb-12"
+            className="text-center text-brown-medium max-w-2xl mx-auto mb-12"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -113,9 +113,9 @@ export default function About() {
 
         {/* Notre histoire */}
         <AnimatedSection delay={0.2} className="mt-16">
-          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-[#E8E1D9]/60">
-            <h2 className="text-2xl font-semibold mb-6 flex items-center text-[#5D4D40]">
-              <span className="w-8 h-8 bg-[#F5F2EE] rounded-full flex items-center justify-center mr-3 text-[#6B5D4F]">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-beige-medium/60">
+            <h2 className="text-2xl font-semibold mb-6 flex items-center text-brown-darker">
+              <span className="w-8 h-8 bg-accent-lighter rounded-full flex items-center justify-center mr-3 text-accent-dark">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -134,7 +134,7 @@ export default function About() {
               Notre histoire
             </h2>
 
-            <div className="space-y-4 text-[#8C7B6B]">
+            <div className="space-y-4 text-brown-medium">
               <p>
                 Taste Nantes est né d'un constat simple : le besoin de
                 recommandations fiables pour les restaurants nantais. En tant
@@ -161,7 +161,7 @@ export default function About() {
 
         {/* Nos valeurs */}
         <AnimatedSection delay={0.3} className="mt-16">
-          <h2 className="text-2xl font-semibold mb-8 text-center text-[#5D4D40]">
+          <h2 className="text-2xl font-semibold mb-8 text-center text-brown-darker">
             Nos valeurs
           </h2>
 
@@ -233,7 +233,7 @@ export default function About() {
 
         {/* Rejoignez-nous */}
         <AnimatedSection delay={0.5} className="mt-16">
-          <div className="bg-[#6B5D4F] text-white rounded-2xl p-8 md:p-10 text-center">
+          <div className="bg-brown-dark text-white rounded-2xl p-8 md:p-10 text-center">
             <h2 className="text-2xl font-semibold mb-4">
               Rejoignez l'aventure Taste Nantes
             </h2>
@@ -244,7 +244,7 @@ export default function About() {
             </p>
             <Link
               href="/contact"
-              className="inline-block px-6 py-3 bg-white text-[#5D4D40] font-medium rounded-lg hover:bg-[#F5F2EE] transition-colors"
+              className="inline-block px-6 py-3 bg-white text-brown-darker font-medium rounded-lg hover:bg-beige-light transition-colors"
             >
               Contactez-nous
             </Link>
@@ -254,7 +254,7 @@ export default function About() {
         <AnimatedSection delay={0.6} className="mt-16 text-center">
           <Link
             href="/"
-            className="inline-flex items-center text-[#6B5D4F] hover:text-[#5D4D40] transition-colors"
+            className="inline-flex items-center text-brown-darker hover:text-brown-dark transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

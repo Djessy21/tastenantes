@@ -43,13 +43,13 @@ const PolicySection = ({
 }) => {
   return (
     <div className="mb-10">
-      <h2 className="text-xl font-semibold mb-4 flex items-center text-[#5D4D40]">
-        <span className="w-8 h-8 bg-[#E8E1D9] rounded-full flex items-center justify-center mr-3 text-[#6B5D4F]">
+      <h2 className="text-xl font-semibold mb-4 flex items-center text-brown-darker">
+        <span className="w-8 h-8 bg-accent-lighter rounded-full flex items-center justify-center mr-3 text-accent-dark">
           {icon}
         </span>
         {title}
       </h2>
-      <div className="pl-11 space-y-3 text-[#8C7B6B]">{children}</div>
+      <div className="pl-11 space-y-3 text-brown-medium">{children}</div>
     </div>
   );
 };
@@ -70,7 +70,7 @@ export default function Privacy() {
       <div className="dior-container max-w-4xl mx-auto px-4">
         <AnimatedSection>
           <motion.h1
-            className="text-4xl md:text-5xl font-bold text-center mb-3 text-[#5D4D40]"
+            className="text-4xl md:text-5xl font-bold text-center mb-3 text-brown-darker"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -79,14 +79,14 @@ export default function Privacy() {
           </motion.h1>
 
           <motion.div
-            className="w-20 h-1 bg-[#6B5D4F] mx-auto mb-8"
+            className="w-20 h-1 bg-brown-dark mx-auto mb-8"
             initial={{ width: 0 }}
             animate={{ width: 80 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           />
 
           <motion.p
-            className="text-center text-[#8C7B6B] max-w-2xl mx-auto mb-4"
+            className="text-center text-brown-medium max-w-2xl mx-auto mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -98,7 +98,7 @@ export default function Privacy() {
           </motion.p>
 
           <motion.p
-            className="text-center text-[#A89B8C] text-sm mb-12"
+            className="text-center text-brown-light text-sm mb-12"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.5 }}
@@ -107,7 +107,7 @@ export default function Privacy() {
           </motion.p>
         </AnimatedSection>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-[#E8E1D9]/60">
+        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-beige-medium/60">
           <AnimatedSection delay={0.2}>
             <PolicySection
               title="Collecte des données"
@@ -319,7 +319,7 @@ export default function Privacy() {
                 Pour exercer ces droits, veuillez nous contacter via notre{" "}
                 <Link
                   href="/contact"
-                  className="text-[#6B5D4F] hover:text-[#5D4D40] hover:underline"
+                  className="text-brown-dark hover:text-brown-darker hover:underline"
                 >
                   formulaire de contact
                 </Link>
@@ -387,13 +387,13 @@ export default function Privacy() {
               <ul className="list-disc pl-5 space-y-2">
                 <li>
                   Par email :{" "}
-                  <span className="text-[#6B5D4F]">tastenantes@gmail.com</span>
+                  <span className="text-brown-dark">tastenantes@gmail.com</span>
                 </li>
                 <li>
                   Via notre{" "}
                   <Link
                     href="/contact"
-                    className="text-[#6B5D4F] hover:text-[#5D4D40] hover:underline"
+                    className="text-brown-dark hover:text-brown-darker hover:underline"
                   >
                     formulaire de contact
                   </Link>
@@ -407,7 +407,7 @@ export default function Privacy() {
         <AnimatedSection delay={1.0} className="mt-16 text-center">
           <Link
             href="/"
-            className="inline-flex items-center text-[#6B5D4F] hover:text-[#5D4D40] transition-colors"
+            className="inline-flex items-center text-brown-dark hover:text-brown-darker transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

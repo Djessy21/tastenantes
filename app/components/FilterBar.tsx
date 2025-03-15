@@ -256,14 +256,14 @@ export default function FilterBar({
   return (
     <div className="w-full relative" ref={searchRef}>
       {/* Barre de recherche avec filtres */}
-      <div className="bg-white border-b border-[#D2C8BC] hover:border-[#A89B8C]">
+      <div className="bg-white border-b border-beige-dark hover:border-brown-light">
         {/* Champ de recherche */}
         <div className="flex items-center p-2">
           <div className="relative flex-grow">
             <div className="relative flex items-center bg-transparent">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-[#8C7B6B] ml-3"
+                className="h-5 w-5 text-brown-medium ml-3"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -280,7 +280,7 @@ export default function FilterBar({
                 placeholder="Rechercher un restaurant..."
                 value={restaurantSearchTerm}
                 onChange={(e) => setRestaurantSearchTerm(e.target.value)}
-                className="w-full py-3 px-3 bg-transparent border-none text-sm text-[#5D4D40] placeholder-[#A89B8C] focus:outline-none text-[16px]"
+                className="w-full py-3 px-3 bg-transparent border-none text-sm text-brown-darker placeholder-brown-light focus:outline-none text-[16px]"
                 style={{ fontSize: "16px" }}
                 autoComplete="off"
                 autoCorrect="off"
@@ -295,7 +295,7 @@ export default function FilterBar({
                       onSearchChange("");
                     }
                   }}
-                  className="flex items-center justify-center h-8 w-8 mr-1 rounded-full text-[#A89B8C] hover:text-[#6B5D4F] hover:bg-[#F5F2EE] transition-colors"
+                  className="flex items-center justify-center h-8 w-8 mr-1 rounded-full text-brown-light hover:text-brown-dark hover:bg-beige-light transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -320,8 +320,8 @@ export default function FilterBar({
             ref={buttonRef}
             className={`ml-2 flex items-center justify-center h-10 w-10 rounded-lg transition-all relative ${
               showSuggestions
-                ? "bg-[#6B5D4F] text-white"
-                : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9]"
+                ? "bg-brown-dark text-white"
+                : "bg-beige-light text-brown-medium hover:bg-beige-medium"
             }`}
             onClick={() => {
               console.log(
@@ -348,7 +348,7 @@ export default function FilterBar({
 
             {/* Badge indiquant le nombre de filtres sélectionnés */}
             {totalFilters > 0 && (
-              <div className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-[#E05D5D] text-white text-[10px] font-medium px-1">
+              <div className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-accent text-white text-[10px] font-medium px-1">
                 {totalFilters}
               </div>
             )}
@@ -357,19 +357,19 @@ export default function FilterBar({
 
         {/* Affichage des filtres sélectionnés */}
         {totalFilters > 0 && (
-          <div className="px-4 py-2 flex flex-wrap gap-1.5 items-center border-t border-[#E8E1D9]">
+          <div className="px-4 py-2 flex flex-wrap gap-1.5 items-center border-t border-beige-medium">
             {/* Affichage des filtres de cuisine (limité en fonction de la taille de l'écran) */}
             {selectedCuisines
               .slice(0, Math.min(maxVisibleFilters, selectedCuisines.length))
               .map((cuisine) => (
                 <div
                   key={cuisine}
-                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40] max-w-[150px] truncate"
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-beige-dark text-brown-darker max-w-[150px] truncate"
                 >
                   <span className="truncate">{cuisine}</span>
                   <button
                     onClick={() => removeFilter("cuisine", cuisine)}
-                    className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
+                    className="ml-1 flex-shrink-0 text-brown-darker/80 hover:text-brown-darker"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -402,12 +402,12 @@ export default function FilterBar({
               .map((establishment) => (
                 <div
                   key={establishment}
-                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F] max-w-[150px] truncate"
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-beige-medium text-brown-dark max-w-[150px] truncate"
                 >
                   <span className="truncate">{establishment}</span>
                   <button
                     onClick={() => removeFilter("establishment", establishment)}
-                    className="ml-1 flex-shrink-0 text-[#6B5D4F]/80 hover:text-[#6B5D4F]"
+                    className="ml-1 flex-shrink-0 text-brown-dark/80 hover:text-brown-dark"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -431,7 +431,7 @@ export default function FilterBar({
             {restaurantSearchTerm &&
               selectedCuisines.length + selectedEstablishments.length <
                 maxVisibleFilters && (
-                <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F5F2EE] text-[#5D4D40] max-w-[150px] truncate">
+                <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-beige-light text-brown-darker max-w-[150px] truncate">
                   <span className="truncate">"{restaurantSearchTerm}"</span>
                   <button
                     onClick={() => {
@@ -440,7 +440,7 @@ export default function FilterBar({
                         onSearchChange("");
                       }
                     }}
-                    className="ml-1 flex-shrink-0 text-[#5D4D40]/80 hover:text-[#5D4D40]"
+                    className="ml-1 flex-shrink-0 text-brown-darker/80 hover:text-brown-darker"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -462,7 +462,7 @@ export default function FilterBar({
 
             {/* Indicateur pour les filtres supplémentaires */}
             {totalFilters > maxVisibleFilters && (
-              <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#6B5D4F] text-white">
+              <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brown-dark text-white">
                 +
                 {totalFilters -
                   Math.min(
@@ -480,7 +480,7 @@ export default function FilterBar({
 
             <button
               onClick={clearAllFilters}
-              className="ml-1 text-xs text-[#8C7B6B] hover:text-[#5D4D40] transition-colors"
+              className="ml-1 text-xs text-brown-medium hover:text-brown-darker transition-colors"
             >
               Effacer tout
             </button>
@@ -504,7 +504,7 @@ export default function FilterBar({
 
             {/* Panneau de filtres avec animation */}
             <motion.div
-              className="fixed left-0 right-0 top-[4rem] sm:mx-auto max-w-[600px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-[#E8E1D9]/60 z-[1000] overflow-hidden"
+              className="fixed left-0 right-0 top-[4rem] sm:mx-auto max-w-[600px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-beige-medium/60 z-[1000] overflow-hidden"
               style={{
                 boxShadow:
                   "0 10px 25px -5px rgba(107, 93, 79, 0.15), 0 8px 10px -6px rgba(107, 93, 79, 0.1)",
@@ -521,12 +521,12 @@ export default function FilterBar({
               exit="exit"
             >
               {/* Onglets avec style amélioré */}
-              <div className="flex border-b border-[#E8E1D9]/60 bg-[#FDFBF9]/80">
+              <div className="flex border-b border-beige-medium/60 bg-beige-lighter/80">
                 <button
                   className={`flex-1 py-4 px-4 text-sm font-medium transition-all duration-200 ${
                     activeTab === "cuisine"
-                      ? "text-[#5D4D40] border-b-2 border-[#6B5D4F] bg-white/80"
-                      : "text-[#8C7B6B] hover:text-[#5D4D40] hover:bg-white/40"
+                      ? "text-brown-darker border-b-2 border-brown-dark bg-white/80"
+                      : "text-brown-medium hover:text-brown-darker hover:bg-white/40"
                   }`}
                   onClick={() => setActiveTab("cuisine")}
                 >
@@ -551,8 +551,8 @@ export default function FilterBar({
                 <button
                   className={`flex-1 py-4 px-4 text-sm font-medium transition-all duration-200 ${
                     activeTab === "establishment"
-                      ? "text-[#5D4D40] border-b-2 border-[#6B5D4F] bg-white/80"
-                      : "text-[#8C7B6B] hover:text-[#5D4D40] hover:bg-white/40"
+                      ? "text-brown-darker border-b-2 border-brown-dark bg-white/80"
+                      : "text-brown-medium hover:text-brown-darker hover:bg-white/40"
                   }`}
                   onClick={() => setActiveTab("establishment")}
                 >
@@ -599,8 +599,8 @@ export default function FilterBar({
                           key={cuisine}
                           className={`px-3 py-2 rounded-full text-sm transition-all duration-200 ${
                             selectedCuisines.includes(cuisine)
-                              ? "bg-[#7D9D74] text-white font-medium shadow-sm"
-                              : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9] hover:shadow-sm"
+                              ? "bg-accent text-white font-medium shadow-sm"
+                              : "bg-beige-light text-brown-medium hover:bg-beige-medium hover:shadow-sm"
                           }`}
                           onClick={() => toggleCuisine(cuisine)}
                           whileHover={{ scale: 1.03 }}
@@ -619,8 +619,8 @@ export default function FilterBar({
                           key={establishment}
                           className={`px-3 py-2 rounded-full text-sm transition-all duration-200 ${
                             selectedEstablishments.includes(establishment)
-                              ? "bg-[#A3BF9B] text-[#5C7A53] font-medium shadow-sm"
-                              : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9] hover:shadow-sm"
+                              ? "bg-accent-light text-accent-dark font-medium shadow-sm"
+                              : "bg-beige-light text-brown-medium hover:bg-beige-medium hover:shadow-sm"
                           }`}
                           onClick={() => toggleEstablishment(establishment)}
                           whileHover={{ scale: 1.03 }}
@@ -636,7 +636,7 @@ export default function FilterBar({
 
               {/* Bouton de fermeture avec style amélioré et plus arrondi - sans délimitation */}
               <div
-                className="p-4 flex justify-between items-center bg-[#FDFBF9]/80"
+                className="p-4 flex justify-between items-center bg-beige-lighter/80"
                 style={{
                   paddingLeft: isMobile ? "12px" : "16px",
                   paddingRight: isMobile ? "12px" : "16px",
@@ -644,7 +644,7 @@ export default function FilterBar({
                   paddingBottom: isMobile ? "12px" : "16px",
                 }}
               >
-                <div className="text-sm text-[#8C7B6B]">
+                <div className="text-sm text-brown-medium">
                   {totalFilters > 0 ? (
                     <span>
                       {totalFilters} filtre{totalFilters > 1 ? "s" : ""}{" "}
@@ -656,7 +656,7 @@ export default function FilterBar({
                 </div>
                 <motion.button
                   onClick={() => setShowSuggestions(false)}
-                  className="px-6 py-2.5 bg-[#7D9D74] text-white text-sm font-medium rounded-full hover:bg-[#5C7A53] transition-colors shadow-sm"
+                  className="px-6 py-2.5 bg-accent text-white text-sm font-medium rounded-full hover:bg-accent-dark transition-colors shadow-sm"
                   whileHover={{
                     scale: 1.05,
                     boxShadow: "0 4px 8px rgba(125, 157, 116, 0.2)",
