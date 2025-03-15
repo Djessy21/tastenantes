@@ -1,5 +1,9 @@
 import path from "path";
 import fs from "fs/promises";
+import { PrismaClient } from "@prisma/client";
+
+// Initialiser le client Prisma
+const prisma = new PrismaClient();
 
 // Import sharp uniquement en développement
 let sharp: any;
@@ -24,6 +28,48 @@ async function ensureUploadDir() {
     await fs.access(UPLOAD_DIR);
   } catch {
     await fs.mkdir(UPLOAD_DIR, { recursive: true });
+  }
+}
+
+// Fonction pour déterminer si nous sommes sur Vercel
+function isVercelProduction(): boolean {
+  return process.env.VERCEL === "1" && process.env.NODE_ENV === "production";
+}
+
+// Fonction pour stocker une image dans la base de données
+async function storeImageInDatabase(
+  file: UploadedFile,
+  type: string,
+  filename: string
+): Promise<string> {
+  console.log("ImageService: Stockage de l'image dans la base de données");
+
+  try {
+    // Convertir le Buffer en Uint8Array pour la compatibilité avec Prisma
+    const uint8Array = new Uint8Array(file.buffer);
+
+    // Stocker l'image dans la table binary_images
+    const binaryImage = await prisma.binary_images.create({
+      data: {
+        image_data: uint8Array,
+        image_type: type,
+        mime_type: file.mimetype,
+        filename: filename,
+      },
+    });
+
+    console.log(
+      `ImageService: Image stockée en base de données avec l'ID: ${binaryImage.id}`
+    );
+
+    // Retourner une URL qui pointe vers notre API d'images
+    return `/api/images/${binaryImage.id}`;
+  } catch (error) {
+    console.error(
+      "ImageService: Erreur lors du stockage en base de données:",
+      error
+    );
+    throw error;
   }
 }
 
@@ -57,19 +103,6 @@ export async function saveImage(
       }
     }
 
-    // Créer le dossier uploads s'il n'existe pas
-    await ensureUploadDir();
-
-    // En environnement de développement, stocker l'image sur le système de fichiers
-    console.log(
-      `ImageService: Stockage de l'image sur le système de fichiers local`
-    );
-
-    // Créer le dossier uploads s'il n'existe pas
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", type);
-    await fs.mkdir(uploadsDir, { recursive: true });
-    console.log(`ImageService: Dossier d'upload créé/vérifié: ${uploadsDir}`);
-
     // Vérifier si le nom de fichier contient des préfixes spéciaux
     const isUserImage = file.originalname.startsWith("user_");
     const isTestImage =
@@ -100,6 +133,26 @@ export async function saveImage(
         `ImageService: Nom de fichier généré avec timestamp: ${filename}`
       );
     }
+
+    // Déterminer si nous sommes sur Vercel en production
+    if (isVercelProduction()) {
+      // Sur Vercel en production, stocker l'image dans la base de données
+      const imageUrl = await storeImageInDatabase(file, type, filename);
+      console.log(`ImageService: URL de l'image générée (DB): ${imageUrl}`);
+      console.log("=== FIN IMAGE SERVICE SAVE IMAGE (SUCCÈS - DB) ===");
+      return imageUrl;
+    }
+
+    // En développement ou autre environnement, stocker l'image sur le système de fichiers local
+    console.log(
+      `ImageService: Stockage de l'image sur le système de fichiers local`
+    );
+
+    // Créer le dossier uploads s'il n'existe pas
+    await ensureUploadDir();
+    const uploadsDir = path.join(process.cwd(), "public", "uploads", type);
+    await fs.mkdir(uploadsDir, { recursive: true });
+    console.log(`ImageService: Dossier d'upload créé/vérifié: ${uploadsDir}`);
 
     const filepath = path.join(uploadsDir, filename);
     console.log(`ImageService: Chemin du fichier: ${filepath}`);
@@ -169,6 +222,47 @@ export async function saveImage(
     } else {
       return `/default-image.svg`;
     }
+  }
+}
+
+// Fonction pour récupérer une image depuis la base de données
+export async function getImageFromDatabase(
+  id: number
+): Promise<{ buffer: Buffer; mimeType: string } | null> {
+  try {
+    console.log(
+      `ImageService: Récupération de l'image avec l'ID ${id} depuis la base de données`
+    );
+
+    // Récupérer l'image depuis la table binary_images
+    const binaryImage = await prisma.binary_images.findUnique({
+      where: { id },
+    });
+
+    if (!binaryImage) {
+      console.error(
+        `ImageService: Image avec l'ID ${id} non trouvée dans la base de données`
+      );
+      return null;
+    }
+
+    // Convertir Uint8Array en Buffer
+    const buffer = Buffer.from(binaryImage.image_data);
+
+    console.log(
+      `ImageService: Image récupérée, type: ${binaryImage.mime_type}, taille: ${buffer.length} bytes`
+    );
+
+    return {
+      buffer,
+      mimeType: binaryImage.mime_type,
+    };
+  } catch (error) {
+    console.error(
+      "ImageService: Erreur lors de la récupération de l'image depuis la base de données:",
+      error
+    );
+    return null;
   }
 }
 
