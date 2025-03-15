@@ -20,26 +20,26 @@ export default function Footer() {
         <div className="flex items-center space-x-4 mb-2 sm:mb-0">
           <Link
             href="/about"
-            className="text-accent hover:text-accent-dark transition-colors"
+            className="text-brown-dark hover:text-brown-darker transition-colors"
           >
             À propos
           </Link>
           <Link
             href="/contact"
-            className="text-accent hover:text-accent-dark transition-colors"
+            className="text-brown-dark hover:text-brown-darker transition-colors"
           >
             Contact
           </Link>
           <Link
             href="/privacy"
-            className="text-accent hover:text-accent-dark transition-colors"
+            className="text-brown-dark hover:text-brown-darker transition-colors"
           >
             Confidentialité
           </Link>
           {isDevelopment && (
             <Link
               href="/accent-demo"
-              className="text-accent hover:text-accent-dark transition-colors"
+              className="text-brown-dark hover:text-brown-darker transition-colors"
             >
               Démo Couleurs
             </Link>
