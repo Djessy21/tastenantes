@@ -430,23 +430,31 @@ export default function EditRestaurantModal({
                           "Image sélectionnée dans ImageUpload:",
                           imageUrl
                         );
-                        console.log(
-                          "Type d'URL:",
-                          imageUrl.startsWith("data:")
-                            ? "Data URL"
-                            : imageUrl.startsWith("/api/")
-                            ? "API URL"
-                            : imageUrl.startsWith("/uploads/")
-                            ? "Upload URL"
-                            : imageUrl.startsWith("blob:")
-                            ? "Blob URL"
-                            : imageUrl.startsWith("http")
-                            ? "URL externe"
-                            : "Autre type d'URL"
-                        );
+
+                        // Vérifier si imageUrl est défini avant d'utiliser startsWith
+                        if (imageUrl) {
+                          console.log(
+                            "Type d'URL:",
+                            imageUrl.startsWith("data:")
+                              ? "Data URL"
+                              : imageUrl.startsWith("/api/")
+                              ? "API URL"
+                              : imageUrl.startsWith("/uploads/")
+                              ? "Upload URL"
+                              : imageUrl.startsWith("blob:")
+                              ? "Blob URL"
+                              : imageUrl.startsWith("http")
+                              ? "URL externe"
+                              : "Autre type d'URL"
+                          );
+                        } else {
+                          console.warn("URL d'image non définie ou invalide");
+                          // Utiliser une image par défaut
+                          imageUrl = "/default-restaurant.svg";
+                        }
 
                         // Si c'est une URL de données, convertir en File
-                        if (imageUrl.startsWith("data:")) {
+                        if (imageUrl && imageUrl.startsWith("data:")) {
                           console.log("Conversion de l'URL de données en File");
                           fetch(imageUrl)
                             .then((res) => res.blob())
@@ -495,7 +503,7 @@ export default function EditRestaurantModal({
                                 err instanceof Error ? err.message : String(err)
                               );
                             });
-                        } else if (imageUrl.startsWith("blob:")) {
+                        } else if (imageUrl && imageUrl.startsWith("blob:")) {
                           // Si c'est une URL de blob, la convertir en File
                           console.log("Conversion de l'URL de blob en File");
                           fetch(imageUrl)
@@ -546,8 +554,9 @@ export default function EditRestaurantModal({
                               );
                             });
                         } else if (
-                          imageUrl.startsWith("/api/") ||
-                          imageUrl.startsWith("/uploads/")
+                          imageUrl &&
+                          (imageUrl.startsWith("/api/") ||
+                            imageUrl.startsWith("/uploads/"))
                         ) {
                           // Si c'est une URL d'API ou d'uploads, mettre à jour directement l'URL de l'image
                           console.log(

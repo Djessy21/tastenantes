@@ -97,16 +97,40 @@ export default function ImageUpload({
 
           const data = await response.json();
           console.log(
-            `Image utilisateur uploadée avec succès: ${data.imageUrl}`
+            `Image utilisateur uploadée avec succès: ${
+              data.url || data.imageUrl
+            }`
           );
 
           // Mettre à jour l'URL avec celle retournée par l'API
-          onImageSelect(data.imageUrl);
+          // Vérifier si la réponse contient url ou imageUrl (pour compatibilité)
+          if (data.url || data.imageUrl) {
+            onImageSelect(data.url || data.imageUrl);
+          } else {
+            console.error(
+              "La réponse de l'API ne contient pas d'URL d'image valide:",
+              data
+            );
+            // Utiliser l'URL de prévisualisation comme fallback
+            if (previewUrl) {
+              onImageSelect(previewUrl);
+            } else {
+              onImageSelect(`/default-${imageType}.svg`);
+            }
+          }
         } catch (error) {
           console.error("Erreur lors de l'upload de l'image:", error);
-          // En cas d'erreur, on conserve l'URL de blob en développement
-          if (process.env.NODE_ENV !== "development") {
-            // En production, on utilise une image par défaut
+          // Toujours fournir une URL par défaut, même en développement
+          // Si nous avons déjà une prévisualisation, l'utiliser
+          if (previewUrl) {
+            console.log(
+              `Utilisation de l'URL de prévisualisation comme fallback: ${previewUrl}`
+            );
+            onImageSelect(previewUrl);
+          } else {
+            console.log(
+              `Utilisation de l'image par défaut: /default-${imageType}.svg`
+            );
             onImageSelect(`/default-${imageType}.svg`);
           }
         } finally {

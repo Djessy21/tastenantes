@@ -1,11 +1,14 @@
 /**
- * Script pour mettre à jour les images de tous les restaurants
+ * Script pour mettre à jour les images des restaurants sans images ou avec des images par défaut
  *
  * Utilisation:
  * npm run update-images
  *
- * Ce script met à jour les images de tous les restaurants dans la base de données
- * en leur attribuant une URL d'image valide depuis Unsplash.
+ * Ce script met à jour les images des restaurants dans la base de données
+ * qui n'ont pas d'image ou qui ont une image par défaut, en leur attribuant
+ * une URL d'image valide depuis Unsplash.
+ *
+ * IMPORTANT: Ce script ne remplace PAS les images téléchargées par les utilisateurs.
  */
 
 import { PrismaClient } from "@prisma/client";
@@ -28,6 +31,34 @@ const restaurantImages = [
   "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?q=80&w=1000",
 ];
 
+/**
+ * Vérifie si une image est une image utilisateur
+ * @param imageUrl L'URL de l'image à vérifier
+ * @returns true si c'est une image utilisateur, false sinon
+ */
+function isUserImage(imageUrl: string | null): boolean {
+  if (!imageUrl) return false;
+
+  // Les images utilisateur sont stockées dans le dossier uploads
+  // ou commencent par "user_"
+  return imageUrl.includes("/uploads/") || imageUrl.includes("user_");
+}
+
+/**
+ * Vérifie si une image est une image par défaut ou manquante
+ * @param imageUrl L'URL de l'image à vérifier
+ * @returns true si c'est une image par défaut ou manquante, false sinon
+ */
+function isDefaultOrMissingImage(imageUrl: string | null): boolean {
+  if (!imageUrl) return true;
+
+  return (
+    imageUrl.includes("default-") ||
+    imageUrl === "" ||
+    imageUrl.includes("placeholder")
+  );
+}
+
 async function updateRestaurantImages() {
   // Afficher l'environnement actuel
   const env = getEnvironment();
@@ -40,32 +71,59 @@ async function updateRestaurantImages() {
     const restaurants = await prisma.restaurant.findMany();
     console.log(`📊 ${restaurants.length} restaurants trouvés.`);
 
-    // Mettre à jour chaque restaurant avec une image
+    // Mettre à jour uniquement les restaurants sans image ou avec une image par défaut
     let updatedCount = 0;
+    let skippedCount = 0;
+
     for (const restaurant of restaurants) {
-      // Sélectionner une image aléatoire dans notre liste
-      const randomImage =
-        restaurantImages[Math.floor(Math.random() * restaurantImages.length)];
+      // Vérifier si l'image est une image utilisateur
+      if (isUserImage(restaurant.image)) {
+        console.log(
+          `⏭️ Restaurant ${restaurant.id} (${restaurant.name}) ignoré: image utilisateur détectée.`
+        );
+        skippedCount++;
+        continue;
+      }
 
-      // Mettre à jour le restaurant
-      await prisma.restaurant.update({
-        where: { id: restaurant.id },
-        data: {
-          image: randomImage,
-        },
-      });
+      // Vérifier si l'image est une image par défaut ou manquante
+      if (isDefaultOrMissingImage(restaurant.image)) {
+        // Sélectionner une image aléatoire dans notre liste
+        const randomImage =
+          restaurantImages[Math.floor(Math.random() * restaurantImages.length)];
 
-      updatedCount++;
+        // Mettre à jour le restaurant
+        await prisma.restaurant.update({
+          where: { id: restaurant.id },
+          data: {
+            image: randomImage,
+          },
+        });
+
+        console.log(
+          `✅ Restaurant ${restaurant.id} (${restaurant.name}) mis à jour avec une nouvelle image.`
+        );
+        updatedCount++;
+      } else {
+        console.log(
+          `⏭️ Restaurant ${restaurant.id} (${restaurant.name}) ignoré: image existante.`
+        );
+        skippedCount++;
+      }
 
       // Afficher la progression
-      if (updatedCount % 10 === 0 || updatedCount === restaurants.length) {
+      if (
+        (updatedCount + skippedCount) % 10 === 0 ||
+        updatedCount + skippedCount === restaurants.length
+      ) {
         console.log(
-          `✅ ${updatedCount}/${restaurants.length} restaurants mis à jour.`
+          `📊 Progression: ${updatedCount + skippedCount}/${
+            restaurants.length
+          } restaurants traités (${updatedCount} mis à jour, ${skippedCount} ignorés).`
         );
       }
     }
 
-    return updatedCount;
+    return { updatedCount, skippedCount };
   } catch (error) {
     console.error("❌ Erreur lors de la mise à jour des images:", error);
     throw error;
@@ -78,9 +136,9 @@ async function updateRestaurantImages() {
 // Exécuter la fonction si le script est appelé directement
 if (require.main === module) {
   updateRestaurantImages()
-    .then((count) => {
+    .then((result) => {
       console.log(
-        `📊 Opération terminée. ${count} restaurants mis à jour avec de nouvelles images.`
+        `📊 Opération terminée. ${result.updatedCount} restaurants mis à jour avec de nouvelles images, ${result.skippedCount} restaurants ignorés.`
       );
       process.exit(0);
     })
