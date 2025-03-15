@@ -61,28 +61,28 @@ body {
   }
 
   .dior-card {
-    @apply bg-white transition-all duration-300 border border-[#E8E1D9]/60 rounded-lg shadow-sm hover:shadow-md;
+    @apply bg-white transition-all duration-300 border border-beige-medium rounded-lg shadow-sm hover:shadow-md;
   }
 
   .dior-text {
-    @apply font-serif tracking-wider text-[#5D4D40];
+    @apply font-serif tracking-wider text-brown-darker;
   }
 
   .dior-heading {
-    @apply text-2xl sm:text-4xl font-light tracking-wider uppercase text-[#5D4D40];
+    @apply text-2xl sm:text-4xl font-light tracking-wider uppercase text-brown-darker;
   }
 
   .dior-button {
-    @apply px-4 py-2 bg-[#6B5D4F] text-white uppercase tracking-wider text-xs font-medium transition-colors hover:bg-[#5D4D40];
+    @apply px-4 py-2 bg-brown-dark text-white uppercase tracking-wider text-xs font-medium transition-colors hover:bg-brown-darker;
     border-radius: var(--button-border-radius);
   }
 
   .dior-input {
-    @apply w-full border-0 border-b border-[#E8E1D9] pb-2 text-sm sm:text-base bg-transparent focus:outline-none focus:border-[#6B5D4F] text-[#5D4D40] placeholder-[#A89B8C];
+    @apply w-full border-0 border-b border-beige-medium pb-2 text-sm sm:text-base bg-transparent focus:outline-none focus:border-brown-dark text-brown-darker placeholder-brown-light;
   }
 
   .mobile-map-toggle {
-    @apply fixed bottom-4 right-4 bg-[#6B5D4F] text-white p-3 rounded-full shadow-lg z-40 flex items-center justify-center lg:hidden hover:bg-[#5D4D40];
+    @apply fixed bottom-4 right-4 bg-brown-dark text-white p-3 rounded-full shadow-lg z-40 flex items-center justify-center lg:hidden hover:bg-brown-darker;
   }
 
   .custom-scrollbar {
@@ -91,20 +91,19 @@ body {
 
   /* Nouvelles classes utilisant la couleur d'accentuation */
   .accent-button {
-    @apply px-4 py-2 bg-[#7D9D74] text-white uppercase tracking-wider text-xs font-medium transition-colors hover:bg-[#5C7A53];
-    border-radius: var(--button-border-radius);
+    @apply px-4 py-2 bg-accent text-white uppercase tracking-wider text-xs font-medium transition-colors hover:bg-accent-dark;
   }
 
   .accent-text {
-    @apply text-[#7D9D74];
+    @apply text-accent;
   }
 
   .accent-border {
-    @apply border border-[#7D9D74];
+    @apply border border-accent;
   }
 
   .accent-bg-light {
-    @apply bg-[#E1EBD9];
+    @apply bg-accent-lighter;
   }
 }
 
@@ -273,3 +272,312 @@ button {
     height: 320px;
   }
 } */
+
+/* Classes utilitaires pour les couleurs d'accentuation */
+.bg-accent {
+  background-color: var(--color-accent);
+}
+
+.bg-accent-dark {
+  background-color: var(--color-accent-dark);
+}
+
+.bg-accent-light {
+  background-color: var(--color-accent-light);
+}
+
+.bg-accent-lighter {
+  background-color: var(--color-accent-lighter);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.text-accent-dark {
+  color: var(--color-accent-dark);
+}
+
+.text-accent-light {
+  color: var(--color-accent-light);
+}
+
+.border-accent {
+  border-color: var(--color-accent);
+}
+
+.hover\:bg-accent:hover {
+  background-color: var(--color-accent);
+}
+
+.hover\:bg-accent-dark:hover {
+  background-color: var(--color-accent-dark);
+}
+
+.hover\:bg-accent-light:hover {
+  background-color: var(--color-accent-light);
+}
+
+.hover\:bg-accent-lighter:hover {
+  background-color: var(--color-accent-lighter);
+}
+
+.hover\:text-accent:hover {
+  color: var(--color-accent);
+}
+
+.hover\:border-accent:hover {
+  border-color: var(--color-accent);
+}
+
+/* Bouton d'accentuation */
+.accent-button {
+  background-color: var(--color-accent);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.accent-button:hover {
+  background-color: var(--color-accent-dark);
+}
+
+.accent-button-outline {
+  background-color: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  transition: all 0.2s ease;
+}
+
+.accent-button-outline:hover {
+  background-color: var(--color-accent-lighter);
+}
+
+.accent-button-light {
+  background-color: var(--color-accent-lighter);
+  color: var(--color-accent-dark);
+  transition: all 0.2s ease;
+}
+
+.accent-button-light:hover {
+  background-color: var(--color-accent-light);
+  color: white;
+}
+
+/* Classes utilitaires pour les couleurs de base */
+.bg-brown-dark {
+  background-color: var(--color-brown-dark);
+}
+
+.bg-brown-darker {
+  background-color: var(--color-brown-darker);
+}
+
+.bg-brown-medium {
+  background-color: var(--color-brown-medium);
+}
+
+.bg-brown-light {
+  background-color: var(--color-brown-light);
+}
+
+.bg-beige-dark {
+  background-color: var(--color-beige-dark);
+}
+
+.bg-beige-medium {
+  background-color: var(--color-beige-medium);
+}
+
+.bg-beige-light {
+  background-color: var(--color-beige-light);
+}
+
+.bg-beige-lighter {
+  background-color: var(--color-beige-lighter);
+}
+
+.text-brown-dark {
+  color: var(--color-brown-dark);
+}
+
+.text-brown-darker {
+  color: var(--color-brown-darker);
+}
+
+.text-brown-medium {
+  color: var(--color-brown-medium);
+}
+
+.text-brown-light {
+  color: var(--color-brown-light);
+}
+
+.border-brown-dark {
+  border-color: var(--color-brown-dark);
+}
+
+.border-brown-medium {
+  border-color: var(--color-brown-medium);
+}
+
+.border-beige-medium {
+  border-color: var(--color-beige-medium);
+}
+
+.border-beige-light {
+  border-color: var(--color-beige-light);
+}
+
+.hover\:bg-brown-dark:hover {
+  background-color: var(--color-brown-dark);
+}
+
+.hover\:bg-brown-darker:hover {
+  background-color: var(--color-brown-darker);
+}
+
+.hover\:bg-brown-medium:hover {
+  background-color: var(--color-brown-medium);
+}
+
+.hover\:bg-beige-light:hover {
+  background-color: var(--color-beige-light);
+}
+
+.hover\:text-brown-dark:hover {
+  color: var(--color-brown-dark);
+}
+
+.hover\:text-brown-darker:hover {
+  color: var(--color-brown-darker);
+}
+
+.hover\:border-brown-dark:hover {
+  border-color: var(--color-brown-dark);
+}
+
+/* Boutons avec les couleurs de base */
+.brown-button {
+  background-color: var(--color-brown-dark);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.brown-button:hover {
+  background-color: var(--color-brown-darker);
+}
+
+.brown-button-outline {
+  background-color: transparent;
+  border: 1px solid var(--color-brown-dark);
+  color: var(--color-brown-dark);
+  transition: all 0.2s ease;
+}
+
+.brown-button-outline:hover {
+  background-color: var(--color-beige-light);
+}
+
+/* Classes d'opacité pour les bordures */
+.border-beige-medium\/60 {
+  border-color: rgba(
+    232,
+    225,
+    217,
+    0.6
+  ); /* --color-beige-medium avec 60% d'opacité */
+}
+
+.border-beige-medium\/50 {
+  border-color: rgba(232, 225, 217, 0.5);
+}
+
+.border-beige-medium\/40 {
+  border-color: rgba(232, 225, 217, 0.4);
+}
+
+.border-beige-light\/60 {
+  border-color: rgba(245, 242, 238, 0.6);
+}
+
+.border-brown-dark\/60 {
+  border-color: rgba(107, 93, 79, 0.6);
+}
+
+.border-brown-medium\/60 {
+  border-color: rgba(140, 123, 107, 0.6);
+}
+
+.border-accent\/60 {
+  border-color: rgba(125, 157, 116, 0.6);
+}
+
+/* Classes focus pour les bordures */
+.focus\:border-brown-dark:focus {
+  border-color: var(--color-brown-dark);
+}
+
+.focus\:border-brown-darker:focus {
+  border-color: var(--color-brown-darker);
+}
+
+.focus\:border-brown-medium:focus {
+  border-color: var(--color-brown-medium);
+}
+
+.focus\:border-beige-dark:focus {
+  border-color: var(--color-beige-dark);
+}
+
+.focus\:border-beige-medium:focus {
+  border-color: var(--color-beige-medium);
+}
+
+.focus\:border-accent:focus {
+  border-color: var(--color-accent);
+}
+
+.focus\:border-accent-dark:focus {
+  border-color: var(--color-accent-dark);
+}
+
+/* Classes placeholder pour les couleurs */
+.placeholder-brown-dark::placeholder {
+  color: var(--color-brown-dark);
+}
+
+.placeholder-brown-darker::placeholder {
+  color: var(--color-brown-darker);
+}
+
+.placeholder-brown-medium::placeholder {
+  color: var(--color-brown-medium);
+}
+
+.placeholder-brown-light::placeholder {
+  color: var(--color-brown-light);
+}
+
+.placeholder-beige-dark::placeholder {
+  color: var(--color-beige-dark);
+}
+
+.placeholder-beige-medium::placeholder {
+  color: var(--color-beige-medium);
+}
+
+.placeholder-beige-light::placeholder {
+  color: var(--color-beige-light);
+}
+
+.placeholder-accent::placeholder {
+  color: var(--color-accent);
+}
+
+.placeholder-accent-dark::placeholder {
+  color: var(--color-accent-dark);
+}
+
+.placeholder-accent-light::placeholder {
+  color: var(--color-accent-light);
+}
