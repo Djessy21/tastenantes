@@ -180,6 +180,8 @@ export default function EditRestaurantModal({
       console.log("=== DÉBUT SOUMISSION DU FORMULAIRE ===");
       console.log("Restaurant actuel:", restaurant);
       console.log("Nouvelle image sélectionnée:", newImage ? "Oui" : "Non");
+      console.log("URL d'image temporaire:", formData.tempImageUrl);
+      console.log("URL d'image actuelle du restaurant:", restaurant.image);
 
       let updatedImageUrl = restaurant.image;
 
@@ -196,7 +198,8 @@ export default function EditRestaurantModal({
         imageFormData.append("image", newImage);
         imageFormData.append("type", "restaurant");
         // Ajouter un identifiant unique pour éviter les problèmes de cache
-        const uniqueId = `${restaurant.id}_${Date.now()}`;
+        // Utiliser un préfixe 'user_' pour distinguer des images de test
+        const uniqueId = `user_${restaurant.id}_${Date.now()}`;
         imageFormData.append("uniqueId", uniqueId);
 
         console.log(
@@ -220,7 +223,8 @@ export default function EditRestaurantModal({
           console.log("Données de réponse de l'API d'upload:", responseData);
 
           // Utiliser l'URL complète retournée par l'API
-          updatedImageUrl = responseData.imageUrl;
+          // Vérifier si la réponse contient url ou imageUrl (pour compatibilité)
+          updatedImageUrl = responseData.url || responseData.imageUrl;
           console.log("Nouvelle URL d'image reçue de l'API:", updatedImageUrl);
         } else {
           const errorText = await imageResponse.text();
