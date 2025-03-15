@@ -614,7 +614,7 @@ export default function Home() {
                   {isPreview() && (
                     <button
                       onClick={resetPreviewDatabase}
-                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-accent hover:bg-accent-dark"
+                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-600 hover:bg-red-700"
                       title="Réinitialiser la base de données de preview"
                     >
                       Réinitialiser DB
@@ -623,7 +623,7 @@ export default function Home() {
                   {isAdmin && (
                     <button
                       onClick={clearAllRestaurants}
-                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-accent hover:bg-accent-dark"
+                      className="dior-button whitespace-nowrap w-full sm:w-auto bg-red-600 hover:bg-red-700"
                       title="Supprimer tous les restaurants et leurs plats associés"
                     >
                       Supprimer tout
