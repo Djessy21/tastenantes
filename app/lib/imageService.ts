@@ -1,6 +1,5 @@
 import path from "path";
 import fs from "fs/promises";
-import { storeBinaryImage } from "./db-edge";
 
 // Import sharp uniquement en développement
 let sharp: any;
@@ -58,120 +57,79 @@ export async function saveImage(
       }
     }
 
-    // Détection plus robuste de l'environnement de production
-    const isProduction =
-      process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
-    console.log(`ImageService: Est en production? ${isProduction}`);
+    // Créer le dossier uploads s'il n'existe pas
+    await ensureUploadDir();
 
-    // En environnement de production, stocker l'image dans la base de données
-    if (isProduction) {
+    // En environnement de développement, stocker l'image sur le système de fichiers
+    console.log(
+      `ImageService: Stockage de l'image sur le système de fichiers local`
+    );
+
+    // Créer le dossier uploads s'il n'existe pas
+    const uploadsDir = path.join(process.cwd(), "public", "uploads", type);
+    await fs.mkdir(uploadsDir, { recursive: true });
+    console.log(`ImageService: Dossier d'upload créé/vérifié: ${uploadsDir}`);
+
+    // Vérifier si le nom de fichier contient des préfixes spéciaux
+    const isUserImage = file.originalname.startsWith("user_");
+    const isTestImage =
+      file.originalname.includes("unsplash") ||
+      file.originalname.includes("test_") ||
+      file.originalname.includes("seed_");
+
+    // Utiliser le nom de fichier original qui peut déjà contenir un identifiant unique
+    // ou générer un nom de fichier unique si nécessaire
+    let filename;
+    if (isUserImage) {
+      // Pour les images utilisateur, conserver le préfixe user_ et ajouter un timestamp
+      filename = file.originalname.replace(/\s+/g, "-");
       console.log(
-        `ImageService: Stockage de l'image dans la base de données pour le type: ${type}`
+        `ImageService: Utilisation du nom de fichier utilisateur: ${filename}`
       );
-
-      try {
-        // Optimiser l'image avant de la stocker si sharp est disponible
-        let imageBuffer = file.buffer;
-        console.log(
-          `ImageService: Taille du buffer avant stockage: ${imageBuffer.length} bytes`
-        );
-        console.log(
-          `ImageService: Contenu du buffer valide: ${
-            imageBuffer && imageBuffer.length > 0
-          }`
-        );
-        console.log(`ImageService: Type MIME: ${file.mimetype}`);
-        console.log(`ImageService: Nom du fichier: ${file.originalname}`);
-
-        // Stocker l'image dans la base de données
-        console.log(
-          `ImageService: Appel de storeBinaryImage avec un buffer de ${imageBuffer.length} bytes`
-        );
-
-        try {
-          const imageId = await storeBinaryImage(
-            imageBuffer,
-            type,
-            file.mimetype,
-            file.originalname
-          );
-
-          console.log(
-            `ImageService: Image stockée avec succès, ID: ${imageId}`
-          );
-
-          // Retourner l'URL de l'API qui servira l'image
-          const imageUrl = `/api/images/${imageId}`;
-          console.log(`ImageService: URL de l'image générée: ${imageUrl}`);
-          console.log("=== FIN IMAGE SERVICE SAVE IMAGE (PRODUCTION) ===");
-          return imageUrl;
-        } catch (storageError) {
-          console.error(
-            "ImageService: Erreur lors de l'appel à storeBinaryImage:",
-            storageError
-          );
-          console.error(
-            "ImageService: Détails de l'erreur:",
-            storageError instanceof Error
-              ? storageError.message
-              : String(storageError)
-          );
-          throw storageError;
-        }
-      } catch (dbError) {
-        console.error(
-          "ImageService: Erreur lors du stockage de l'image dans la base de données:",
-          dbError
-        );
-        console.error(
-          "ImageService: Détails de l'erreur:",
-          dbError instanceof Error ? dbError.message : String(dbError)
-        );
-        // En cas d'erreur, utiliser une image statique
-        console.log(
-          `ImageService: Utilisation d'une image statique pour le type: ${type} (après erreur DB)`
-        );
-        console.log("=== FIN IMAGE SERVICE SAVE IMAGE (ERREUR DB) ===");
-        if (type === "restaurant") {
-          return `/default-restaurant.svg`;
-        } else if (type === "dish") {
-          return `/default-dish.svg`;
-        } else {
-          return `/default-image.svg`;
-        }
-      }
+    } else if (isTestImage) {
+      // Pour les images de test, ajouter un préfixe test_ pour les identifier clairement
+      const cleanName = file.originalname.replace(/\s+/g, "-");
+      filename = `test_${Date.now()}_${cleanName}`;
+      console.log(
+        `ImageService: Image de test détectée, nom généré: ${filename}`
+      );
     } else {
+      // Pour les autres images, générer un nom unique avec un timestamp
+      filename = `${Date.now()}_${file.originalname.replace(/\s+/g, "-")}`;
       console.log(
-        `ImageService: Stockage de l'image sur le système de fichiers local`
+        `ImageService: Nom de fichier généré avec timestamp: ${filename}`
       );
-      // En développement avec sharp disponible
-      // Créer le dossier uploads s'il n'existe pas
-      const uploadsDir = path.join(process.cwd(), "public", "uploads", type);
-      await fs.mkdir(uploadsDir, { recursive: true });
-      console.log(`ImageService: Dossier d'upload créé/vérifié: ${uploadsDir}`);
+    }
 
-      // Utiliser le nom de fichier original qui peut déjà contenir un identifiant unique
-      // ou générer un nom de fichier unique si nécessaire
-      const filename = file.originalname.includes("_")
-        ? file.originalname.replace(/\s+/g, "-")
-        : `${Date.now()}-${file.originalname.replace(/\s+/g, "-")}`;
-      console.log(`ImageService: Nom de fichier généré: ${filename}`);
+    const filepath = path.join(uploadsDir, filename);
+    console.log(`ImageService: Chemin du fichier: ${filepath}`);
 
-      const filepath = path.join(uploadsDir, filename);
-      console.log(`ImageService: Chemin du fichier: ${filepath}`);
+    // Optimiser et sauvegarder l'image
+    if (!sharp) {
+      console.log(
+        `ImageService: Sharp n'est pas disponible, sauvegarde directe du buffer`
+      );
+      // Convertir le Buffer en Uint8Array pour éviter les problèmes de type
+      await fs.writeFile(filepath, new Uint8Array(file.buffer));
+      console.log(`ImageService: Fichier sauvegardé directement: ${filepath}`);
+    } else {
+      console.log(`ImageService: Optimisation de l'image avec Sharp`);
 
-      // Optimiser et sauvegarder l'image
-      if (!sharp) {
+      // Paramètres d'optimisation différents selon le type d'image
+      if (isUserImage) {
+        // Pour les images utilisateur, optimiser avec une meilleure qualité
+        await sharp(file.buffer)
+          .resize(1200, 800, {
+            fit: "inside",
+            withoutEnlargement: true,
+          })
+          .jpeg({ quality: 85 })
+          .toFile(filepath);
         console.log(
-          `ImageService: Sharp n'est pas disponible, sauvegarde directe du buffer`
-        );
-        // Convertir le Buffer en Uint8Array pour éviter les problèmes de type
-        await fs.writeFile(filepath, new Uint8Array(file.buffer));
-        console.log(
-          `ImageService: Fichier sauvegardé directement: ${filepath}`
+          `ImageService: Image utilisateur optimisée et sauvegardée: ${filepath}`
         );
       } else {
-        console.log(`ImageService: Optimisation de l'image avec Sharp`);
+        // Pour les autres images, utiliser des paramètres standard
         await sharp(file.buffer)
           .resize(800, 600, {
             fit: "inside",
@@ -180,16 +138,16 @@ export async function saveImage(
           .jpeg({ quality: 80 })
           .toFile(filepath);
         console.log(
-          `ImageService: Fichier optimisé et sauvegardé: ${filepath}`
+          `ImageService: Image optimisée et sauvegardée: ${filepath}`
         );
       }
-
-      // Retourner l'URL relative pour l'accès via le navigateur
-      const imageUrl = `/uploads/${type}/${filename}`;
-      console.log(`ImageService: URL de l'image générée: ${imageUrl}`);
-      console.log("=== FIN IMAGE SERVICE SAVE IMAGE (DÉVELOPPEMENT) ===");
-      return imageUrl;
     }
+
+    // Retourner l'URL relative pour l'accès via le navigateur
+    const imageUrl = `/uploads/${type}/${filename}`;
+    console.log(`ImageService: URL de l'image générée: ${imageUrl}`);
+    console.log("=== FIN IMAGE SERVICE SAVE IMAGE (SUCCÈS) ===");
+    return imageUrl;
   } catch (error) {
     console.error(
       "ImageService: Erreur générale lors du traitement de l'image:",
