@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
+import { isExternalUrl, downloadExternalImage } from "./utils";
 
 interface ImageUploadProps {
   onImageSelect: (imageUrl: string) => void;
@@ -8,6 +9,9 @@ interface ImageUploadProps {
   initialImage?: string;
   showCreditField?: boolean;
   imageType?: "dish" | "restaurant";
+  className?: string;
+  height?: string;
+  alt?: string;
 }
 
 export default function ImageUpload({
@@ -17,57 +21,55 @@ export default function ImageUpload({
   initialImage = "",
   showCreditField = true,
   imageType = "dish",
+  className,
+  height,
+  alt,
 }: ImageUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [photoCredit, setPhotoCredit] = useState(initialCredit);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialiser l'aperçu avec l'image initiale si elle existe
+  // Gérer l'image initiale
   useEffect(() => {
     if (initialImage) {
-      // Nettoyer l'URL de l'image en supprimant les paramètres de requête
-      const cleanImageUrl = initialImage.split("?")[0];
-      setPreviewUrl(cleanImageUrl);
+      setPreviewUrl(initialImage);
     }
+
+    // Nettoyage lors du démontage du composant
+    return () => {
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
   }, [initialImage]);
 
-  const handleImageChange = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      // Créer une URL temporaire pour la prévisualisation
-      const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
-
-      // Pour le développement local, on utilise directement l'URL temporaire
-      if (process.env.NODE_ENV === "development") {
-        onImageSelect(objectUrl);
-        return;
-      }
-
-      // En production, on uploadera l'image vers un service de stockage
+  // Fonction pour traiter une URL externe
+  const handleExternalUrl = useCallback(
+    async (url: string) => {
       try {
+        console.log(`Traitement de l'URL externe: ${url}`);
         setIsLoading(true);
+
+        // Générer un nom de fichier unique
+        const filename = `${imageType}_${Date.now()}.jpg`;
+
+        // Télécharger l'image externe
+        const file = await downloadExternalImage(url, filename);
+
+        // Uploader l'image vers l'API
         const formData = new FormData();
         formData.append("image", file);
-        formData.append("type", imageType); // Utiliser le type d'image spécifié
-        // Ajouter un identifiant unique pour éviter les conflits de noms de fichiers
-        const uniqueId = `${Date.now()}_${Math.random()
-          .toString(36)
-          .substring(2, 15)}`;
-        formData.append("uniqueId", uniqueId);
+        formData.append("type", imageType);
+        formData.append(
+          "uniqueId",
+          `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
+        );
 
+        console.log(`Envoi de l'image téléchargée à l'API d'upload`);
         const response = await fetch("/api/upload", {
           method: "POST",
           body: formData,
-          // Désactiver la mise en cache
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
         });
 
         if (!response.ok) {
@@ -75,17 +77,112 @@ export default function ImageUpload({
         }
 
         const data = await response.json();
-        // Utiliser l'URL complète sans ajouter de paramètres supplémentaires
+        console.log(`Image uploadée avec succès: ${data.imageUrl}`);
+
+        // Mettre à jour l'URL avec celle retournée par l'API
         onImageSelect(data.imageUrl);
+
+        // Mettre à jour la prévisualisation
+        setPreviewUrl(data.imageUrl);
       } catch (error) {
-        console.error("Error uploading image:", error);
-        // En cas d'erreur, on utilise une image par défaut
+        console.error("Erreur lors du traitement de l'URL externe:", error);
+        // En cas d'erreur, utiliser une image par défaut
         onImageSelect(`/default-${imageType}.svg`);
+        setPreviewUrl(`/default-${imageType}.svg`);
       } finally {
         setIsLoading(false);
       }
     },
-    [onImageSelect, imageType]
+    [imageType, onImageSelect]
+  );
+
+  const handleImageChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+
+        // Révoquer l'ancienne URL d'objet si c'est un blob
+        if (previewUrl && previewUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(previewUrl);
+        }
+
+        // Créer une URL temporaire pour la prévisualisation
+        const newObjectUrl = URL.createObjectURL(file);
+        setPreviewUrl(newObjectUrl);
+
+        // Afficher immédiatement la prévisualisation pour une meilleure expérience utilisateur
+        onImageSelect(newObjectUrl);
+
+        // Uploader l'image vers l'API en arrière-plan
+        try {
+          setIsLoading(true);
+          const formData = new FormData();
+          formData.append("image", file);
+          formData.append("type", imageType);
+          formData.append(
+            "uniqueId",
+            `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
+          );
+
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error("Upload failed");
+          }
+
+          const data = await response.json();
+          // Mettre à jour l'URL avec celle retournée par l'API
+          onImageSelect(data.imageUrl);
+        } catch (error) {
+          console.error("Erreur lors de l'upload de l'image:", error);
+          // En cas d'erreur, on conserve l'URL de blob en développement
+          if (process.env.NODE_ENV !== "development") {
+            // En production, on utilise une image par défaut
+            onImageSelect(`/default-${imageType}.svg`);
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    },
+    [onImageSelect, imageType, previewUrl]
+  );
+
+  // Fonction pour gérer les URLs externes collées
+  const handlePaste = useCallback(
+    async (e: React.ClipboardEvent<HTMLInputElement>) => {
+      const clipboardData = e.clipboardData;
+      const pastedText = clipboardData.getData("text");
+
+      // Vérifier si le texte collé est une URL externe
+      if (pastedText && isExternalUrl(pastedText)) {
+        e.preventDefault();
+        console.log(`URL externe détectée lors du collage: ${pastedText}`);
+        await handleExternalUrl(pastedText);
+      }
+    },
+    [handleExternalUrl]
+  );
+
+  // Fonction pour gérer les URLs externes saisies manuellement
+  const handleUrlInput = useCallback(
+    async (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        const input = e.currentTarget;
+        const url = input.value.trim();
+
+        if (url && isExternalUrl(url)) {
+          e.preventDefault();
+          console.log(`URL externe saisie manuellement: ${url}`);
+          input.value = "";
+          await handleExternalUrl(url);
+        }
+      }
+    },
+    [handleExternalUrl]
   );
 
   const handleCreditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,8 +193,8 @@ export default function ImageUpload({
     }
   };
 
-  const handleButtonClick = () => {
-    // Déclencher le clic sur l'input file caché
+  // Fonction pour déclencher le clic sur l'input file
+  const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
 
@@ -114,7 +211,7 @@ export default function ImageUpload({
         />
         <button
           type="button"
-          onClick={handleButtonClick}
+          onClick={triggerFileInput}
           className="w-full p-4 text-center border-2 border-dashed rounded-lg cursor-pointer border-beige-dark hover:border-brown-medium transition-colors text-brown-medium"
         >
           {isLoading ? (
@@ -123,15 +220,34 @@ export default function ImageUpload({
             <span>Cliquez pour sélectionner une image</span>
           )}
         </button>
+
+        {/* Input pour les URLs externes */}
+        <div className="mt-2">
+          <input
+            type="text"
+            placeholder="Ou collez une URL d'image externe (https://...)"
+            className="w-full px-3 py-2 border border-beige-medium rounded-md focus:outline-none focus:ring-2 focus:ring-brown-dark"
+            onPaste={handlePaste}
+            onKeyDown={handleUrlInput}
+          />
+          <p className="text-xs text-brown-medium mt-1">
+            Appuyez sur Entrée après avoir saisi une URL
+          </p>
+        </div>
       </div>
 
       {previewUrl && (
         <div className="relative aspect-video w-full">
           <img
             src={previewUrl}
-            alt="Preview"
+            alt={alt || "Image"}
             className="object-cover rounded-lg w-full h-full"
-            key={`preview-${previewUrl}`} // Forcer le rechargement de l'image quand l'URL change
+            loading="eager"
+            decoding="sync"
+            onError={(e) => {
+              console.error(`Erreur de chargement de l'image: ${previewUrl}`);
+              e.currentTarget.src = `/default-${imageType}.svg`;
+            }}
           />
         </div>
       )}

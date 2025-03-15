@@ -440,6 +440,8 @@ export default function EditRestaurantModal({
                             ? "Upload URL"
                             : imageUrl.startsWith("blob:")
                             ? "Blob URL"
+                            : imageUrl.startsWith("http")
+                            ? "URL externe"
                             : "Autre type d'URL"
                         );
 
@@ -580,9 +582,21 @@ export default function EditRestaurantModal({
                             return newFormData;
                           });
                         } else {
+                          // Pour les autres types d'URL (y compris les URLs externes),
+                          // le composant ImageUpload s'occupe déjà de les convertir en URLs locales
                           console.log(
-                            "Type d'URL non reconnu, aucune action spécifique"
+                            "URL traitée par le composant ImageUpload, mise à jour de l'aperçu:",
+                            imageUrl
                           );
+
+                          // Mettre à jour l'aperçu avec l'URL fournie
+                          setImagePreview(imageUrl);
+
+                          // Stocker l'URL dans un état local pour l'utiliser lors de la soumission
+                          setFormData((prev) => ({
+                            ...prev,
+                            tempImageUrl: imageUrl,
+                          }));
                         }
 
                         console.log("=== FIN ON IMAGE SELECT ===");

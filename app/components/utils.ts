@@ -58,3 +58,45 @@ export function clearImageCache(url: string): void {
   // Cette fonction est maintenue pour compatibilité mais simplifiée
   // pour éviter les opérations coûteuses
 }
+
+/**
+ * Vérifie si une URL est une URL externe (http/https)
+ * @param url L'URL à vérifier
+ * @returns true si l'URL est externe, false sinon
+ */
+export function isExternalUrl(url: string): boolean {
+  return url.startsWith("http://") || url.startsWith("https://");
+}
+
+/**
+ * Télécharge une image externe et la renvoie sous forme de File
+ * @param url L'URL externe de l'image
+ * @param filename Le nom de fichier à utiliser
+ * @returns Une promesse qui se résout avec un objet File
+ */
+export async function downloadExternalImage(
+  url: string,
+  filename: string
+): Promise<File> {
+  try {
+    console.log(`Téléchargement de l'image externe: ${url}`);
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(
+        `Erreur lors du téléchargement de l'image: ${response.status}`
+      );
+    }
+
+    const blob = await response.blob();
+    console.log(
+      `Image téléchargée, taille: ${blob.size} bytes, type: ${blob.type}`
+    );
+
+    // Créer un objet File à partir du Blob
+    return new File([blob], filename, { type: blob.type || "image/jpeg" });
+  } catch (error) {
+    console.error("Erreur lors du téléchargement de l'image externe:", error);
+    throw error;
+  }
+}
