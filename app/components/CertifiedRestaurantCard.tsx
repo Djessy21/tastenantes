@@ -134,7 +134,7 @@ export default function CertifiedRestaurantCard({
             e.stopPropagation();
             if (onClick) onClick();
           }}
-          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-[#6B5D4F] text-white rounded-lg hover:bg-[#5D4D40] transition-all duration-300 shadow-sm hover:shadow-md relative"
+          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-dark transition-all duration-300 shadow-sm hover:shadow-md relative"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
@@ -153,7 +153,7 @@ export default function CertifiedRestaurantCard({
             />
           </svg>
           <span>Voir les dégustations</span>
-          <span className="absolute -top-2 -right-2 bg-[#E05D5D] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          <span className="absolute -top-2 -right-2 bg-white border border-accent text-accent-dark text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
             {dishesCount}
           </span>
         </motion.button>
@@ -166,10 +166,9 @@ export default function CertifiedRestaurantCard({
             e.stopPropagation();
             setShowAddDishForm(!showAddDishForm);
           }}
-          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-[#6B5D4F] text-[#6B5D4F] hover:bg-[#6B5D4F] hover:text-white transition-all duration-300"
+          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white transition-all duration-300 rounded-md"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          style={{ borderRadius: "var(--button-border-radius)" }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -199,7 +198,7 @@ export default function CertifiedRestaurantCard({
       <div
         className={`dior-card p-0 transition-all duration-300 relative rounded-lg ${
           isSelected
-            ? "shadow-[0_10px_30px_rgba(107,93,79,0.2)] border border-[#E8E1D9]"
+            ? "shadow-[0_10px_30px_rgba(107,93,79,0.2)] border border-beige-medium"
             : "shadow-[0_5px_15px_rgba(107,93,79,0.1)] hover:shadow-[0_15px_35px_rgba(107,93,79,0.15)]"
         }`}
         onClick={onClick}
@@ -244,7 +243,7 @@ export default function CertifiedRestaurantCard({
                   )}
                 </>
               ) : (
-                <div className="w-full h-full flex items-center justify-center border border-[#E8E1D9] bg-[#F5F2EE] text-[#8C7B6B]">
+                <div className="w-full h-full flex items-center justify-center border border-beige-medium bg-beige-light text-brown-medium">
                   <span className="text-lg opacity-50">Photo</span>
                 </div>
               )}
@@ -255,13 +254,13 @@ export default function CertifiedRestaurantCard({
               <div>
                 {/* En-tête avec nom */}
                 <div className="mb-3">
-                  <h3 className="text-xl font-medium mb-2 text-[#5D4D40]">
+                  <h3 className="text-xl font-medium mb-2 text-brown-darker">
                     {restaurant.name}
                   </h3>
 
                   {/* Type d'établissement et cuisine avec badges */}
                   <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#E8E1D9] text-[#6B5D4F]">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent-lighter text-accent-dark">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-3 w-3 mr-1"
@@ -279,7 +278,7 @@ export default function CertifiedRestaurantCard({
                       {restaurant.specialNote || "Restaurant"}
                     </span>
 
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#D2C8BC] text-[#5D4D40]">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-beige-light text-brown-dark">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-3 w-3 mr-1"
@@ -302,7 +301,7 @@ export default function CertifiedRestaurantCard({
                   <div className="flex items-start text-sm mb-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1 mt-0.5 text-[#8C7B6B]"
+                      className="h-4 w-4 mr-1 mt-0.5 text-accent"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -320,7 +319,7 @@ export default function CertifiedRestaurantCard({
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
-                    <span className="text-[#5D4D40] opacity-75">
+                    <span className="text-brown-darker">
                       {restaurant.address}
                     </span>
                   </div>
@@ -330,7 +329,7 @@ export default function CertifiedRestaurantCard({
                     <div className="flex items-start text-sm mb-2">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1 mt-0.5 text-[#8C7B6B]"
+                        className="h-4 w-4 mr-1 mt-0.5 text-accent"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -343,15 +342,31 @@ export default function CertifiedRestaurantCard({
                         />
                       </svg>
                       <button
-                        className="opacity-75 text-[#6B5D4F] hover:text-[#5D4D40] hover:underline"
+                        className="text-brown-darker hover:text-accent transition-colors flex items-center group"
                         onClick={(e) =>
                           openExternalLink(e, restaurant.website || "#")
                         }
                       >
-                        {restaurant.website?.replace(
-                          /^https?:\/\/(www\.)?/,
-                          ""
-                        )}
+                        <span className="group-hover:underline">
+                          {restaurant.website?.replace(
+                            /^https?:\/\/(www\.)?/,
+                            ""
+                          )}
+                        </span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-3 w-3 ml-1 text-accent"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
                       </button>
                     </div>
                   )}
@@ -361,7 +376,7 @@ export default function CertifiedRestaurantCard({
                     <div className="flex items-start text-sm">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1 mt-0.5 text-[#8C7B6B]"
+                        className="h-4 w-4 mr-1 mt-0.5 text-accent"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -379,7 +394,7 @@ export default function CertifiedRestaurantCard({
                         <circle cx="17.5" cy="6.5" r=".75" strokeWidth="2" />
                       </svg>
                       <button
-                        className="opacity-75 text-[#6B5D4F] hover:text-[#5D4D40] hover:underline"
+                        className="text-brown-darker hover:text-accent transition-colors flex items-center group"
                         onClick={(e) =>
                           openExternalLink(
                             e,
@@ -387,7 +402,23 @@ export default function CertifiedRestaurantCard({
                           )
                         }
                       >
-                        @{restaurant.instagram}
+                        <span className="group-hover:underline">
+                          @{restaurant.instagram}
+                        </span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-3 w-3 ml-1 text-accent"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
                       </button>
                     </div>
                   )}
@@ -405,10 +436,9 @@ export default function CertifiedRestaurantCard({
                     <>
                       <motion.button
                         onClick={openEditModal}
-                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-[#6B5D4F] text-[#6B5D4F] hover:bg-[#6B5D4F] hover:text-white transition-all duration-300"
+                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white transition-all duration-300 rounded-md"
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
-                        style={{ borderRadius: "var(--button-border-radius)" }}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -433,12 +463,9 @@ export default function CertifiedRestaurantCard({
                             e.stopPropagation();
                             setShowAddDishForm(!showAddDishForm);
                           }}
-                          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-[#6B5D4F] text-[#6B5D4F] hover:bg-[#6B5D4F] hover:text-white transition-all duration-300"
+                          className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-accent text-accent hover:bg-accent hover:text-white transition-all duration-300 rounded-md"
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
-                          style={{
-                            borderRadius: "var(--button-border-radius)",
-                          }}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -461,10 +488,9 @@ export default function CertifiedRestaurantCard({
                       <motion.button
                         onClick={handleDelete}
                         disabled={isDeleting}
-                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-[#E05D5D] text-[#E05D5D] hover:bg-[#E05D5D] hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 text-xs uppercase tracking-wider px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-md"
                         whileHover={{ scale: isDeleting ? 1 : 1.03 }}
                         whileTap={{ scale: isDeleting ? 1 : 0.97 }}
-                        style={{ borderRadius: "var(--button-border-radius)" }}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -487,10 +513,10 @@ export default function CertifiedRestaurantCard({
                 </div>
 
                 {/* Certification */}
-                <div className="text-xs opacity-50 flex items-center">
+                <div className="text-xs flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 mr-1 text-[#8C7B6B]"
+                    className="h-3 w-3 mr-1 text-accent"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -502,9 +528,9 @@ export default function CertifiedRestaurantCard({
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  <span className="text-[#8C7B6B]">Validée par</span>{" "}
+                  <span className="text-brown-darker">Validée par</span>{" "}
                   <button
-                    className="ml-1 text-[#6B5D4F] hover:text-[#5D4D40] hover:underline"
+                    className="ml-1 text-brown-darker hover:text-accent hover:underline transition-colors"
                     onClick={(e) =>
                       restaurant.certifiedBy &&
                       openExternalLink(
@@ -522,10 +548,10 @@ export default function CertifiedRestaurantCard({
 
           {showAddDishForm && isAdmin && (
             <div
-              className="mt-6 border-t border-[#E8E1D9] pt-6 px-4 sm:px-6 pb-4"
+              className="mt-6 border-t border-beige-medium pt-6 px-4 sm:px-6 pb-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <h4 className="text-sm uppercase tracking-wider font-medium mb-4 text-[#5D4D40]">
+              <h4 className="text-sm uppercase tracking-wider font-medium mb-4 text-accent">
                 Ajouter un nouveau plat
               </h4>
               <AddDishForm
