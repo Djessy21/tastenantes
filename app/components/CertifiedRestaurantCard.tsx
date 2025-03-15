@@ -115,6 +115,9 @@ export default function CertifiedRestaurantCard({
   };
 
   const handleRestaurantUpdated = (updatedRestaurant: CertifiedRestaurant) => {
+    // Pas besoin d'ajouter un timestamp, l'URL de l'image devrait déjà être unique
+    // grâce aux modifications dans EditRestaurantModal et ImageUpload
+    console.log("Restaurant mis à jour avec image:", updatedRestaurant.image);
     onUpdate?.(updatedRestaurant);
     setIsEditModalOpen(false);
   };
@@ -217,6 +220,7 @@ export default function CertifiedRestaurantCard({
                     src={restaurant.image}
                     alt={restaurant.name}
                     className="restaurant-image"
+                    key={`restaurant-image-${restaurant.id}-${restaurant.image}`}
                     onError={(e) => {
                       console.error(
                         `Erreur de chargement de l'image: ${restaurant.image}`

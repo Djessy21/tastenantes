@@ -5,6 +5,7 @@ import { CertifiedRestaurant } from "../types/restaurant";
 import ImageUpload from "./ImageUpload";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
+import { getUncachedImageUrl, clearImageCache } from "../lib/utils";
 
 interface EditRestaurantModalProps {
   isOpen: boolean;
@@ -108,26 +109,66 @@ export default function EditRestaurantModal({
         instagram: restaurant.instagram || "",
         photo_credit: restaurant.photo_credit || "",
         location: restaurant.location || { lat: 0, lng: 0 },
-        tempImageUrl: restaurant.image || "",
+        tempImageUrl: "",
       });
 
       // Initialiser l'aperçu de l'image avec l'image actuelle du restaurant
       if (restaurant.image) {
-        setImagePreview(restaurant.image);
+        // Nettoyer l'URL de l'image en supprimant les paramètres de requête
+        const cleanImageUrl = restaurant.image.split("?")[0];
+        setImagePreview(cleanImageUrl);
       }
     }
   }, [restaurant]);
 
   const handleImageChange = (file: File | null) => {
+    console.log("=== DÉBUT HANDLE IMAGE CHANGE ===");
+    console.log(
+      "Fichier reçu:",
+      file ? `${file.name} (${file.size} bytes, ${file.type})` : "null"
+    );
+
     setNewImage(file);
+    console.log("setNewImage appelé avec le fichier");
 
     if (file) {
+      console.log("Création d'un FileReader pour générer une prévisualisation");
       const reader = new FileReader();
+
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        console.log("FileReader a terminé la lecture du fichier");
+        const result = reader.result as string;
+        console.log(
+          "Résultat du FileReader:",
+          result
+            ? `${result.substring(0, 50)}... (${result.length} caractères)`
+            : "null"
+        );
+
+        setImagePreview(result);
+        console.log("setImagePreview appelé avec le résultat du FileReader");
       };
+
+      reader.onerror = (error) => {
+        console.error("Erreur lors de la lecture du fichier:", error);
+        console.error(
+          "Détails de l'erreur:",
+          error instanceof Error ? error.message : String(error)
+        );
+      };
+
+      console.log("Début de la lecture du fichier en tant que DataURL");
       reader.readAsDataURL(file);
+    } else {
+      console.log("Aucun fichier fourni, réinitialisation de l'aperçu");
+      setImagePreview(restaurant.image || null);
+      console.log(
+        "setImagePreview appelé avec l'image du restaurant:",
+        restaurant.image || "null"
+      );
     }
+
+    console.log("=== FIN HANDLE IMAGE CHANGE ===");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -136,27 +177,48 @@ export default function EditRestaurantModal({
     setError(null);
 
     try {
+      console.log("=== DÉBUT SOUMISSION DU FORMULAIRE ===");
+      console.log("Restaurant actuel:", restaurant);
+      console.log("Nouvelle image sélectionnée:", newImage ? "Oui" : "Non");
+      console.log("URL d'image temporaire:", formData.tempImageUrl);
+
       let updatedImageUrl = formData.tempImageUrl || restaurant.image;
+      console.log("URL d'image initiale:", updatedImageUrl);
 
       // Si une nouvelle image a été sélectionnée, la télécharger
       if (newImage) {
-        console.log(
-          "Téléchargement d'une nouvelle image pour le restaurant:",
-          restaurant.id
-        );
+        console.log("Téléchargement d'une nouvelle image");
+        console.log("Détails de l'image:", {
+          nom: newImage.name,
+          taille: newImage.size,
+          type: newImage.type,
+        });
+
         const imageFormData = new FormData();
         imageFormData.append("image", newImage);
         imageFormData.append("type", "restaurant");
+        imageFormData.append("uniqueId", `${restaurant.id}_${Date.now()}`);
+
+        console.log("FormData créé pour l'upload de l'image");
+        console.log("Appel de l'API d'upload...");
 
         const imageResponse = await fetch("/api/upload", {
           method: "POST",
           body: imageFormData,
         });
 
+        console.log("Réponse de l'API d'upload reçue:", {
+          status: imageResponse.status,
+          ok: imageResponse.ok,
+        });
+
         if (imageResponse.ok) {
           const responseData = await imageResponse.json();
+          console.log("Données de réponse de l'API d'upload:", responseData);
+
+          // Utiliser l'URL complète retournée par l'API
           updatedImageUrl = responseData.imageUrl;
-          console.log("Nouvelle URL d'image obtenue:", updatedImageUrl);
+          console.log("Nouvelle URL d'image reçue de l'API:", updatedImageUrl);
         } else {
           const errorText = await imageResponse.text();
           console.error("Erreur lors de l'upload de l'image:", errorText);
@@ -164,25 +226,46 @@ export default function EditRestaurantModal({
           setIsSubmitting(false);
           return;
         }
-      } else {
-        console.log("Utilisation de l'URL d'image existante:", updatedImageUrl);
+      } else if (formData.tempImageUrl) {
+        // Utiliser l'URL temporaire telle quelle
+        updatedImageUrl = formData.tempImageUrl;
+        console.log(
+          "Utilisation de l'URL d'image temporaire:",
+          updatedImageUrl
+        );
       }
 
-      // Mettre à jour le restaurant
-      console.log("Mise à jour du restaurant avec les données:", {
-        name: formData.name,
-        address: formData.address,
-        cuisine: formData.cuisine,
-        specialNote: formData.specialNote,
-        certifiedBy: formData.certifiedBy,
-        featured: formData.featured,
-        website: formData.website,
-        instagram: formData.instagram,
-        photo_credit: formData.photo_credit,
-        image: updatedImageUrl,
-        location: formData.location,
-      });
+      // Ajouter un timestamp unique à l'URL pour forcer le rechargement
+      if (updatedImageUrl) {
+        // Nettoyer l'URL en supprimant les paramètres existants
+        const baseUrl = updatedImageUrl.split("?")[0];
+        // Ajouter un nouveau timestamp
+        updatedImageUrl = `${baseUrl}?t=${Date.now()}`;
+        console.log("URL d'image finale avec timestamp:", updatedImageUrl);
+      }
 
+      console.log(
+        "Mise à jour du restaurant avec l'URL d'image:",
+        updatedImageUrl
+      );
+      console.log(
+        "Préparation des données pour la mise à jour du restaurant:",
+        {
+          name: formData.name,
+          address: formData.address,
+          cuisine: formData.cuisine,
+          specialNote: formData.specialNote,
+          certifiedBy: formData.certifiedBy,
+          featured: formData.featured,
+          website: formData.website,
+          instagram: formData.instagram,
+          photo_credit: formData.photo_credit,
+          image: updatedImageUrl,
+        }
+      );
+
+      // Mettre à jour le restaurant
+      console.log(`Appel de l'API PUT /api/restaurants/${restaurant.id}...`);
       const response = await fetch(`/api/restaurants/${restaurant.id}`, {
         method: "PUT",
         headers: {
@@ -203,20 +286,38 @@ export default function EditRestaurantModal({
         }),
       });
 
+      console.log("Réponse de l'API de mise à jour reçue:", {
+        status: response.status,
+        ok: response.ok,
+      });
+
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erreur de réponse API:", errorData);
-        throw new Error(
-          errorData.error || "Erreur lors de la mise à jour du restaurant"
+        const errorText = await response.text();
+        console.error(
+          "Erreur lors de la mise à jour du restaurant:",
+          errorText
         );
+        throw new Error(`Erreur lors de la mise à jour: ${errorText}`);
       }
 
       const updatedRestaurant = await response.json();
       console.log("Restaurant mis à jour avec succès:", updatedRestaurant);
+      console.log(
+        "URL d'image dans le restaurant mis à jour:",
+        updatedRestaurant.image
+      );
+
+      // Appeler le callback avec le restaurant mis à jour
       onRestaurantUpdated(updatedRestaurant);
       onClose();
+
+      // Toujours recharger la page pour s'assurer que les changements sont visibles
+      console.log("Rechargement de la page pour afficher les modifications");
+      window.location.reload();
+
+      console.log("=== FIN SOUMISSION DU FORMULAIRE ===");
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du restaurant:", error);
+      console.error("Erreur lors de la soumission:", error);
       setError(
         error instanceof Error ? error.message : "Une erreur est survenue"
       );
@@ -309,32 +410,72 @@ export default function EditRestaurantModal({
                   <div className="flex-1">
                     <ImageUpload
                       onImageSelect={(imageUrl) => {
+                        console.log("=== DÉBUT ON IMAGE SELECT ===");
                         console.log(
                           "Image sélectionnée dans ImageUpload:",
                           imageUrl
                         );
+                        console.log(
+                          "Type d'URL:",
+                          imageUrl.startsWith("data:")
+                            ? "Data URL"
+                            : imageUrl.startsWith("/api/")
+                            ? "API URL"
+                            : imageUrl.startsWith("/uploads/")
+                            ? "Upload URL"
+                            : "Autre type d'URL"
+                        );
+
                         // Si c'est une URL de données, convertir en File
                         if (imageUrl.startsWith("data:")) {
                           console.log("Conversion de l'URL de données en File");
                           fetch(imageUrl)
                             .then((res) => res.blob())
                             .then((blob) => {
-                              const file = new File(
-                                [blob],
-                                "restaurant-image.jpg",
-                                { type: "image/jpeg" }
+                              // Créer un nom de fichier unique avec l'ID du restaurant
+                              const uniqueFileName = `restaurant_${
+                                restaurant.id
+                              }_${Date.now()}.jpg`;
+                              console.log(
+                                "Nom de fichier unique généré:",
+                                uniqueFileName
                               );
                               console.log(
-                                "File créé à partir de l'URL de données"
+                                "Taille du blob:",
+                                blob.size,
+                                "Type du blob:",
+                                blob.type
                               );
+
+                              const file = new File([blob], uniqueFileName, {
+                                type: "image/jpeg",
+                              });
+                              console.log(
+                                "File créé à partir de l'URL de données:",
+                                uniqueFileName
+                              );
+                              console.log(
+                                "Taille du fichier:",
+                                file.size,
+                                "Type du fichier:",
+                                file.type
+                              );
+
                               handleImageChange(file);
+                              console.log(
+                                "handleImageChange appelé avec le fichier"
+                              );
                             })
-                            .catch((err) =>
+                            .catch((err) => {
                               console.error(
                                 "Erreur lors de la conversion de l'URL de données:",
                                 err
-                              )
-                            );
+                              );
+                              console.error(
+                                "Détails de l'erreur:",
+                                err instanceof Error ? err.message : String(err)
+                              );
+                            });
                         } else if (
                           imageUrl.startsWith("/api/") ||
                           imageUrl.startsWith("/uploads/")
@@ -344,19 +485,49 @@ export default function EditRestaurantModal({
                             "URL d'image reçue, mise à jour de l'aperçu:",
                             imageUrl
                           );
-                          setImagePreview(imageUrl);
+
+                          // Nettoyer l'URL pour éviter les problèmes de cache
+                          const cleanedUrl = imageUrl.includes("?")
+                            ? imageUrl
+                            : `${imageUrl}?t=${Date.now()}`;
+                          console.log(
+                            "URL nettoyée avec timestamp:",
+                            cleanedUrl
+                          );
+
+                          setImagePreview(cleanedUrl);
+                          console.log(
+                            "setImagePreview appelé avec l'URL nettoyée"
+                          );
+
                           // Stocker l'URL dans un état local pour l'utiliser lors de la soumission
-                          setFormData((prev) => ({
-                            ...prev,
-                            tempImageUrl: imageUrl, // Nous utiliserons cette URL temporaire lors de la soumission
-                          }));
+                          setFormData((prev) => {
+                            const newFormData = {
+                              ...prev,
+                              tempImageUrl: cleanedUrl,
+                            };
+                            console.log(
+                              "Nouveau formData avec tempImageUrl:",
+                              newFormData.tempImageUrl
+                            );
+                            return newFormData;
+                          });
+                        } else {
+                          console.log(
+                            "Type d'URL non reconnu, aucune action spécifique"
+                          );
                         }
+
+                        console.log("=== FIN ON IMAGE SELECT ===");
                       }}
                       onCreditSelect={(credit) => {
                         console.log("Crédit photo mis à jour:", credit);
                         setFormData({ ...formData, photo_credit: credit });
                       }}
                       initialCredit={formData.photo_credit}
+                      initialImage={
+                        restaurant.image ? restaurant.image.split("?")[0] : ""
+                      }
                       imageType="restaurant"
                     />
                   </div>

@@ -378,10 +378,14 @@ export async function storeBinaryImage(
   filename: string
 ): Promise<number> {
   try {
+    console.log(`=== DÉBUT DB STORE BINARY IMAGE ===`);
     console.log(
       `DB: Début du stockage de l'image binaire de type: ${imageType}, MIME: ${mimeType}, nom: ${filename}`
     );
     console.log(`DB: Taille du buffer: ${imageData.length} bytes`);
+    console.log(`DB: Buffer valide: ${imageData && imageData.length > 0}`);
+    console.log(`DB: Type de imageData: ${typeof imageData}`);
+    console.log(`DB: Est un Buffer: ${Buffer.isBuffer(imageData)}`);
 
     // Nettoyer le nom du fichier pour éviter les problèmes avec les caractères spéciaux
     const cleanFilename = filename
@@ -394,29 +398,89 @@ export async function storeBinaryImage(
     console.log(`DB: Nom de fichier nettoyé: ${cleanFilename}`);
 
     // Convertir le Buffer en format hexadécimal pour PostgreSQL
-    const hexData = "\\x" + imageData.toString("hex");
-    console.log(`DB: Buffer converti en format hexadécimal`);
+    let hexData;
+    try {
+      hexData = "\\x" + imageData.toString("hex");
+      console.log(
+        `DB: Buffer converti en format hexadécimal (${hexData.length} caractères)`
+      );
+    } catch (hexError) {
+      console.error(
+        "DB: Erreur lors de la conversion en hexadécimal:",
+        hexError
+      );
+      throw new Error("Erreur lors de la conversion du buffer en hexadécimal");
+    }
+
+    // Vérifier si la table binary_images existe
+    try {
+      const { rows: tableCheck } = await sql`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = 'public' 
+          AND table_name = 'binary_images'
+        ) as exists
+      `;
+
+      const tableExists = tableCheck[0].exists;
+      console.log(`DB: La table binary_images existe: ${tableExists}`);
+
+      if (!tableExists) {
+        console.log("DB: La table binary_images n'existe pas, création...");
+        await sql`
+          CREATE TABLE IF NOT EXISTS binary_images (
+            id SERIAL PRIMARY KEY,
+            image_data BYTEA NOT NULL,
+            image_type VARCHAR(50) NOT NULL,
+            mime_type VARCHAR(100) NOT NULL,
+            filename VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+          )
+        `;
+        console.log("DB: Table binary_images créée avec succès");
+      }
+    } catch (tableCheckError) {
+      console.error(
+        "DB: Erreur lors de la vérification de la table:",
+        tableCheckError
+      );
+    }
 
     console.log(`DB: Exécution de la requête SQL pour insérer l'image`);
-    const { rows } = await sql`
-      INSERT INTO binary_images (
-        image_data,
-        image_type,
-        mime_type,
-        filename
-      ) VALUES (
-        ${hexData}::bytea,
-        ${imageType},
-        ${mimeType},
-        ${cleanFilename}
-      )
-      RETURNING id
-    `;
+    try {
+      const { rows } = await sql`
+        INSERT INTO binary_images (
+          image_data,
+          image_type,
+          mime_type,
+          filename
+        ) VALUES (
+          ${hexData}::bytea,
+          ${imageType},
+          ${mimeType},
+          ${cleanFilename}
+        )
+        RETURNING id
+      `;
 
-    console.log(`DB: Image insérée avec succès, ID: ${rows[0].id}`);
-    return rows[0].id;
+      console.log(`DB: Image insérée avec succès, ID: ${rows[0].id}`);
+      console.log(`=== FIN DB STORE BINARY IMAGE (SUCCÈS) ===`);
+      return rows[0].id;
+    } catch (insertError) {
+      console.error("DB: Erreur lors de l'insertion de l'image:", insertError);
+      console.error(
+        "DB: Détails de l'erreur d'insertion:",
+        insertError instanceof Error ? insertError.message : String(insertError)
+      );
+      throw insertError;
+    }
   } catch (error) {
     console.error("DB: Erreur lors du stockage de l'image binaire:", error);
+    console.error(
+      "DB: Détails de l'erreur:",
+      error instanceof Error ? error.message : String(error)
+    );
+    console.log(`=== FIN DB STORE BINARY IMAGE (ERREUR) ===`);
     throw error;
   }
 }
@@ -428,15 +492,20 @@ export async function getBinaryImageById(id: number): Promise<{
   filename: string;
 } | null> {
   try {
+    console.log(`=== DÉBUT DB GET BINARY IMAGE ===`);
     console.log(`DB: Récupération de l'image binaire avec l'ID: ${id}`);
+
     const { rows } = await sql`
       SELECT image_data, mime_type, filename
       FROM binary_images
       WHERE id = ${id}
     `;
 
+    console.log(`DB: Requête exécutée, nombre de résultats: ${rows.length}`);
+
     if (rows.length === 0) {
       console.log(`DB: Aucune image trouvée avec l'ID: ${id}`);
+      console.log(`=== FIN DB GET BINARY IMAGE (NON TROUVÉE) ===`);
       return null;
     }
 
@@ -445,16 +514,40 @@ export async function getBinaryImageById(id: number): Promise<{
     console.log(
       `DB: Image trouvée, MIME: ${row.mime_type}, nom: ${row.filename}`
     );
-    return {
+
+    // Vérifier si les données de l'image sont présentes
+    if (!row.image_data) {
+      console.log(`DB: Les données de l'image sont nulles ou vides`);
+      console.log(`=== FIN DB GET BINARY IMAGE (DONNÉES VIDES) ===`);
+      return null;
+    }
+
+    console.log(
+      `DB: Taille des données binaires: ${row.image_data.length} bytes`
+    );
+
+    const result = {
       image_data: Buffer.from(row.image_data),
       mime_type: row.mime_type,
       filename: row.filename,
     };
+
+    console.log(
+      `DB: Buffer créé avec succès, taille: ${result.image_data.length} bytes`
+    );
+    console.log(`=== FIN DB GET BINARY IMAGE (SUCCÈS) ===`);
+
+    return result;
   } catch (error) {
     console.error(
       "DB: Erreur lors de la récupération de l'image binaire:",
       error
     );
+    console.error(
+      "DB: Détails de l'erreur:",
+      error instanceof Error ? error.message : String(error)
+    );
+    console.log(`=== FIN DB GET BINARY IMAGE (ERREUR) ===`);
     throw error;
   }
 }
@@ -529,6 +622,10 @@ export async function updateRestaurant(
   photo_credit: string = ""
 ): Promise<Restaurant> {
   try {
+    console.log("=== DÉBUT DB UPDATE RESTAURANT ===");
+    console.log("ID du restaurant à mettre à jour:", id);
+    console.log("URL d'image reçue pour mise à jour:", image_url);
+
     // Vérifier si les colonnes website, instagram et photo_credit existent
     const checkColumnsResult = await sql`
       SELECT column_name 
@@ -544,10 +641,17 @@ export async function updateRestaurant(
     const hasInstagramColumn = existingColumns.includes("instagram");
     const hasPhotoCreditColumn = existingColumns.includes("photo_credit");
 
+    console.log("Colonnes existantes:", {
+      website: hasWebsiteColumn,
+      instagram: hasInstagramColumn,
+      photo_credit: hasPhotoCreditColumn,
+    });
+
     // Construire la requête SQL en fonction des colonnes existantes
     let query;
 
     if (hasWebsiteColumn && hasInstagramColumn && hasPhotoCreditColumn) {
+      console.log("Utilisation de la requête avec toutes les colonnes");
       // Toutes les colonnes existent
       query = sql<Restaurant>`
         UPDATE restaurants
@@ -569,6 +673,7 @@ export async function updateRestaurant(
         RETURNING *
       `;
     } else if (hasWebsiteColumn && hasInstagramColumn) {
+      console.log("Utilisation de la requête avec website et instagram");
       // Seulement website et instagram existent
       query = sql<Restaurant>`
         UPDATE restaurants
@@ -589,6 +694,9 @@ export async function updateRestaurant(
         RETURNING *
       `;
     } else {
+      console.log(
+        "Utilisation de la requête de base sans colonnes supplémentaires"
+      );
       // Aucune des colonnes n'existe
       query = sql<Restaurant>`
         UPDATE restaurants
@@ -608,10 +716,24 @@ export async function updateRestaurant(
       `;
     }
 
+    console.log("Exécution de la requête SQL de mise à jour");
     const { rows } = await query;
+
+    console.log("Restaurant mis à jour dans la base de données:", {
+      id: rows[0].id,
+      name: rows[0].name,
+      image: rows[0].image,
+      image_url: rows[0].image_url,
+    });
+    console.log("=== FIN DB UPDATE RESTAURANT ===");
+
     return rows[0];
   } catch (error) {
     console.error("Error updating restaurant:", error);
+    console.error(
+      "Détails de l'erreur:",
+      error instanceof Error ? error.message : String(error)
+    );
     throw error;
   }
 }
