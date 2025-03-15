@@ -599,7 +599,7 @@ export default function FilterBar({
                           key={cuisine}
                           className={`px-3 py-2 rounded-full text-sm transition-all duration-200 ${
                             selectedCuisines.includes(cuisine)
-                              ? "bg-[#D2C8BC] text-[#5D4D40] font-medium shadow-sm"
+                              ? "bg-[#7D9D74] text-white font-medium shadow-sm"
                               : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9] hover:shadow-sm"
                           }`}
                           onClick={() => toggleCuisine(cuisine)}
@@ -619,7 +619,7 @@ export default function FilterBar({
                           key={establishment}
                           className={`px-3 py-2 rounded-full text-sm transition-all duration-200 ${
                             selectedEstablishments.includes(establishment)
-                              ? "bg-[#E8E1D9] text-[#6B5D4F] font-medium shadow-sm"
+                              ? "bg-[#A3BF9B] text-[#5C7A53] font-medium shadow-sm"
                               : "bg-[#F5F2EE] text-[#8C7B6B] hover:bg-[#E8E1D9] hover:shadow-sm"
                           }`}
                           onClick={() => toggleEstablishment(establishment)}
@@ -656,10 +656,10 @@ export default function FilterBar({
                 </div>
                 <motion.button
                   onClick={() => setShowSuggestions(false)}
-                  className="px-6 py-2.5 bg-[#6B5D4F] text-white text-sm font-medium rounded-full hover:bg-[#5D4D40] transition-colors shadow-sm"
+                  className="px-6 py-2.5 bg-[#7D9D74] text-white text-sm font-medium rounded-full hover:bg-[#5C7A53] transition-colors shadow-sm"
                   whileHover={{
                     scale: 1.05,
-                    boxShadow: "0 4px 8px rgba(107, 93, 79, 0.2)",
+                    boxShadow: "0 4px 8px rgba(125, 157, 116, 0.2)",
                   }}
                   whileTap={{ scale: 0.97 }}
                 >

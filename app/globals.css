@@ -29,6 +29,12 @@
   --color-beige-medium: #e8e1d9;
   --color-beige-light: #f5f2ee;
   --color-beige-lighter: #fdfbf9;
+
+  /* Couleurs d'accentuation */
+  --color-accent: #7d9d74; /* Vert olive/sauge - couleur principale d'accentuation */
+  --color-accent-dark: #5c7a53; /* Version plus foncée pour les hover */
+  --color-accent-light: #a3bf9b; /* Version plus claire pour les éléments secondaires */
+  --color-accent-lighter: #e1ebd9; /* Version très claire pour les arrière-plans subtils */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -81,6 +87,24 @@ body {
 
   .custom-scrollbar {
     @apply scrollbar-thin scrollbar-thumb-[#D2C8BC] scrollbar-track-transparent;
+  }
+
+  /* Nouvelles classes utilisant la couleur d'accentuation */
+  .accent-button {
+    @apply px-4 py-2 bg-[#7D9D74] text-white uppercase tracking-wider text-xs font-medium transition-colors hover:bg-[#5C7A53];
+    border-radius: var(--button-border-radius);
+  }
+
+  .accent-text {
+    @apply text-[#7D9D74];
+  }
+
+  .accent-border {
+    @apply border border-[#7D9D74];
+  }
+
+  .accent-bg-light {
+    @apply bg-[#E1EBD9];
   }
 }
 

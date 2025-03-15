@@ -26,6 +26,12 @@ export default function Footer() {
           >
             Confidentialité
           </Link>
+          <Link
+            href="/accent-demo"
+            className="text-[#7D9D74] hover:text-[#5C7A53] transition-colors"
+          >
+            Démo Couleurs
+          </Link>
         </div>
         <div className="flex items-center">
           <span>© {new Date().getFullYear()} Taste Nantes</span>
