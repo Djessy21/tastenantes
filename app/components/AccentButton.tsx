@@ -37,10 +37,11 @@ const AccentButton: React.FC<AccentButtonProps> = ({
 
   // Ajouter les classes de variante
   const variantClasses = {
-    solid: "bg-[#7D9D74] text-white hover:bg-[#5C7A53]",
+    solid: "bg-accent text-white hover:bg-accent-dark",
     outline:
-      "bg-transparent border border-[#7D9D74] text-[#7D9D74] hover:bg-[#E1EBD9]",
-    light: "bg-[#E1EBD9] text-[#5C7A53] hover:bg-[#A3BF9B] hover:text-white",
+      "bg-transparent border border-accent text-accent hover:bg-accent-lighter",
+    light:
+      "bg-accent-lighter text-accent-dark hover:bg-accent-light hover:text-white",
   };
 
   const disabledClasses = disabled

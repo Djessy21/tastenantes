@@ -81,7 +81,7 @@ const AccentDemo: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-6 rounded-lg border border-[#E8E1D9] shadow-sm">
             <div className="flex items-center mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#E1EBD9] flex items-center justify-center text-[#7D9D74]">
+              <div className="w-10 h-10 rounded-full bg-accent-lighter flex items-center justify-center text-accent">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -109,9 +109,9 @@ const AccentDemo: React.FC = () => {
             </AccentButton>
           </div>
 
-          <div className="p-6 rounded-lg border border-[#7D9D74] shadow-sm">
+          <div className="p-6 rounded-lg border border-accent shadow-sm">
             <div className="flex items-center mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#7D9D74] flex items-center justify-center text-white">
+              <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -147,16 +147,16 @@ const AccentDemo: React.FC = () => {
           Badges et étiquettes
         </h3>
         <div className="flex flex-wrap gap-3">
-          <span className="px-2 py-1 text-xs rounded-full bg-[#E1EBD9] text-[#5C7A53]">
+          <span className="px-2 py-1 text-xs rounded-full bg-accent-lighter text-accent-dark">
             Nouveau
           </span>
-          <span className="px-2 py-1 text-xs rounded-full bg-[#7D9D74] text-white">
+          <span className="px-2 py-1 text-xs rounded-full bg-accent text-white">
             Populaire
           </span>
-          <span className="px-2 py-1 text-xs rounded-full border border-[#7D9D74] text-[#7D9D74]">
+          <span className="px-2 py-1 text-xs rounded-full border border-accent text-accent">
             Exclusif
           </span>
-          <span className="px-2 py-1 text-xs rounded-full bg-[#A3BF9B] text-white">
+          <span className="px-2 py-1 text-xs rounded-full bg-accent-light text-white">
             Recommandé
           </span>
         </div>
@@ -168,21 +168,18 @@ const AccentDemo: React.FC = () => {
         </h3>
         <p className="mb-2 text-[#8C7B6B]">
           Vous pouvez utiliser la couleur d'accentuation pour mettre en évidence
-          <span className="text-[#7D9D74] font-medium">
-            {" "}
-            des mots importants{" "}
-          </span>
+          <span className="text-accent font-medium"> des mots importants </span>
           dans votre texte ou pour créer des
           <a
             href="#"
-            className="text-[#7D9D74] hover:text-[#5C7A53] hover:underline"
+            className="text-accent hover:text-accent-dark hover:underline"
           >
             {" "}
             liens cliquables
           </a>
           .
         </p>
-        <div className="p-4 bg-[#E1EBD9] rounded-lg text-[#5C7A53] mt-4">
+        <div className="p-4 bg-accent-lighter rounded-lg text-accent-dark mt-4">
           Ce bloc utilise la couleur d'accentuation la plus claire comme
           arrière-plan.
         </div>
