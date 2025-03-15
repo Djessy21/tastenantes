@@ -7,7 +7,7 @@ import { CertifiedRestaurant } from "../types/restaurant";
 import { motion } from "framer-motion";
 import EditRestaurantModal from "./EditRestaurantModal";
 import PhotoCredit from "./PhotoCredit";
-import { getUncachedImageUrl, clearImageCache } from "../lib/utils";
+import { getUncachedImageUrl, clearImageCache } from "./utils";
 
 interface CertifiedRestaurantCardProps {
   restaurant: CertifiedRestaurant;
