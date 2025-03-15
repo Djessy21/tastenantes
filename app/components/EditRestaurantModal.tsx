@@ -5,7 +5,7 @@ import { CertifiedRestaurant } from "../types/restaurant";
 import ImageUpload from "./ImageUpload";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
-import { getUncachedImageUrl, clearImageCache } from "../lib/utils";
+import { getUncachedImageUrl, clearImageCache } from "@/app/lib/utils";
 
 interface EditRestaurantModalProps {
   isOpen: boolean;
@@ -180,10 +180,8 @@ export default function EditRestaurantModal({
       console.log("=== DÉBUT SOUMISSION DU FORMULAIRE ===");
       console.log("Restaurant actuel:", restaurant);
       console.log("Nouvelle image sélectionnée:", newImage ? "Oui" : "Non");
-      console.log("URL d'image temporaire:", formData.tempImageUrl);
 
-      let updatedImageUrl = formData.tempImageUrl || restaurant.image;
-      console.log("URL d'image initiale:", updatedImageUrl);
+      let updatedImageUrl = restaurant.image;
 
       // Si une nouvelle image a été sélectionnée, la télécharger
       if (newImage) {
@@ -197,9 +195,14 @@ export default function EditRestaurantModal({
         const imageFormData = new FormData();
         imageFormData.append("image", newImage);
         imageFormData.append("type", "restaurant");
-        imageFormData.append("uniqueId", `${restaurant.id}_${Date.now()}`);
+        // Ajouter un identifiant unique pour éviter les problèmes de cache
+        const uniqueId = `${restaurant.id}_${Date.now()}`;
+        imageFormData.append("uniqueId", uniqueId);
 
-        console.log("FormData créé pour l'upload de l'image");
+        console.log(
+          "FormData créé pour l'upload de l'image avec uniqueId:",
+          uniqueId
+        );
         console.log("Appel de l'API d'upload...");
 
         const imageResponse = await fetch("/api/upload", {
@@ -227,7 +230,7 @@ export default function EditRestaurantModal({
           return;
         }
       } else if (formData.tempImageUrl) {
-        // Utiliser l'URL temporaire telle quelle
+        // Utiliser l'URL temporaire si elle existe
         updatedImageUrl = formData.tempImageUrl;
         console.log(
           "Utilisation de l'URL d'image temporaire:",
@@ -307,13 +310,25 @@ export default function EditRestaurantModal({
         updatedRestaurant.image
       );
 
+      // Nettoyer le cache de l'image
+      if (updatedRestaurant.image) {
+        clearImageCache(updatedRestaurant.image);
+        console.log("Cache de l'image nettoyé:", updatedRestaurant.image);
+
+        // S'assurer que l'URL de l'image contient un timestamp pour forcer le rechargement
+        updatedRestaurant.image = getUncachedImageUrl(
+          updatedRestaurant.image,
+          true
+        );
+        console.log("URL d'image avec timestamp:", updatedRestaurant.image);
+      }
+
       // Appeler le callback avec le restaurant mis à jour
       onRestaurantUpdated(updatedRestaurant);
       onClose();
 
-      // Toujours recharger la page pour s'assurer que les changements sont visibles
-      console.log("Rechargement de la page pour afficher les modifications");
-      window.location.reload();
+      // Ne pas recharger la page complète, car cela peut interférer avec la mise à jour de l'image
+      console.log("Mise à jour effectuée sans rechargement de la page");
 
       console.log("=== FIN SOUMISSION DU FORMULAIRE ===");
     } catch (error) {
@@ -423,6 +438,8 @@ export default function EditRestaurantModal({
                             ? "API URL"
                             : imageUrl.startsWith("/uploads/")
                             ? "Upload URL"
+                            : imageUrl.startsWith("blob:")
+                            ? "Blob URL"
                             : "Autre type d'URL"
                         );
 
@@ -469,6 +486,56 @@ export default function EditRestaurantModal({
                             .catch((err) => {
                               console.error(
                                 "Erreur lors de la conversion de l'URL de données:",
+                                err
+                              );
+                              console.error(
+                                "Détails de l'erreur:",
+                                err instanceof Error ? err.message : String(err)
+                              );
+                            });
+                        } else if (imageUrl.startsWith("blob:")) {
+                          // Si c'est une URL de blob, la convertir en File
+                          console.log("Conversion de l'URL de blob en File");
+                          fetch(imageUrl)
+                            .then((res) => res.blob())
+                            .then((blob) => {
+                              // Créer un nom de fichier unique avec l'ID du restaurant
+                              const uniqueFileName = `restaurant_${
+                                restaurant.id
+                              }_${Date.now()}.jpg`;
+                              console.log(
+                                "Nom de fichier unique généré:",
+                                uniqueFileName
+                              );
+                              console.log(
+                                "Taille du blob:",
+                                blob.size,
+                                "Type du blob:",
+                                blob.type
+                              );
+
+                              const file = new File([blob], uniqueFileName, {
+                                type: blob.type || "image/jpeg",
+                              });
+                              console.log(
+                                "File créé à partir de l'URL de blob:",
+                                uniqueFileName
+                              );
+                              console.log(
+                                "Taille du fichier:",
+                                file.size,
+                                "Type du fichier:",
+                                file.type
+                              );
+
+                              handleImageChange(file);
+                              console.log(
+                                "handleImageChange appelé avec le fichier"
+                              );
+                            })
+                            .catch((err) => {
+                              console.error(
+                                "Erreur lors de la conversion de l'URL de blob:",
                                 err
                               );
                               console.error(

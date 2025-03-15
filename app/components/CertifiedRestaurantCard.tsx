@@ -7,6 +7,7 @@ import { CertifiedRestaurant } from "../types/restaurant";
 import { motion } from "framer-motion";
 import EditRestaurantModal from "./EditRestaurantModal";
 import PhotoCredit from "./PhotoCredit";
+import { getUncachedImageUrl, clearImageCache } from "@/app/lib/utils";
 
 interface CertifiedRestaurantCardProps {
   restaurant: CertifiedRestaurant;
@@ -32,6 +33,9 @@ export default function CertifiedRestaurantCard({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [dishesCount, setDishesCount] = useState<number>(0);
   const [dishesLoaded, setDishesLoaded] = useState<boolean>(false);
+  const [imageKey, setImageKey] = useState<string>(
+    `restaurant-image-${restaurant.id}`
+  );
 
   // Précharger les informations sur les plats en arrière-plan
   useEffect(() => {
@@ -77,6 +81,25 @@ export default function CertifiedRestaurantCard({
     }
   }, [showAddDishForm, dishesLoaded, restaurant.id]);
 
+  // Mettre à jour la clé de l'image lorsque le restaurant change
+  useEffect(() => {
+    // Générer une nouvelle clé pour forcer le rechargement de l'image uniquement si l'URL de l'image a changé
+    if (restaurant.image) {
+      // Précharger l'image pour accélérer l'affichage
+      const img = new Image();
+      img.src = restaurant.image;
+
+      // Ne générer une nouvelle clé que si l'URL de l'image a changé
+      setImageKey(
+        `restaurant-image-${restaurant.id}-${restaurant.image.split("?")[0]}`
+      );
+      console.log(
+        "Nouvelle clé d'image générée:",
+        `restaurant-image-${restaurant.id}-${restaurant.image.split("?")[0]}`
+      );
+    }
+  }, [restaurant.id, restaurant.image]);
+
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce restaurant ?")) {
@@ -115,9 +138,35 @@ export default function CertifiedRestaurantCard({
   };
 
   const handleRestaurantUpdated = (updatedRestaurant: CertifiedRestaurant) => {
-    // Pas besoin d'ajouter un timestamp, l'URL de l'image devrait déjà être unique
-    // grâce aux modifications dans EditRestaurantModal et ImageUpload
-    console.log("Restaurant mis à jour avec image:", updatedRestaurant.image);
+    console.log("Restaurant mis à jour:", updatedRestaurant);
+    console.log("Ancienne image:", restaurant.image);
+    console.log("Nouvelle image:", updatedRestaurant.image);
+
+    // Si l'image a changé, utiliser getUncachedImageUrl pour forcer le rechargement
+    if (
+      updatedRestaurant.image &&
+      updatedRestaurant.image !== restaurant.image
+    ) {
+      updatedRestaurant.image = getUncachedImageUrl(
+        updatedRestaurant.image,
+        true
+      );
+      console.log(
+        "URL d'image avec timestamp pour forcer le rechargement:",
+        updatedRestaurant.image
+      );
+
+      // Générer une nouvelle clé pour forcer le rechargement de l'image
+      const newKey = `restaurant-image-${updatedRestaurant.id}-${Date.now()}`;
+      console.log("Nouvelle clé d'image générée:", newKey);
+      setImageKey(newKey);
+
+      // Forcer le nettoyage du cache de l'image
+      clearImageCache(updatedRestaurant.image);
+      console.log("Cache de l'image nettoyé:", updatedRestaurant.image);
+    }
+
+    // Appeler le callback de mise à jour
     onUpdate?.(updatedRestaurant);
     setIsEditModalOpen(false);
   };
@@ -220,7 +269,12 @@ export default function CertifiedRestaurantCard({
                     src={restaurant.image}
                     alt={restaurant.name}
                     className="restaurant-image"
-                    key={`restaurant-image-${restaurant.id}-${restaurant.image}`}
+                    key={imageKey}
+                    loading="eager"
+                    decoding="sync"
+                    onLoad={() =>
+                      console.log("Image chargée:", restaurant.image)
+                    }
                     onError={(e) => {
                       console.error(
                         `Erreur de chargement de l'image: ${restaurant.image}`
