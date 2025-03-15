@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Dish } from "@/app/lib/db-edge";
+import { Dish } from "../lib/db-edge";
 import AddDishForm from "./AddDishForm";
 import { CertifiedRestaurant } from "../types/restaurant";
 import { motion } from "framer-motion";
 import EditRestaurantModal from "./EditRestaurantModal";
 import PhotoCredit from "./PhotoCredit";
-import { getUncachedImageUrl, clearImageCache } from "@/app/lib/utils";
+import { getUncachedImageUrl, clearImageCache } from "../lib/utils";
 
 interface CertifiedRestaurantCardProps {
   restaurant: CertifiedRestaurant;

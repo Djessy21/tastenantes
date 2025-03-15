@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Dish } from "@/app/lib/db-edge";
+import { Dish } from "../lib/db-edge";
 import PhotoCredit from "./PhotoCredit";
 import "./dish-animations.css";
 
