@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { CertifiedRestaurant } from "../types/restaurant";
 import ImageUpload from "./ImageUpload";
 import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
 
 interface EditRestaurantModalProps {
   isOpen: boolean;
@@ -18,6 +19,15 @@ export default function EditRestaurantModal({
   restaurant,
   onRestaurantUpdated,
 }: EditRestaurantModalProps) {
+  // État pour suivre si le composant est monté côté client
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Effet pour définir isMounted à true après le montage du composant
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
+
   // Liste des types de cuisine les plus répandus
   const cuisineTypes = [
     "Française",
@@ -217,9 +227,10 @@ export default function EditRestaurantModal({
 
   if (!isOpen) return null;
 
-  return (
+  // Utiliser un portail uniquement côté client
+  const modalContent = (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center">
         {/* Overlay avec flou */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -241,7 +252,7 @@ export default function EditRestaurantModal({
             stiffness: 350,
             damping: 25,
           }}
-          className="relative z-10 w-full max-w-2xl mx-4 bg-white rounded-xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          className="relative z-[10000] w-full max-w-2xl mx-4 bg-white rounded-xl shadow-2xl overflow-y-auto max-h-[90vh]"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
@@ -540,4 +551,7 @@ export default function EditRestaurantModal({
       </div>
     </AnimatePresence>
   );
+
+  // Rendre le contenu du modal dans un portail uniquement côté client
+  return isMounted ? createPortal(modalContent, document.body) : null;
 }
