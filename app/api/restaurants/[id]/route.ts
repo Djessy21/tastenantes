@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   getRestaurantById,
   updateRestaurant,
@@ -8,11 +8,14 @@ import {
 export const runtime = "edge";
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
+    const id = parseInt(params.id, 10);
+    const searchParams = request.nextUrl.searchParams;
+    const includeMenus = searchParams.get("includeMenus") === "true";
+
     if (isNaN(id)) {
       return NextResponse.json(
         { error: "Invalid restaurant ID" },
@@ -36,7 +39,18 @@ export async function GET(
       certifiedBy: restaurant.certified_by,
       certificationDate: restaurant.certification_date,
       specialNote: restaurant.special_note,
+      menus: [],
     };
+
+    // Assurer que l'image est accessible via la propriété 'image'
+    if (!transformedRestaurant.image && restaurant.image_url) {
+      transformedRestaurant.image = restaurant.image_url;
+    }
+
+    // Si aucune image n'est définie, utiliser une image statique
+    if (!transformedRestaurant.image) {
+      transformedRestaurant.image = `/default-restaurant.svg`;
+    }
 
     return NextResponse.json(transformedRestaurant);
   } catch (error) {

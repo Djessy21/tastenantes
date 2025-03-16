@@ -1,15 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 
-// Déclaration pour le contexte global
-declare global {
-  var prisma: PrismaClient | undefined;
-}
+// PrismaClient est attaché au scope global dans les environnements de développement pour éviter
+// d'épuiser la limite de connexions à la base de données.
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-// Création d'un singleton pour éviter les connexions multiples en développement
-export const prisma = global.prisma || new PrismaClient();
+export const prisma = globalForPrisma.prisma || new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
-  global.prisma = prisma;
-}
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export default prisma;

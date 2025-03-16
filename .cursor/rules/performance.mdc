@@ -1,0 +1,47 @@
+---
+description: "Performance Optimization Guidelines for Tastenantes project"
+globs: 
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+alwaysApply: false
+---
+
+# Performance Optimization Guidelines
+
+## React Server Components
+- Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC)
+- Use server components for data fetching when possible
+- Only use client components when necessary for interactivity
+- Follow the Next.js App Router architecture for optimal performance
+
+## Component Optimization
+- Wrap client components in Suspense with fallback
+- Use dynamic loading for non-critical components
+- Implement proper memoization with useMemo and useCallback
+- Avoid unnecessary re-renders
+
+## Image Optimization
+- Optimize images with next/image
+- Use WebP format for better compression
+- Include size data (width and height) to prevent layout shifts
+- Implement lazy loading for images below the fold
+
+## JavaScript Optimization
+- Minimize client-side JavaScript
+- Implement proper code splitting with dynamic imports
+- Use streaming where appropriate
+- Optimize bundle size with tree shaking
+
+## Caching and Data Fetching
+- Implement proper caching strategies
+- Use React Query or SWR for client-side data fetching
+- Leverage Next.js caching mechanisms
+- Implement incremental static regeneration when appropriate
+
+## Core Web Vitals
+- Optimize for Largest Contentful Paint (LCP)
+- Minimize Cumulative Layout Shift (CLS)
+- Improve First Input Delay (FID) and Interaction to Next Paint (INP)
+- Use the Web Vitals library to monitor performance 

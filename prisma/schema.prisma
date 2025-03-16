@@ -89,6 +89,7 @@ model Restaurant {
   phoneNumber       String?             @map("phone_number") @db.VarChar(20)
   dishes            Dish[]
   restaurant_images restaurant_images[]
+  menus             Menu[]              // Relation avec les menus
 
   @@map("restaurants")
 }
@@ -102,6 +103,7 @@ model Dish {
   imageUrl     String?     @map("image_url")
   createdAt    DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
   restaurant   Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  menuItems    MenuItem[]  // Relation avec les éléments de menu
 
   @@map("dishes")
 }
@@ -136,4 +138,70 @@ model ContactMessage {
   readAt    DateTime? @map("read_at") @db.Timestamptz(6)
 
   @@map("contact_messages")
+}
+
+// Nouveaux modèles pour le système de menu digital
+
+model Menu {
+  id           Int        @id @default(autoincrement())
+  restaurantId Int        @map("restaurant_id")
+  name         String     @db.VarChar(255)
+  description  String?    @db.Text
+  isActive     Boolean    @default(true) @map("is_active")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  categories   Category[]
+  qrCode       String?    @map("qr_code")
+  slug         String     @unique @db.VarChar(255)
+
+  @@map("menus")
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  menuId      Int        @map("menu_id")
+  name        String     @db.VarChar(255)
+  description String?    @db.Text
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  menu        Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  menuItems   MenuItem[]
+
+  @@map("categories")
+}
+
+model MenuItem {
+  id          Int       @id @default(autoincrement())
+  categoryId  Int       @map("category_id")
+  dishId      Int?      @map("dish_id")
+  name        String    @db.VarChar(255)
+  description String?   @db.Text
+  price       Decimal   @db.Decimal(10, 2)
+  imageUrl    String?   @map("image_url")
+  isAvailable Boolean   @default(true) @map("is_available")
+  isSpecial   Boolean   @default(false) @map("is_special")
+  order       Int       @default(0)
+  allergens   String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  dish        Dish?     @relation(fields: [dishId], references: [id], onDelete: SetNull)
+  options     Option[]
+
+  @@map("menu_items")
+}
+
+model Option {
+  id          Int      @id @default(autoincrement())
+  menuItemId  Int      @map("menu_item_id")
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  menuItem    MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@map("options")
 }
